@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\MasterPasswordController;
@@ -509,4 +510,7 @@ Route::get('/history/{id}', [MobileHistoryController::class, 'showHistory'])->na
 Route::get('/searchfilter', [MobileController::class, 'searchFilter'])->name('searchfilter');
 Route::get('/search-mobiles', [MobileController::class, 'apiSearchMobiles'])->name('api.searchMobiles');
 
-
+//Accounts Routes
+Route::get('/accounts/{id}', [AccountsController::class, 'showAccounts'])->name('showAccounts');
+Route::post('/credit', [AccountsController::class, 'creditAmount'])->name('creditAmount');
+Route::post('/debit', [AccountsController::class, 'debitAmount'])->name('debitAmount');

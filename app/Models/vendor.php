@@ -17,4 +17,8 @@ class vendor extends Model
     {
         return $this->hasMany(Mobile::class);
     }
+    public function accounts()
+{
+    return $this->hasMany(Accounts::class);
+}
 }

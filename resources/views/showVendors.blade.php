@@ -229,6 +229,7 @@
                                         <th>CNIC</th>
                                         <th>Sent to Vendor Mobiles</th>
                                         <th>Mobiles Receive From Vendor</th>
+                                        <th>Accounts</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -262,6 +263,11 @@
                                             <td>
                                                 <a href="{{ route('showVSHistory', $key->id) }}" class="btn btn-sm btn-danger">
                                                     <i class="fa fa-eye"></i>
+                                                </a>
+                                            </td>
+                                              <td>
+                                                <a href="{{ route('showAccounts', $key->id) }}" class="btn btn-sm btn-primary">
+                                                    <i class="fa fa-book"></i>
                                                 </a>
                                             </td>
                                             <td>
