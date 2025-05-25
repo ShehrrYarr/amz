@@ -12,22 +12,26 @@ class AccountsController extends Controller
     {
         $this->middleware('auth');
     }
-    public function showAccounts($id)
-    {
-        $accounts = Accounts::where('vendor_id', $id)->get();
-        $vendor = Vendor::find($id);
+   public function showAccounts($id)
+{
+    $accounts = Accounts::where('vendor_id', $id)->get();
+    $vendor = Vendor::find($id);
 
-        $formatted = $accounts->map(function ($item) {
-            return [
-                'created_at' => $item->created_at->format('Y-m-d H:i'),
-                'cr' => $item->category === 'CR' ? $item->amount : null,
-                'db' => $item->category === 'DB' ? $item->amount : null,
-                'description' => $item->description ?? '-',
-            ];
-        });
+    $formatted = $accounts->map(function ($item) {
+        return [
+            'created_at' => $item->created_at->format('Y-m-d H:i'),
+            'cr' => $item->category === 'CR' ? $item->amount : null,
+            'db' => $item->category === 'DB' ? $item->amount : null,
+            'description' => $item->description ?? '-',
+        ];
+    });
 
-        return view('showAccounts', compact('formatted', 'vendor'));
-    }
+    $totalCredit = $accounts->where('category', 'CR')->sum('amount');
+    $totalDebit = $accounts->where('category', 'DB')->sum('amount');
+
+    return view('showAccounts', compact('formatted', 'vendor', 'totalCredit', 'totalDebit'));
+}
+
 
     public function creditAmount(Request $request)
     {

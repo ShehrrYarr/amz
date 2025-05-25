@@ -182,6 +182,15 @@
                                             {{ number_format($formatted->sum('db'), ) }}
                                         </th>
                                     </tr>
+                                    <tr>
+                                        <th colspan="2">Net Balance</th>
+                                        <th colspan="2">
+                                            @php
+                                                $net = $totalCredit - $totalDebit;
+                                            @endphp
+                                            {{ $net >= 0 ? 'Vendor Owes You: ' . number_format($net) : 'You Owe Vendor: ' . number_format(abs($net)) }}
+                                        </th>
+                                    </tr>
                                 </tfoot>
                             </table>
                         </div>

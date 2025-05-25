@@ -41,6 +41,15 @@
                         </select>
                     </div>
                     <div class="col-md-4">
+                        <label>Availability</label>
+                        <select id="filterAvailability" class="form-control">
+                            <option value="">All</option>
+                            <option value="Available">Available</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Sold">Sold</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
                         <label>&nbsp;</label>
                         <button id="searchBtn" class="btn btn-primary btn-block">Search</button>
                     </div>
@@ -74,7 +83,7 @@
                                         <th>Availability</th>
                                         <th>Transfer</th>
                                         <th>Mobile History</th>
-                                        
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -93,53 +102,53 @@
         </div>
     </div>
     <script>
-$(document).ready(function() {
-    $('#searchBtn').on('click', function () {
-        let company = $('#filterCompany').val();
-        let group = $('#filterGroup').val();
+        $('#searchBtn').on('click', function () {
+            let company = $('#filterCompany').val();
+            let group = $('#filterGroup').val();
+            let availability = $('#filterAvailability').val();
 
-        $.ajax({
-            url: '{{ route("api.searchMobiles") }}',
-            method: 'GET',
-            data: {
-                company_id: company,
-                group_id: group
-            },
-            success: function(response) {
-                let tbody = $('#mobileTable tbody');
-                tbody.empty();
+            $.ajax({
+                url: '{{ route("api.searchMobiles") }}',
+                method: 'GET',
+                data: {
+                    company_id: company,
+                    group_id: group,
+                    availability: availability
+                },
+                success: function (response) {
+                    let tbody = $('#mobileTable tbody');
+                    tbody.empty();
 
-                if (response.length > 0) {
-                    $.each(response, function(index, mobile) {
-                        tbody.append(`
-                            <tr>
-                                <td>${mobile.created_at}</td>
-                                <td>${mobile.mobile_name}</td>
-                                <td>${mobile.company_name || '-'}</td>
-                                <td>${mobile.group_name || '-'}</td>
-                                <td>${mobile.vendor_name || '-'}</td>
-                                <td>${mobile.imei_number}</td>
-                                <td>${mobile.sim_lock}</td>
-                                <td>${mobile.color}</td>
-                                <td>${mobile.storage}</td>
-                                <td>${mobile.battery_health || '-'}</td>
-                                <td>${mobile.cost_price}</td>
-                                <td>${mobile.selling_price}</td>
-                                <td>${mobile.availability}</td>
-                                <td>${mobile.is_transfer ? 'Yes' : 'No'}</td>
-                               
-                                <td><a href="history/${mobile.id}" class="btn btn-sm btn-warning"> <i class="fa fa-eye"></i></a></td>
-                            </tr>
-                        `);
-                    });
-                } else {
-                    tbody.append('<tr><td colspan="16" class="text-center">No records found.</td></tr>');
+                    if (response.length > 0) {
+                        $.each(response, function (index, mobile) {
+                            tbody.append(`
+                                <tr>
+                                    <td>${mobile.created_at}</td>
+                                    <td>${mobile.mobile_name}</td>
+                                    <td>${mobile.company_name || '-'}</td>
+                                    <td>${mobile.group_name || '-'}</td>
+                                    <td>${mobile.vendor_name || '-'}</td>
+                                    <td>${mobile.imei_number}</td>
+                                    <td>${mobile.sim_lock}</td>
+                                    <td>${mobile.color}</td>
+                                    <td>${mobile.storage}</td>
+                                    <td>${mobile.battery_health || '-'}</td>
+                                    <td>${mobile.cost_price}</td>
+                                    <td>${mobile.selling_price}</td>
+                                    <td>${mobile.availability}</td>
+                                    <td>${mobile.is_transfer ? 'Yes' : 'No'}</td>
+                                    <td><a href="history/${mobile.id}" class="btn btn-sm btn-warning"> <i class="fa fa-eye"></i></a></td>
+                                </tr>
+                            `);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="16" class="text-center">No records found.</td></tr>');
+                    }
                 }
-            }
+            });
         });
-    });
-});
-</script>
+
+    </script>
 
 
 @endsection

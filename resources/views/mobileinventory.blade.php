@@ -110,7 +110,7 @@
 
                             <div class="mb-1">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="text" class="form-control"  name="password" required>
+                                <input type="text" class="form-control" name="password" required>
                             </div>
                         </div>
                         <div class="form-actions">
@@ -156,9 +156,9 @@
                                 <input class="form-control" type="hidden" name="id" id="did" value="Update">
                                 <input type="text" class="form-control" id="dmobile_name" name="mobile_name" readonly>
                             </div>
-                              <div class="mb-1">
+                            <div class="mb-1">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="text" class="form-control"  name="password" required>
+                                <input type="text" class="form-control" name="password" required>
                             </div>
 
 
@@ -223,9 +223,9 @@
                                 </select>
                             </div>
 
-                              <div class="mb-1">
+                            <div class="mb-1">
                                 <label for="vendor_id" class="form-label">Vendor</label>
-                                <select class="form-control" name="vendor_id" >
+                                <select class="form-control" name="vendor_id">
                                     <option value="">Select Vendor</option>
                                     @foreach ($vendors as $vendor)
                                         <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
@@ -236,7 +236,7 @@
                             <div class="mb-1">
                                 <label for="customer_name" class="form-label">Customer Name</label>
 
-                                <input type="text" class="form-control" id="customer_name" name="customer_name" >
+                                <input type="text" class="form-control" id="customer_name" name="customer_name">
                             </div>
 
                             <div class="mb-1" style="display: none">
@@ -350,8 +350,10 @@
 
                             <div class="mb-1">
                                 <label for="imei_number" class="form-label">IMEI Number</label>
-                                <input type="text" class="form-control" name="imei_number" required>
+                                <input type="text" class="form-control" name="imei_number" required pattern="\d{14}"
+                                    maxlength="14" minlength="14" title="IMEI number must be exactly 14 digits">
                             </div>
+
 
                             <div class="mb-1">
                                 <label for="sim_lock" class="form-label">SIM Lock</label>
@@ -597,9 +599,9 @@
                                             <td>{{ $key->battery_health }}</td>
                                             <td>{{ $key->cost_price }}</td>
                                             <td>{{ $key->selling_price }}</td>
-                                             <td>
-                                                <a href="{{ route('showHistory', $key->id) }}" class="btn btn-sm btn-warning" >
-                                                     <i class="fa fa-eye"></i>
+                                            <td>
+                                                <a href="{{ route('showHistory', $key->id) }}" class="btn btn-sm btn-warning">
+                                                    <i class="fa fa-eye"></i>
 
                                                 </a>
 

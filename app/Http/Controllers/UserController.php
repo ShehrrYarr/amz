@@ -24,41 +24,19 @@ class UserController extends Controller
         $userMobileCount = Mobile::where('availability', 'Available')
             ->where('is_transfer', false)->where('user_id', Auth::id())
             ->count();
-        // User Received Mobiles Count
-        $receivedMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
-            ->whereIn('id', function ($query) {
-                $query->select(\DB::raw('MAX(id)'))
-                    ->from('transfer_records')
-                    ->groupBy('mobile_id');
-            })
-            ->where('to_user_id', Auth::id())
-            ->whereHas('mobile', function ($query) {
-                $query->where('user_id', Auth::id())
-                    ->where('availability', 'Available')
-                    ->where('is_transfer', true);
-            })
-            ->count();
+      
 
         // User Sold Mobiles
-        $soldMobile = Mobile::where('user_id', auth()->user()->id)->where('availability', 'Sold')->where('is_approve','Not_Approved')->where('is_transfer', false)->count();
-                $pendingMobiles = Mobile::where('user_id', auth()->user()->id)->where('availability', 'Pending')->where('is_approve','Not_Approved')->where('is_transfer', false)->count();
+        $soldMobile = Mobile::where('user_id', auth()->user()->id)->where('availability', 'Sold')->where('is_approve', 'Not_Approved')->where('is_transfer', false)->count();
+        $pendingMobiles = Mobile::where('user_id', auth()->user()->id)
+        ->where('availability', 'Pending')->where('is_approve', 'Not_Approved')
+        ->where('is_transfer', false)->count();
+         $pendingMobilesCost = Mobile::where('user_id', auth()->user()->id)
+        ->where('availability', 'Pending')->where('is_approve', 'Not_Approved')
+        ->where('is_transfer', false) ->sum('cost_price');
 
         // Received sold mobiles
-        $receivedSoldMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
-            ->whereIn('id', function ($query) {
-                $query->select(\DB::raw('MAX(id)'))
-                    ->from('transfer_records')
-                    ->groupBy('mobile_id');
-            })
-            ->where('to_user_id', Auth::id())
-            ->whereHas('mobile', function ($query) {
-                $query->where('user_id', Auth::id())
-                    ->where('availability', 'Sold')->where('is_approve','Not_Approved');
-            })
-            ->whereHas('mobile', function ($query) {
-                $query->where('is_transfer', true);
-            })
-            ->count();
+       
         // Total Cost Price
         $totalCostPrice = DB::table('mobiles')
             ->where('user_id', auth()->user()->id)
@@ -74,7 +52,7 @@ class UserController extends Controller
             ->selectRaw('SUM(cost_price) as total_cost, SUM(selling_price) as total_selling_price')
             ->first();
 
-            $totalSellingPrice = $totals->total_selling_price;
+        $totalSellingPrice = $totals->total_selling_price;
         // $totalCost = $totals->total_cost;
 
         //total received mobile cost
@@ -86,12 +64,12 @@ class UserController extends Controller
                         ->whereColumn('mobile_id', 'mobiles.id');
                 });
         })
-        ->where('mobiles.user_id', auth()->id())
-        ->where('mobiles.availability', 'Available')
-        ->where('mobiles.is_transfer', true)
-        ->sum('mobiles.cost_price');
-        
-         //Weekly Profit
+            ->where('mobiles.user_id', auth()->id())
+            ->where('mobiles.availability', 'Available')
+            ->where('mobiles.is_transfer', true)
+            ->sum('mobiles.cost_price');
+
+        //Weekly Profit
         $startOfWeek = Carbon::now()->startOfWeek(Carbon::FRIDAY);
         $endOfWeek = Carbon::now()->endOfWeek(Carbon::FRIDAY);
 
@@ -101,30 +79,16 @@ class UserController extends Controller
             ->where('is_approve', 'Not_Approved')
             ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
             ->sum('selling_price') - Mobile::where('user_id', auth()->user()->id)
-            ->where('availability', 'Sold')
-            ->where('is_transfer', false)
-            ->where('is_approve', 'Not_Approved')
-            ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
-            ->sum('cost_price');
-            
-            $receivedPendingMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
-            ->whereIn('id', function ($query) {
-                $query->select(\DB::raw('MAX(id)'))
-                    ->from('transfer_records')
-                    ->groupBy('mobile_id');
-            })
-            ->where('to_user_id', Auth::id())
-            ->whereHas('mobile', function ($query) {
-                $query->where('user_id', Auth::id())
-                    ->where('availability', 'Pending')->where('is_approve','Not_Approved');
-            })
-            ->whereHas('mobile', function ($query) {
-                $query->where('is_transfer', true);
-            })
-            ->count();
+                ->where('availability', 'Sold')
+                ->where('is_transfer', false)
+                ->where('is_approve', 'Not_Approved')
+                ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
+                ->sum('cost_price');
+
+        
 
 
-        return view('user_dashboard', compact('userMobileCount', 'receivedMobiles', 'soldMobile', 'receivedSoldMobiles', 'totalCostPrice', 'totalSellingPrice','sumCostPrice','profit','pendingMobiles','receivedPendingMobiles'));
+        return view('user_dashboard', compact('userMobileCount',  'soldMobile', 'totalCostPrice', 'totalSellingPrice', 'sumCostPrice', 'profit', 'pendingMobiles','pendingMobilesCost'));
     }
 
     /**
