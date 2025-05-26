@@ -267,7 +267,7 @@
                             </div>
                             <div class="mb-1" style="display: none">
                                 <label for="battery_health" class="form-label">Battery Health</label>
-                                <input type="text" class="form-control" id="sbattery_health" name="battery_health" required>
+                                <input type="text" class="form-control" id="sbattery_health" name="battery_health">
                             </div>
 
                             <div class="mb-1" style="display: none">
