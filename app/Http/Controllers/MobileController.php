@@ -17,6 +17,7 @@ use App\Exports\SoldMobilesExport;
 use App\Models\Restore;
 use App\Models\MobileHistory;
 use App\Models\vendor;
+use App\Models\Accounts;
 
 
 
@@ -78,8 +79,19 @@ class MobileController extends Controller
 
         $mobile->save();
 
+        // Create account entry if vendor is involved
+        if ($mobile->vendor_id) {
+            Accounts::create([
+                'vendor_id' => $mobile->vendor_id,
+                'category' => 'DB',
+                'amount' => $mobile->cost_price,
+                'description' => 'Purchased ' . $mobile->mobile_name,
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Mobile created successfully.');
     }
+
 
 
     public function editMobile($id)
@@ -97,86 +109,136 @@ class MobileController extends Controller
 
 
 
-    //    public function sellMobile(Request $request)
-// {
-//     $data = Mobile::findOrFail($request->id);
+    public function sellMobile(Request $request)
+{
+    if ($request->availability == 'Available') {
+        return redirect()->back()->with('danger', 'Please select a different availability option.');
+    }
+
+    if (!$request->filled('customer_name') && !$request->filled('vendor_id')) {
+        return redirect()->back()->with('danger', 'Enter customer name or select a vendor.');
+    }
+
+    $data = Mobile::findOrFail($request->id);
+
+    // Handle vendor sale
+    if ($request->filled('vendor_id')) {
+        $data->sold_vendor_id = $request->vendor_id;
+
+        $vendor = Vendor::find($request->vendor_id);
+        $historyVendorName = $vendor ? $vendor->name : 'Unknown Vendor';
+        $data->customer_name = $historyVendorName;
+
+        $sellingPrice = (float) $request->selling_price;
+        $paidAmount = (float) $request->pay_amount;
+        $mobileName = $data->mobile_name;
+
+        // ✅ 1. Record the full amount vendor has to pay (Debit)
+        if ($sellingPrice > 0) {
+            Accounts::create([
+                'vendor_id' => $request->vendor_id,
+                'category' => 'DB',
+                'amount' => $sellingPrice,
+                'description' => "Vendor purchase: Mobile {$mobileName}",
+            ]);
+        }
+
+        // ✅ 2. Record the amount vendor actually paid (Credit)
+        if ($paidAmount > 0) {
+            Accounts::create([
+                'vendor_id' => $request->vendor_id,
+                'category' => 'CR',
+                'amount' => $paidAmount,
+                'description' => "Vendor paid: Mobile {$mobileName}",
+            ]);
+        }
+    } else {
+        // Handle customer sale
+        $data->customer_name = $request->input('customer_name');
+        $data->sold_vendor_id = null;
+    }
+
+    // Common sale data
+    $data->selling_price = $request->input('selling_price');
+    $data->availability = $request->input('availability');
+    $data->sold_at = Carbon::now();
+    $data->is_approve = $request->input('is_approve');
+    $data->save();
+
+    // History entry
+    $historyCustomerName = $data->sold_vendor_id
+        ? ($vendor ? $vendor->name : 'Unknown Vendor')
+        : $data->customer_name;
+
+    MobileHistory::create([
+        'mobile_id' => $data->id,
+        'mobile_name' => $data->mobile_name,
+        'customer_name' => $historyCustomerName,
+        'battery_health' => $data->battery_health,
+        'cost_price' => $data->cost_price,
+        'selling_price' => $data->selling_price,
+        'availability_status' => $data->availability,
+    ]);
+
+    return redirect()->back()->with('success', 'Mobile status changed successfully.');
+}
+
+
+
+    // public function sellMobile(Request $request)
+    // {
+
+    //     if ($request->availability == 'Available') {
+    //         return redirect()->back()->with('danger', 'please select a different option');
+    //     }
+
+    //     if (!$request->filled('customer_name') && !$request->filled('vendor_id')) {
+    //         return redirect()->back()->with('danger', 'Enter customer name or select a vendor.');
+    //     }
+
+    //     $data = Mobile::findOrFail($request->id);
+
+    //     // Check if vendor_id is present
+    //     if ($request->filled('vendor_id')) {
+    //         // Vendor sale
+    //         $data->sold_vendor_id = $request->vendor_id;
+    //         $vendorName = vendor::find($data->sold_vendor_id);
+    //         $historyVendorName = $vendorName ? $vendorName->name : 'Unknown Vendor';
+    //         $data->customer_name = $historyVendorName; // Optional: clear customer field if vendor sale
+    //     } else {
+    //         // Customer sale
+    //         $data->customer_name = $request->input('customer_name');
+    //         $data->sold_vendor_id = null; // Optional: clear vendor field if customer sale
+    //     }
 
     //     $data->selling_price = $request->input('selling_price');
-//     $data->availability = $request->input('availability');
-//     $data->customer_name = $request->input('customer_name');
-//     $data->sold_at = Carbon::now();
-//     $data->is_approve = $request->input('is_approve');
+    //     $data->availability = $request->input('availability');
+    //     $data->sold_at = Carbon::now();
+    //     $data->is_approve = $request->input('is_approve');
 
     //     $data->save();
 
+    //     // Determine customer name for history
+    //     if ($data->sold_vendor_id) {
+    //         $vendor = vendor::find($data->sold_vendor_id);
+    //         $historyCustomerName = $vendor ? $vendor->name : 'Unknown Vendor';
+    //     } else {
+    //         $historyCustomerName = $data->customer_name;
+    //     }
+
     //     // Save history record
-//     MobileHistory::create([
-//         'mobile_id' => $data->id,
-//         'mobile_name' => $data->mobile_name,
-//         'customer_name' => $data->customer_name,
-//         'battery_health' => $data->battery_health,
-//         'cost_price' => $data->cost_price,
-//         'selling_price' => $data->selling_price,
-//         'availability_status' => $data->availability,
-//     ]);
+    //     MobileHistory::create([
+    //         'mobile_id' => $data->id,
+    //         'mobile_name' => $data->mobile_name,
+    //         'customer_name' => $historyCustomerName,
+    //         'battery_health' => $data->battery_health,
+    //         'cost_price' => $data->cost_price,
+    //         'selling_price' => $data->selling_price,
+    //         'availability_status' => $data->availability,
+    //     ]);
 
-    //     return redirect()->back()->with('success', 'Mobile Sold successfully.');
-// }
-
-    public function sellMobile(Request $request)
-    {
-
-        if ($request->availability == 'Available') {
-            return redirect()->back()->with('danger', 'please select a different option');
-        }
-
-        if (!$request->filled('customer_name') && !$request->filled('vendor_id')) {
-            return redirect()->back()->with('danger', 'Enter customer name or select a vendor.');
-        }
-
-        $data = Mobile::findOrFail($request->id);
-
-        // Check if vendor_id is present
-        if ($request->filled('vendor_id')) {
-            // Vendor sale
-            $data->sold_vendor_id = $request->vendor_id;
-            $vendorName = vendor::find($data->sold_vendor_id);
-            $historyVendorName = $vendorName ? $vendorName->name : 'Unknown Vendor';
-            $data->customer_name = $historyVendorName; // Optional: clear customer field if vendor sale
-        } else {
-            // Customer sale
-            $data->customer_name = $request->input('customer_name');
-            $data->sold_vendor_id = null; // Optional: clear vendor field if customer sale
-        }
-
-        $data->selling_price = $request->input('selling_price');
-        $data->availability = $request->input('availability');
-        $data->sold_at = Carbon::now();
-        $data->is_approve = $request->input('is_approve');
-
-        $data->save();
-
-        // Determine customer name for history
-        if ($data->sold_vendor_id) {
-            $vendor = vendor::find($data->sold_vendor_id);
-            $historyCustomerName = $vendor ? $vendor->name : 'Unknown Vendor';
-        } else {
-            $historyCustomerName = $data->customer_name;
-        }
-
-        // Save history record
-        MobileHistory::create([
-            'mobile_id' => $data->id,
-            'mobile_name' => $data->mobile_name,
-            'customer_name' => $historyCustomerName,
-            'battery_health' => $data->battery_health,
-            'cost_price' => $data->cost_price,
-            'selling_price' => $data->selling_price,
-            'availability_status' => $data->availability,
-        ]);
-
-        return redirect()->back()->with('success', 'Mobile status changed successfully.');
-    }
+    //     return redirect()->back()->with('success', 'Mobile status changed successfully.');
+    // }
 
     public function updateMobile(Request $request)
     {

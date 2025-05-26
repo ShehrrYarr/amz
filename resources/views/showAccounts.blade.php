@@ -166,8 +166,12 @@
                                         <tr>
                                             <td>{{ $row['created_at'] }}</td>
                                             <td>{{ $row['description'] }}</td>
-                                            <td>{{ $row['cr'] !== null ? number_format($row['cr'], ) : '-' }}</td>
-                                            <td>{{ $row['db'] !== null ? '-' . number_format($row['db'], ) : '-' }}</td>
+                                            <td>
+                                                {{ $row['cr'] !== null ? number_format($row['cr'], 2) : '-' }}
+                                            </td>
+                                            <td style="color: red;">
+                                                {{ $row['db'] !== null ? '-' . number_format($row['db'], 2) : '-' }}
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -176,24 +180,35 @@
                                         <th>Total</th>
                                         <th></th>
                                         <th>
-                                            {{ number_format($formatted->sum('cr'), ) }}
+                                            {{ number_format($totalCredit, 2) }}
                                         </th>
                                         <th>
-                                            {{ number_format($formatted->sum('db'), ) }}
+                                            {{ number_format($totalDebit, 2) }}
                                         </th>
                                     </tr>
                                     <tr>
                                         <th colspan="2">Net Balance</th>
                                         <th colspan="2">
                                             @php
+                                                // Net = Credits - Debits
                                                 $net = $totalCredit - $totalDebit;
                                             @endphp
-                                            {{ $net >= 0 ? 'Vendor Owes You: ' . number_format($net) : 'You Owe Vendor: ' . number_format(abs($net)) }}
+
+                                            @if ($net > 0)
+                                                <span class="badge bg-primary">Vendor Owes You:
+                                                    {{ number_format($net, 2) }}</span>
+                                            @elseif ($net < 0)
+                                                <span class="badge bg-danger">You Owe Vendor:
+                                                    {{ number_format(abs($net), 2) }}</span>
+                                            @else
+                                                <span class="badge bg-secondary">No Balance</span>
+                                            @endif
                                         </th>
                                     </tr>
                                 </tfoot>
                             </table>
                         </div>
+
 
                     </div>
                 </div>

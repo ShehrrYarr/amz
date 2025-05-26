@@ -233,6 +233,12 @@
                                 </select>
                             </div>
 
+                            <div class="mb-1" id="payAmountContainer" style="display: none;">
+                                <label for="pay_amount" class="form-label">Pay Amount</label>
+                                <input type="number" class="form-control" name="pay_amount" id="pay_amount">
+                            </div>
+
+
                             <div class="mb-1">
                                 <label for="customer_name" class="form-label">Customer Name</label>
 
@@ -829,22 +835,21 @@
         }, 5000); // 15 seconds in milliseconds
         //End Message Time Out
 
-        // //Moment Library
-        // $(document).ready(function() {
-        //     // Initialize DataTable
-        //     var table = $('.table').DataTable();
+        $(document).ready(function () {
+            $('select[name="vendor_id"]').on('change', function () {
+                let vendorSelected = $(this).val();
 
-        //     // Update "Added at" column with formatted dates
-        //     table.columns().every(function() {
-        //         var column = this;
-        //         if (column.header().textContent === 'Added at') {
-        //             column.nodes().to$().each(function(cell, index) {
-        //                 var originalDate = $(cell).text();
-        //                 var formattedDate = moment(originalDate).format('MMMM Do YYYY, h:mm:ss a');
-        //                 $(cell).text(formattedDate);
-        //             });
-        //         }
-        //     });
-        // });
+                if (vendorSelected) {
+                    // Vendor selected: Hide customer_name and show pay_amount
+                    $('#customer_name').closest('.mb-1').hide();
+                    $('#payAmountContainer').show();
+                } else {
+                    // Vendor not selected: Show customer_name and hide pay_amount
+                    $('#customer_name').closest('.mb-1').show();
+                    $('#payAmountContainer').hide();
+                }
+            });
+        });
+
     </script>
 @endsection

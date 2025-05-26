@@ -12,25 +12,69 @@ class AccountsController extends Controller
     {
         $this->middleware('auth');
     }
-   public function showAccounts($id)
-{
-    $accounts = Accounts::where('vendor_id', $id)->get();
-    $vendor = Vendor::find($id);
 
-    $formatted = $accounts->map(function ($item) {
-        return [
-            'created_at' => $item->created_at->format('Y-m-d H:i'),
-            'cr' => $item->category === 'CR' ? $item->amount : null,
-            'db' => $item->category === 'DB' ? $item->amount : null,
-            'description' => $item->description ?? '-',
-        ];
-    });
 
-    $totalCredit = $accounts->where('category', 'CR')->sum('amount');
-    $totalDebit = $accounts->where('category', 'DB')->sum('amount');
+    //    public function showAccounts($id)
+// {
+//     $accounts = Accounts::where('vendor_id', $id)->get();
+//     $vendor = Vendor::find($id);
 
-    return view('showAccounts', compact('formatted', 'vendor', 'totalCredit', 'totalDebit'));
-}
+    //     $formatted = $accounts->map(function ($item) {
+//         return [
+//             'created_at' => $item->created_at->format('Y-m-d H:i'),
+//             'cr' => $item->category === 'CR' ? $item->amount : null,
+//             'db' => $item->category === 'DB' ? $item->amount : null,
+//             'description' => $item->description ?? '-',
+//         ];
+//     });
+
+    //     $totalCredit = $accounts->where('category', 'CR')->sum('amount');
+//     $totalDebit = $accounts->where('category', 'DB')->sum('amount');
+
+    //     return view('showAccounts', compact('formatted', 'vendor', 'totalCredit', 'totalDebit'));
+// }
+
+    public function showAccounts($id)
+    {
+        $accounts = Accounts::where('vendor_id', $id)->get();
+        $vendor = Vendor::find($id);
+
+        $formatted = $accounts->map(function ($item) {
+            return [
+                'created_at' => $item->created_at->format('Y-m-d H:i'),
+                'cr' => $item->category === 'CR' ? $item->amount : null,
+                'db' => $item->category === 'DB' ? $item->amount : null,
+                'description' => $item->description ?? '-',
+            ];
+        });
+
+        $totalCredit = $accounts->where('category', 'CR')->sum('amount');
+        $totalDebit = $accounts->where('category', 'DB')->sum('amount');
+
+        // Fallback for PHP 7.x using strpos instead of str_starts_with
+        $purchaseFromVendor = $accounts->filter(function ($a) {
+            return $a->category === 'DB' && strpos($a->description, 'Purchased') === 0;
+        })->sum('amount');
+
+        $vendorSales = $accounts->filter(function ($a) {
+            return $a->category === 'CR' && strpos($a->description, 'Vendor purchase') === 0;
+        })->sum('amount');
+
+        $vendorPayments = $accounts->filter(function ($a) {
+            return $a->category === 'CR' && strpos($a->description, 'Vendor paid') === 0;
+        })->sum('amount');
+
+        $netBalance = $vendorSales + $vendorPayments - $purchaseFromVendor;
+
+        return view('showAccounts', compact(
+            'formatted',
+            'vendor',
+            'totalCredit',
+            'totalDebit',
+            'netBalance'
+        ));
+    }
+
 
 
     public function creditAmount(Request $request)
