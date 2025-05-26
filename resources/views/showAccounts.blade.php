@@ -157,8 +157,9 @@
                                     <tr>
                                         <th>Date</th>
                                         <th>Description</th>
-                                        <th>Credit (CR)</th>
                                         <th>Debit (DB)</th>
+                                        <th>Credit (CR)</th>
+                                        <th>Balance</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -166,39 +167,51 @@
                                         <tr>
                                             <td>{{ $row['created_at'] }}</td>
                                             <td>{{ $row['description'] }}</td>
+
+                                            {{-- Debit --}}
+                                            <td class="text-danger">
+                                                {{ $row['db'] !== null ? number_format($row['db'], 2) : '-' }}
+                                            </td>
+                                            {{-- Credit --}}
                                             <td>
                                                 {{ $row['cr'] !== null ? number_format($row['cr'], 2) : '-' }}
                                             </td>
-                                            <td style="color: red;">
-                                                {{ $row['db'] !== null ? '-' . number_format($row['db'], 2) : '-' }}
+
+
+                                            {{-- Running Balance --}}
+                                            <td
+                                                class="{{ $row['balance'] > 0 ? 'text-danger' : ($row['balance'] < 0 ? 'text-primary' : '') }}">
+                                                {{ number_format($row['balance'], 2) }}
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
+
                                 <tfoot>
                                     <tr>
-                                        <th>Total</th>
+                                        <th colspan="2" class="text-end">Total Credit:</th>
+                                        <th>{{ number_format($totalCredit, 2) }}</th>
+                                        <th>-</th>
                                         <th></th>
-                                        <th>
-                                            {{ number_format($totalCredit, 2) }}
-                                        </th>
-                                        <th>
-                                            {{ number_format($totalDebit, 2) }}
-                                        </th>
                                     </tr>
                                     <tr>
-                                        <th colspan="2">Net Balance</th>
-                                        <th colspan="2">
-                                            @php
-                                                // Net = Credits - Debits
-                                                $net = $totalCredit - $totalDebit;
-                                            @endphp
+                                        <th colspan="2" class="text-end">Total Debit:</th>
+                                        <th>-</th>
+                                        <th>{{ number_format($totalDebit, 2) }}</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="4" class="text-end">Net Balance:</th>
+                                        <th>
+                                            @php $net = $netBalance ?? 0; @endphp
 
                                             @if ($net > 0)
                                                 <span class="badge bg-primary">Vendor Owes You:
+
                                                     {{ number_format($net, 2) }}</span>
                                             @elseif ($net < 0)
                                                 <span class="badge bg-danger">You Owe Vendor:
+
                                                     {{ number_format(abs($net), 2) }}</span>
                                             @else
                                                 <span class="badge bg-secondary">No Balance</span>
@@ -208,8 +221,6 @@
                                 </tfoot>
                             </table>
                         </div>
-
-
                     </div>
                 </div>
 

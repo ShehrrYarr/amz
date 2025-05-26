@@ -55,6 +55,87 @@ class MobileController extends Controller
 
 
 
+    // public function storeMobile(Request $request)
+    // {
+    //     $validatedData = $request->validate([
+    //         'mobile_name' => 'required',
+    //         'imei_number' => 'required',
+    //         'sim_lock' => 'required|in:J.V,PTA,Non-PTA',
+    //         'color' => 'required',
+    //         'storage' => 'required',
+    //         'cost_price' => 'required|numeric',
+    //         'selling_price' => 'required|numeric',
+    //         'company_id' => 'required|exists:companies,id',
+    //         'group_id' => 'required|exists:groups,id',
+    //         'vendor_id' => 'nullable|exists:vendors,id',
+    //     ]);
+
+    //     $mobile = new Mobile($validatedData);
+    //     $mobile->user()->associate(auth()->user());
+    //     $mobile->original_owner()->associate(auth()->user());
+    //     $mobile->battery_health = $request->battery_health;
+    //     $mobile->availability = 'Available';
+    //     $mobile->is_approve = 'Not_Approved';
+
+    //     $mobile->save();
+
+    //     // Create account entry if vendor is involved
+    //     if ($mobile->vendor_id) {
+    //         Accounts::create([
+    //             'vendor_id' => $mobile->vendor_id,
+    //             'category' => 'DB',
+    //             'amount' => $mobile->cost_price,
+    //             'description' => 'Purchased ' . $mobile->mobile_name,
+    //         ]);
+    //     }
+
+    //     return redirect()->back()->with('success', 'Mobile created successfully.');
+    // }
+
+    // public function storeMobile(Request $request)
+    // {
+    //     $validatedData = $request->validate([
+    //         'mobile_name' => 'required',
+    //         'imei_number' => 'required',
+    //         'sim_lock' => 'required|in:J.V,PTA,Non-PTA',
+    //         'color' => 'required',
+    //         'storage' => 'required',
+    //         'cost_price' => 'required|numeric',
+    //         'selling_price' => 'required|numeric',
+    //         'company_id' => 'required|exists:companies,id',
+    //         'group_id' => 'required|exists:groups,id',
+    //         'vendor_id' => 'nullable|exists:vendors,id',
+    //     ]);
+
+    //     $mobile = new Mobile($validatedData);
+    //     $mobile->user()->associate(auth()->user());
+    //     $mobile->original_owner()->associate(auth()->user());
+    //     $mobile->battery_health = $request->battery_health;
+    //     $mobile->availability = 'Available';
+    //     $mobile->is_approve = 'Not_Approved';
+    //     $mobile->save();
+
+    //     // Account entry if vendor is involved
+    //     if ($mobile->vendor_id) {
+    //         // Get the last balance
+    //         $lastEntry = Accounts::where('vendor_id', $mobile->vendor_id)->latest()->first();
+    //         $previousBalance = $lastEntry ? $lastEntry->balance : 0;
+
+    //         $debitAmount = $mobile->cost_price;
+    //         $newBalance = $previousBalance + $debitAmount;
+
+    //         Accounts::create([
+    //             'vendor_id' => $mobile->vendor_id,
+    //             'category' => 'DB', // Debit
+    //             'amount' => $debitAmount,
+    //             'balance' => $newBalance,
+    //             'description' => 'Purchased ' . $mobile->mobile_name,
+    //         ]);
+    //     }
+
+    //     return redirect()->back()->with('success', 'Mobile created and account updated successfully.');
+    // }
+
     public function storeMobile(Request $request)
     {
         $validatedData = $request->validate([
@@ -76,21 +157,26 @@ class MobileController extends Controller
         $mobile->battery_health = $request->battery_health;
         $mobile->availability = 'Available';
         $mobile->is_approve = 'Not_Approved';
-
         $mobile->save();
 
-        // Create account entry if vendor is involved
-        if ($mobile->vendor_id) {
+        // If bought from vendor, create DB entry
+        if ($request->filled('vendor_id')) {
+            $vendorId = $request->vendor_id;
+            $cost = $request->cost_price;
+            $vendor = Vendor::find($vendorId);
+            $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
+
             Accounts::create([
-                'vendor_id' => $mobile->vendor_id,
-                'category' => 'DB',
-                'amount' => $mobile->cost_price,
-                'description' => 'Purchased ' . $mobile->mobile_name,
+                'vendor_id' => $vendorId,
+                'category' => 'CR',
+                'amount' => $cost,
+                'description' => "Purchased mobile: {$mobile->mobile_name}",
             ]);
         }
 
-        return redirect()->back()->with('success', 'Mobile created successfully.');
+        return redirect()->back()->with('success', 'Mobile created and account updated successfully.');
     }
+
 
 
 
@@ -106,82 +192,174 @@ class MobileController extends Controller
         return response()->json(['result' => $filterId]);
 
     }
-
-
-
     public function sellMobile(Request $request)
-{
-    if ($request->availability == 'Available') {
-        return redirect()->back()->with('danger', 'Please select a different availability option.');
-    }
-
-    if (!$request->filled('customer_name') && !$request->filled('vendor_id')) {
-        return redirect()->back()->with('danger', 'Enter customer name or select a vendor.');
-    }
-
-    $data = Mobile::findOrFail($request->id);
-
-    // Handle vendor sale
-    if ($request->filled('vendor_id')) {
-        $data->sold_vendor_id = $request->vendor_id;
-
-        $vendor = Vendor::find($request->vendor_id);
-        $historyVendorName = $vendor ? $vendor->name : 'Unknown Vendor';
-        $data->customer_name = $historyVendorName;
-
-        $sellingPrice = (float) $request->selling_price;
-        $paidAmount = (float) $request->pay_amount;
-        $mobileName = $data->mobile_name;
-
-        // ✅ 1. Record the full amount vendor has to pay (Debit)
-        if ($sellingPrice > 0) {
-            Accounts::create([
-                'vendor_id' => $request->vendor_id,
-                'category' => 'DB',
-                'amount' => $sellingPrice,
-                'description' => "Vendor purchase: Mobile {$mobileName}",
-            ]);
+    {
+        if ($request->availability == 'Available') {
+            return redirect()->back()->with('danger', 'Please select a different availability option.');
         }
 
-        // ✅ 2. Record the amount vendor actually paid (Credit)
-        if ($paidAmount > 0) {
-            Accounts::create([
-                'vendor_id' => $request->vendor_id,
-                'category' => 'CR',
-                'amount' => $paidAmount,
-                'description' => "Vendor paid: Mobile {$mobileName}",
-            ]);
+        if (!$request->filled('customer_name') && !$request->filled('vendor_id')) {
+            return redirect()->back()->with('danger', 'Enter customer name or select a vendor.');
         }
-    } else {
-        // Handle customer sale
-        $data->customer_name = $request->input('customer_name');
-        $data->sold_vendor_id = null;
+
+        $data = Mobile::findOrFail($request->id);
+
+        if ($request->filled('vendor_id')) {
+            $vendorId = $request->vendor_id;
+            $data->sold_vendor_id = $vendorId;
+
+            $vendor = Vendor::find($vendorId);
+            $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
+            $data->customer_name = $vendorName;
+
+            $sellingPrice = (float) $request->selling_price;
+            $paidAmount = (float) $request->pay_amount;
+            $mobileName = $data->mobile_name;
+
+            // Credit: Vendor owes you
+            if ($sellingPrice > 0) {
+                Accounts::create([
+                    'vendor_id' => $vendorId,
+                    'category' => 'DB',
+                    'amount' => $sellingPrice,
+                    'description' => "Vendor purchased mobile: {$mobileName}",
+                ]);
+            }
+
+            // Debit: Vendor paid you (reducing their debt)
+            if ($paidAmount > 0) {
+                Accounts::create([
+                    'vendor_id' => $vendorId,
+                    'category' => 'CR',
+                    'amount' => $paidAmount,
+                    'description' => "Vendor paid for: {$mobileName}",
+                ]);
+            }
+        } else {
+            // Sold to walk-in customer (no vendor accounting)
+            $data->customer_name = $request->input('customer_name');
+            $data->sold_vendor_id = null;
+        }
+
+        // Update mobile sale details
+        $data->selling_price = $request->input('selling_price');
+        $data->availability = $request->input('availability');
+        $data->sold_at = Carbon::now();
+        $data->is_approve = $request->input('is_approve');
+        $data->save();
+
+        // Record mobile history
+        $historyCustomerName = $data->sold_vendor_id
+            ? ($vendor ? $vendor->name : 'Unknown Vendor')
+            : $data->customer_name;
+
+        MobileHistory::create([
+            'mobile_id' => $data->id,
+            'mobile_name' => $data->mobile_name,
+            'customer_name' => $historyCustomerName,
+            'battery_health' => $data->battery_health,
+            'cost_price' => $data->cost_price,
+            'selling_price' => $data->selling_price,
+            'availability_status' => $data->availability,
+        ]);
+
+        return redirect()->back()->with('success', 'Mobile status changed and account updated successfully.');
     }
 
-    // Common sale data
-    $data->selling_price = $request->input('selling_price');
-    $data->availability = $request->input('availability');
-    $data->sold_at = Carbon::now();
-    $data->is_approve = $request->input('is_approve');
-    $data->save();
 
-    // History entry
-    $historyCustomerName = $data->sold_vendor_id
-        ? ($vendor ? $vendor->name : 'Unknown Vendor')
-        : $data->customer_name;
 
-    MobileHistory::create([
-        'mobile_id' => $data->id,
-        'mobile_name' => $data->mobile_name,
-        'customer_name' => $historyCustomerName,
-        'battery_health' => $data->battery_health,
-        'cost_price' => $data->cost_price,
-        'selling_price' => $data->selling_price,
-        'availability_status' => $data->availability,
-    ]);
 
-    return redirect()->back()->with('success', 'Mobile status changed successfully.');
-}
+    // public function sellMobile(Request $request)
+    // {
+    //     if ($request->availability == 'Available') {
+    //         return redirect()->back()->with('danger', 'Please select a different availability option.');
+    //     }
+
+    //     if (!$request->filled('customer_name') && !$request->filled('vendor_id')) {
+    //         return redirect()->back()->with('danger', 'Enter customer name or select a vendor.');
+    //     }
+
+    //     $data = Mobile::findOrFail($request->id);
+
+    //     if ($request->filled('vendor_id')) {
+    //         $vendorId = $request->vendor_id;
+    //         $data->sold_vendor_id = $vendorId;
+
+    //         $vendor = Vendor::find($vendorId);
+    //         $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
+    //         $data->customer_name = $vendorName;
+
+    //         $sellingPrice = (float) $request->selling_price;
+    //         $paidAmount = (float) $request->pay_amount;
+    //         $mobileName = $data->mobile_name;
+
+    //         $lastEntry = Accounts::where('vendor_id', $vendorId)->latest()->first();
+    //         $currentBalance = $lastEntry ? $lastEntry->balance : 0;
+
+    //         // Vendor buys mobile from you → vendor owes you → balance increases
+    //         if ($sellingPrice > 0) {
+    //             $newBalance = $currentBalance + $sellingPrice;
+
+    //             Accounts::create([
+    //                 'vendor_id' => $vendorId,
+    //                 'category' => 'CR',
+    //                 'amount' => $sellingPrice,
+    //                 'balance' => $newBalance,
+    //                 'description' => "Vendor purchase: Mobile {$mobileName}",
+    //             ]);
+
+    //             $currentBalance = $newBalance;
+    //         }
+
+    //         // Vendor pays you → reduces their debt → balance decreases
+    //         if ($paidAmount > 0) {
+    //             $newBalance = $currentBalance - $paidAmount;
+
+    //             Accounts::create([
+    //                 'vendor_id' => $vendorId,
+    //                 'category' => 'CR',
+    //                 'amount' => $paidAmount,
+    //                 'balance' => $newBalance,
+    //                 'description' => "Vendor paid: Mobile {$mobileName}",
+    //             ]);
+
+    //             $currentBalance = $newBalance;
+    //         }
+    //     } else {
+    //         // Sale to customer (no vendor balance impact)
+    //         $data->customer_name = $request->input('customer_name');
+    //         $data->sold_vendor_id = null;
+    //     }
+
+    //     // Update mobile data
+    //     $data->selling_price = $request->input('selling_price');
+    //     $data->availability = $request->input('availability');
+    //     $data->sold_at = Carbon::now();
+    //     $data->is_approve = $request->input('is_approve');
+    //     $data->save();
+
+    //     // Record mobile history
+    //     $historyCustomerName = $data->sold_vendor_id
+    //         ? ($vendor ? $vendor->name : 'Unknown Vendor')
+    //         : $data->customer_name;
+
+    //     MobileHistory::create([
+    //         'mobile_id' => $data->id,
+    //         'mobile_name' => $data->mobile_name,
+    //         'customer_name' => $historyCustomerName,
+    //         'battery_health' => $data->battery_health,
+    //         'cost_price' => $data->cost_price,
+    //         'selling_price' => $data->selling_price,
+    //         'availability_status' => $data->availability,
+    //     ]);
+
+    //     return redirect()->back()->with('success', 'Mobile status changed successfully.');
+    // }
+
+
+
+
+
 
 
 

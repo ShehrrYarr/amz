@@ -19,8 +19,9 @@ class CreateAccountsTable extends Migration
             $table->unsignedBigInteger('vendor_id')->nullable();
             $table->foreign('vendor_id')->references('id')->on('vendors')->onDelete('set null');
             $table->string('category'); // 'CR' or 'DB'
-            $table->decimal('amount', 10, 2);
-             $table->text('description')->nullable();
+            $table->decimal('amount', 10);
+            $table->text('description')->nullable();
+            // $table->decimal('balance', 12)->nullable();
         });
     }
 
