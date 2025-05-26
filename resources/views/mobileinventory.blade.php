@@ -356,8 +356,8 @@
 
                             <div class="mb-1">
                                 <label for="imei_number" class="form-label">IMEI Number</label>
-                                <input type="text" class="form-control" name="imei_number" required pattern="\d{14}"
-                                    maxlength="14" minlength="14" title="IMEI number must be exactly 14 digits">
+                                <input type="text" class="form-control" name="imei_number" required pattern="\d{15}"
+                                    maxlength="15" minlength="15" title="IMEI number must be exactly 15 digits">
                             </div>
 
 

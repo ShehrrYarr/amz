@@ -102,49 +102,118 @@
         </div>
     </div>
     <script>
-        $('#searchBtn').on('click', function () {
-            let company = $('#filterCompany').val();
-            let group = $('#filterGroup').val();
-            let availability = $('#filterAvailability').val();
+        // $('#searchBtn').on('click', function () {
+        //     let company = $('#filterCompany').val();
+        //     let group = $('#filterGroup').val();
+        //     let availability = $('#filterAvailability').val();
 
-            $.ajax({
-                url: '{{ route("api.searchMobiles") }}',
-                method: 'GET',
-                data: {
-                    company_id: company,
-                    group_id: group,
-                    availability: availability
-                },
-                success: function (response) {
-                    let tbody = $('#mobileTable tbody');
-                    tbody.empty();
+        //     $.ajax({
+        //         url: '{{ route("api.searchMobiles") }}',
+        //         method: 'GET',
+        //         data: {
+        //             company_id: company,
+        //             group_id: group,
+        //             availability: availability
+        //         },
+        //         success: function (response) {
+        //             let tbody = $('#mobileTable tbody');
+        //             tbody.empty();
 
-                    if (response.length > 0) {
-                        $.each(response, function (index, mobile) {
-                            tbody.append(`
-                                <tr>
-                                    <td>${mobile.created_at}</td>
-                                    <td>${mobile.mobile_name}</td>
-                                    <td>${mobile.company_name || '-'}</td>
-                                    <td>${mobile.group_name || '-'}</td>
-                                    <td>${mobile.vendor_name || '-'}</td>
-                                    <td>${mobile.imei_number}</td>
-                                    <td>${mobile.sim_lock}</td>
-                                    <td>${mobile.color}</td>
-                                    <td>${mobile.storage}</td>
-                                    <td>${mobile.battery_health || '-'}</td>
-                                    <td>${mobile.cost_price}</td>
-                                    <td>${mobile.selling_price}</td>
-                                    <td>${mobile.availability}</td>
-                                    <td>${mobile.is_transfer ? 'Yes' : 'No'}</td>
-                                    <td><a href="history/${mobile.id}" class="btn btn-sm btn-warning"> <i class="fa fa-eye"></i></a></td>
-                                </tr>
-                            `);
-                        });
-                    } else {
-                        tbody.append('<tr><td colspan="16" class="text-center">No records found.</td></tr>');
+        //             if (response.length > 0) {
+        //                 $.each(response, function (index, mobile) {
+        //                     tbody.append(`
+        //                         <tr>
+        //                             <td>${mobile.created_at}</td>
+        //                             <td>${mobile.mobile_name}</td>
+        //                             <td>${mobile.company_name || '-'}</td>
+        //                             <td>${mobile.group_name || '-'}</td>
+        //                             <td>${mobile.vendor_name || '-'}</td>
+        //                             <td>${mobile.imei_number}</td>
+        //                             <td>${mobile.sim_lock}</td>
+        //                             <td>${mobile.color}</td>
+        //                             <td>${mobile.storage}</td>
+        //                             <td>${mobile.battery_health || '-'}</td>
+        //                             <td>${mobile.cost_price}</td>
+        //                             <td>${mobile.selling_price}</td>
+        //                             <td>${mobile.availability}</td>
+        //                             <td>${mobile.is_transfer ? 'Yes' : 'No'}</td>
+        //                             <td><a href="history/${mobile.id}" class="btn btn-sm btn-warning"> <i class="fa fa-eye"></i></a></td>
+        //                         </tr>
+        //                     `);
+        //                 });
+        //             } else {
+        //                 tbody.append('<tr><td colspan="16" class="text-center">No records found.</td></tr>');
+        //             }
+        //         }
+        //     });
+        // });
+
+        let table;
+
+        $(document).ready(function () {
+            // Initialize DataTable only once
+            table = $('#mobileTable').DataTable({
+                columns: [
+                    { data: 'created_at' },
+                    { data: 'mobile_name' },
+                    { data: 'company_name' },
+                    { data: 'group_name' },
+                    { data: 'vendor_name' },
+                    { data: 'imei_number' },
+                    { data: 'sim_lock' },
+                    { data: 'color' },
+                    { data: 'storage' },
+                    { data: 'battery_health' },
+                    { data: 'cost_price' },
+                    { data: 'selling_price' },
+                    { data: 'availability' },
+                    { data: 'is_transfer' },
+                    { data: 'actions', orderable: false, searchable: false }
+                ]
+            });
+
+            // Search button logic
+            $('#searchBtn').on('click', function () {
+                let company = $('#filterCompany').val();
+                let group = $('#filterGroup').val();
+                let availability = $('#filterAvailability').val();
+
+                $.ajax({
+                    url: '{{ route("api.searchMobiles") }}',
+                    method: 'GET',
+                    data: {
+                        company_id: company,
+                        group_id: group,
+                        availability: availability
+                    },
+                    success: function (response) {
+                        table.clear();
+
+                        if (response.length > 0) {
+                            $.each(response, function (index, mobile) {
+                                table.row.add({
+                                    created_at: mobile.created_at,
+                                    mobile_name: mobile.mobile_name,
+                                    company_name: mobile.company_name || '-',
+                                    group_name: mobile.group_name || '-',
+                                    vendor_name: mobile.vendor_name || '-',
+                                    imei_number: mobile.imei_number,
+                                    sim_lock: mobile.sim_lock,
+                                    color: mobile.color,
+                                    storage: mobile.storage,
+                                    battery_health: mobile.battery_health || '-',
+                                    cost_price: mobile.cost_price,
+                                    selling_price: mobile.selling_price,
+                                    availability: mobile.availability,
+                                    is_transfer: mobile.is_transfer ? 'Yes' : 'No',
+                                    actions: `<a href="history/${mobile.id}" class="btn btn-sm btn-warning"><i class="fa fa-eye"></i></a>`
+                                });
+                            });
+                        }
+
+                        table.draw();
                     }
-                }
+                });
             });
         });
 
