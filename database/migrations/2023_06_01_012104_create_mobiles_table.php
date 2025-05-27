@@ -28,11 +28,11 @@ class CreateMobilesTable extends Migration
             $table->string('battery_health')->nullable();
 
             $table->timestamps();
-            $table->string('availability');
+            $table->string('availability')->default('Available');
 
             $table->timestamp('sold_at')->nullable();
             $table->boolean('is_transfer')->default(false);
-            $table->string('is_approve');
+            $table->string('is_approve')->default('Not_Approved');
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('original_owner_id')->references('id')->on('users')->onDelete('set null');

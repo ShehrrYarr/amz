@@ -110,7 +110,7 @@
 
                             <div class="mb-1">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="text" class="form-control" name="password" required>
+                                <input type="password" class="form-control" name="password" required>
                             </div>
                         </div>
                         <div class="form-actions">
@@ -158,7 +158,7 @@
                             </div>
                             <div class="mb-1">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="text" class="form-control" name="password" required>
+                                <input type="password" class="form-control" name="password" required>
                             </div>
 
 
@@ -225,13 +225,15 @@
 
                             <div class="mb-1">
                                 <label for="vendor_id" class="form-label">Vendor</label>
-                                <select class="form-control" name="vendor_id">
+                                <select class="form-control" name="vendor_id" id="vendorSelect">
                                     <option value="">Select Vendor</option>
                                     @foreach ($vendors as $vendor)
-                                        <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
+                                        <option value="{{ $vendor->id }}">{{ $vendor->name }} ({{ $vendor->mobile_no }})
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
+
 
                             <div class="mb-1" id="payAmountContainer" style="display: none;">
                                 <label for="pay_amount" class="form-label">Pay Amount</label>
@@ -346,13 +348,15 @@
                             </div>
                             <div class="mb-1">
                                 <label for="vendor_id" class="form-label">Vendor</label>
-                                <select class="form-control" name="vendor_id" required>
+                                <select class="form-control" name="vendor_id" id="vendorSelect1">
                                     <option value="">Select Vendor</option>
                                     @foreach ($vendors as $vendor)
-                                        <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
+                                        <option value="{{ $vendor->id }}">{{ $vendor->name }} ({{ $vendor->mobile_no }})
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
+
 
                             <div class="mb-1">
                                 <label for="imei_number" class="form-label">IMEI Number</label>
@@ -516,11 +520,123 @@
     </div>
     {{-- End Download Modal --}}
 
+    <!-- Multiple entries Modal -->
+
+    <div class="modal fade" id="bulkMobileModal" tabindex="-1" role="dialog" aria-labelledby="bulkMobileLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <form id="bulkMobileForm" method="POST" action="{{ route('bulkStoreMobile') }}">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="bulkMobileLabel">Add Multiple Mobiles</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <!-- Shared Fields -->
+                            <div class="col-md-6 mb-2">
+                                <label>Mobile Name</label>
+                                <input type="text" name="mobile_name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>SIM Lock</label>
+                                <select name="sim_lock" class="form-control" required>
+                                    <option value="J.V">J.V</option>
+                                    <option value="PTA">PTA</option>
+                                    <option value="Non-PTA">Non-PTA</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Color</label>
+                                <input type="text" name="color" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Storage</label>
+                                <input type="text" name="storage" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Battery Health</label>
+                                <input type="text" name="battery_health" class="form-control">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Cost Price</label>
+                                <input type="number" name="cost_price" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Selling Price</label>
+                                <input type="number" name="selling_price" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Company</label>
+                                <select name="company_id" class="form-control" required>
+                                    <option value="">Select Company</option>
+                                    @foreach($companies as $company)
+                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Group</label>
+                                <select name="group_id" class="form-control" required>
+                                    <option value="">Select Group</option>
+                                    @foreach($groups as $group)
+                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Vendor</label>
+                                <select name="vendor_id" class="form-control">
+                                    <option value="">Select Vendor</option>
+                                    @foreach ($vendors as $vendor)
+                                        <option value="{{ $vendor->id }}">{{ $vendor->name }} ({{ $vendor->mobile_no }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label>Number of Mobiles</label>
+                                <input type="number" id="imeiCount" class="form-control" min="1" placeholder="e.g. 5">
+                            </div>
+                        </div>
+
+                        <!-- IMEI Fields Will Be Appended Here -->
+                        <div id="imeiFields" class="mt-3"></div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <i class="fa fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> Save All
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <style>
         .gradient-button3 {
             background: linear-gradient(to right, #74a8e0, #1779e2);
             border-color: #007bff;
             color: white;
+        }
+
+        .gradient-button4 {
+            background: linear-gradient(to right, rgb(224, 116, 116), rgb(226, 23, 23));
+            border-color: rgb(255, 0, 0);
+            color: white;
+        }
+
+        ,
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            padding: 5px 10px;
         }
     </style>
 
@@ -547,6 +663,13 @@
                     data-target="#exampleModal">
                     <i class="feather icon-smartphone" style="font-size: 20px;"></i>
                 </button>
+
+                <button type="button" class="btn btn-primary gradient-button4 ml-1" data-toggle="modal"
+                    data-target="#bulkMobileModal">
+                    <i class="feather icon-smartphone" style="font-size: 20px;"></i>
+                </button>
+
+
 
                 <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
                     <div class="card">
@@ -850,6 +973,115 @@
                 }
             });
         });
+
+
+        $(document).ready(function () {
+            $('#vendorSelect').select2({
+                placeholder: "Select a vendor",
+                allowClear: true,
+                width: '100%' // Optional to make it responsive
+            });
+        });
+
+        $(document).ready(function () {
+            $('#vendorSelect1').select2({
+                placeholder: "Select a vendor",
+                allowClear: true,
+                width: '100%' // Optional to make it responsive
+            });
+        });
+
+        //function to handle multiple IMEI inputs
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const imeiCountInput = document.getElementById('imeiCount');
+            const imeiFieldsContainer = document.getElementById('imeiFields');
+
+            imeiCountInput.addEventListener('input', function () {
+                const count = parseInt(this.value);
+                imeiFieldsContainer.innerHTML = ''; // Clear previous fields
+
+                if (count > 0) {
+                    for (let i = 1; i <= count; i++) {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'mb-2';
+                        wrapper.innerHTML = `
+                            <label for="imei_${i}">IMEI #${i}</label>
+                            <input type="text" id="imei_${i}" name="imeis[]" class="form-control imei-input"
+                                required pattern="\\d{15}" minlength="15" maxlength="15"
+                                placeholder="Enter 15-digit IMEI or scan">
+                            <small class="text-danger d-none" id="duplicate_${i}">Duplicate IMEI detected!</small>
+                        `;
+                        imeiFieldsContainer.appendChild(wrapper);
+                    }
+
+                    updateScannedCount();
+                    addIMEIListeners();
+                }
+            });
+
+            function addIMEIListeners() {
+                const imeiInputs = document.querySelectorAll('.imei-input');
+
+                imeiInputs.forEach((input, index) => {
+                    input.addEventListener('input', function () {
+                        // Remove previous error
+                        document.getElementById(`duplicate_${index + 1}`).classList.add('d-none');
+
+                        const currentValue = this.value.trim();
+                        let duplicate = false;
+
+                        imeiInputs.forEach((other, i) => {
+                            if (i !== index && other.value.trim() === currentValue && currentValue !== '') {
+                                duplicate = true;
+                            }
+                        });
+
+                        if (duplicate) {
+                            document.getElementById(`duplicate_${index + 1}`).classList.remove('d-none');
+                            this.classList.add('is-invalid');
+                        } else {
+                            this.classList.remove('is-invalid');
+                        }
+
+                        updateScannedCount();
+                    });
+
+                    input.addEventListener('keypress', function (e) {
+                        // If Enter is pressed and length is 15, move to next
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (this.value.length === 15 && index + 1 < imeiInputs.length) {
+                                imeiInputs[index + 1].focus();
+                            }
+                        }
+                    });
+
+                    // Optional: autofocus first field
+                    if (index === 0) input.focus();
+                });
+            }
+
+            function updateScannedCount() {
+                const count = document.querySelectorAll('.imei-input')
+                    .filter(input => input.value.trim().length === 15).length;
+
+                let countDisplay = document.getElementById('scannedCount');
+                if (!countDisplay) {
+                    countDisplay = document.createElement('div');
+                    countDisplay.id = 'scannedCount';
+                    countDisplay.className = 'alert alert-info mt-2';
+                    imeiFieldsContainer.parentNode.insertBefore(countDisplay, imeiFieldsContainer.nextSibling);
+                }
+
+                countDisplay.innerHTML = `<strong>${count}</strong> IMEIs scanned`;
+            }
+        });
+
+        // Polyfill for NodeList.prototype.filter (in older browsers)
+        if (!NodeList.prototype.filter) {
+            NodeList.prototype.filter = Array.prototype.filter;
+        }
 
     </script>
 @endsection

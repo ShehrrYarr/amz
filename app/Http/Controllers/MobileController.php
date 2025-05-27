@@ -136,6 +136,67 @@ class MobileController extends Controller
     //     return redirect()->back()->with('success', 'Mobile created and account updated successfully.');
     // }
 
+    public function bulkStoreMobile(Request $request)
+    {
+        $validated = $request->validate([
+            'mobile_name' => 'required|string',
+            'sim_lock' => 'required|in:J.V,PTA,Non-PTA',
+            'color' => 'required|string',
+            'storage' => 'required|string',
+            'cost_price' => 'required|numeric',
+            'selling_price' => 'required|numeric',
+            'company_id' => 'required|exists:companies,id',
+            'group_id' => 'required|exists:groups,id',
+            'vendor_id' => 'nullable|exists:vendors,id',
+            'battery_health' => 'nullable|string',
+            'imeis' => 'required|array|min:1',
+            'imeis.*' => 'required|digits:15|distinct',
+        ]);
+
+        foreach ($validated['imeis'] as $imei) {
+            $mobile = new Mobile([
+                'mobile_name' => $validated['mobile_name'],
+                'sim_lock' => $validated['sim_lock'],
+                'color' => $validated['color'],
+                'storage' => $validated['storage'],
+                'battery_health' => $validated['battery_health'],
+                'imei_number' => $imei,
+                'cost_price' => $validated['cost_price'],
+                'selling_price' => $validated['selling_price'],
+                'company_id' => $validated['company_id'],
+                'group_id' => $validated['group_id'],
+                'availability' => 'Available',
+                'is_approve' => 'Not_Approved',
+            ]);
+
+            $mobile->user()->associate(auth()->user());
+            $mobile->original_owner()->associate(auth()->user());
+            $mobile->vendor_id = $validated['vendor_id'];
+            $mobile->save();
+        }
+
+        // ✅ Accounting entry for vendor (if applicable)
+        if (!empty($validated['vendor_id'])) {
+            $vendorId = $validated['vendor_id'];
+            $vendor = Vendor::find($vendorId);
+            $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
+
+            $unitCost = $validated['cost_price'];
+            $totalUnits = count($validated['imeis']);
+            $totalCost = $unitCost * $totalUnits;
+
+            Accounts::create([
+                'vendor_id' => $vendorId,
+                'category' => 'CR', 
+                'amount' => $totalCost,
+                'description' => "Purchased {$totalUnits} ({$validated['mobile_name']}) from {$vendorName} (Bulk Entry)",
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'All mobiles added and account updated successfully.');
+    }
+
+
     public function storeMobile(Request $request)
     {
         $validatedData = $request->validate([

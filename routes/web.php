@@ -514,3 +514,7 @@ Route::get('/search-mobiles', [MobileController::class, 'apiSearchMobiles'])->na
 Route::get('/accounts/{id}', [AccountsController::class, 'showAccounts'])->name('showAccounts');
 Route::post('/credit', [AccountsController::class, 'creditAmount'])->name('creditAmount');
 Route::post('/debit', [AccountsController::class, 'debitAmount'])->name('debitAmount');
+
+//Bulk entry routes
+Route::post('/mobiles/bulk-store', [MobileController::class, 'bulkStoreMobile'])->name('bulkStoreMobile');
+
