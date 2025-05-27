@@ -518,3 +518,6 @@ Route::post('/debit', [AccountsController::class, 'debitAmount'])->name('debitAm
 //Bulk entry routes
 Route::post('/mobiles/bulk-store', [MobileController::class, 'bulkStoreMobile'])->name('bulkStoreMobile');
 
+//Report Routes
+Route::get('/report/fetch', [MobileController::class, 'fetch'])->name('report.fetch');
+Route::get('/report', function () { return view('report');})->middleware('auth');

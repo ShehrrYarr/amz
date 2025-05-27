@@ -163,6 +163,10 @@
                                                                 class="menu-item" href="/searchfilter"
                                                                 data-i18n="4 columns">Search Filter</a>
                                                 </li>
+                                                <li class="@if(\Request::is('report')) active @endif"><a
+                                                                class="menu-item" href="/report"
+                                                                data-i18n="4 columns">Report</a>
+                                                </li>
                                                 <li class="@if(\Request::is('manageinventory')) active @endif"><a
                                                                 class="menu-item" href="/manageinventory"
                                                                 data-i18n="3 columns">Manage Inventory</a>

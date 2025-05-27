@@ -187,7 +187,7 @@ class MobileController extends Controller
 
             Accounts::create([
                 'vendor_id' => $vendorId,
-                'category' => 'CR', 
+                'category' => 'CR',
                 'amount' => $totalCost,
                 'description' => "Purchased {$totalUnits} ({$validated['mobile_name']}) from {$vendorName} (Bulk Entry)",
             ]);
@@ -265,7 +265,7 @@ class MobileController extends Controller
 
         $data = Mobile::findOrFail($request->id);
 
-        if ($request->filled('vendor_id')) {
+        if ($request->filled('vendor_id')&& $request->availability !== 'Pending') {
             $vendorId = $request->vendor_id;
             $data->sold_vendor_id = $vendorId;
 
@@ -970,6 +970,55 @@ class MobileController extends Controller
         // Return as JSON
         return response()->json($mobiles);
     }
+
+    public function fetch(Request $request)
+    {
+        $query = Mobile::with(['vendor', 'soldVendor', 'company', 'group']);
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+        }
+
+        if ($request->filled('availability')) {
+            $query->where('availability', $request->availability);
+        }
+
+        $mobiles = $query->get();
+
+        // Calculate summary
+        $summary = '';
+        if ($request->availability === 'Available' || !$request->availability) {
+            $summary = [
+                'label' => 'Total Cost of Available Mobiles',
+                'value' => $mobiles->sum('cost_price'),
+            ];
+        } elseif ($request->availability === 'Pending') {
+            $summary = [
+                'label' => 'Total Cost of Pending Mobiles',
+                'value' => $mobiles->sum('cost_price'),
+            ];
+        } elseif ($request->availability === 'Sold') {
+            $totalCost = $mobiles->sum('cost_price');
+            $totalSold = $mobiles->sum('selling_price');
+            $summary = [
+                'label' => 'Total Profit from Sold Mobiles',
+                'value' => $totalSold - $totalCost,
+            ];
+        }
+
+        return response()->json([
+            'summary' => $summary,
+            'mobiles' => $mobiles,
+            'availability' => $request->availability,
+        ]);
+    }
+
+
+
 
 
 
