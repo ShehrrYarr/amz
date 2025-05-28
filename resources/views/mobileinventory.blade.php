@@ -665,7 +665,7 @@
                 </button>
 
                 <a href="/multipleentries" type="button" class="btn btn-primary gradient-button4 ml-1" >
-                    <i class="feather icon-smartphone" style="font-size: 20px;"></i>
+                    <i class="feather icon-copy" style="font-size: 20px;"></i>
                 </a>
 
 
