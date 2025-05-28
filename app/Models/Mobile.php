@@ -19,6 +19,7 @@ class Mobile extends Model
         'vendor_id',
         'company_id',
         'group_id',
+       ' battery_health'
 
     ];
 

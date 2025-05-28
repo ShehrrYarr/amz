@@ -49,26 +49,6 @@
                                                 placeholder="Mobile Name" id="mobile_name"></div>
 
                                         <div class="col-md-3">
-                                            <select class="form-control" id="sim_lock">
-                                                <option value="">SIM Lock</option>
-                                                <option value="J.V">J.V</option>
-                                                <option value="PTA">PTA</option>
-                                                <option value="Non-PTA">Non-PTA</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3"><input type="text" class="form-control" placeholder="Color"
-                                                id="color"></div>
-                                        <div class="col-md-3"><input type="text" class="form-control" placeholder="Storage"
-                                                id="storage"></div>
-                                    </div>
-                                    <div class="row mt-2">
-                                        <div class="col-md-3"><input type="text" class="form-control"
-                                                placeholder="Battery Health" id="battery_health"></div>
-                                        <div class="col-md-3"><input type="number" class="form-control"
-                                                placeholder="Cost Price" id="cost_price"></div>
-                                        <div class="col-md-3"><input type="number" class="form-control"
-                                                placeholder="Selling Price" id="selling_price"></div>
-                                        <div class="col-md-3">
                                             <select class="form-control" id="company_id">
                                                 <option value="">Select Company</option>
                                                 @foreach ($companies as $company)
@@ -76,8 +56,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                    </div>
-                                    <div class="row mt-2">
+
                                         <div class="col-md-3">
                                             <select class="form-control" id="group_id">
                                                 <option value="">Select Group</option>
@@ -86,6 +65,35 @@
                                                 @endforeach
                                             </select>
                                         </div>
+
+                                        <div class="col-md-3">
+                                            <select class="form-control" id="sim_lock">
+                                                <option value="">SIM Lock</option>
+                                                <option value="J.V">J.V</option>
+                                                <option value="PTA">PTA</option>
+                                                <option value="Non-PTA">Non-PTA</option>
+                                            </select>
+                                        </div>
+                                        
+                                        
+                                    </div>
+                                    <div class="row mt-2">
+
+                                    <div class="col-md-3"><input type="text" class="form-control" placeholder="Color"
+                                                id="color"></div>
+                                                <div class="col-md-3"><input type="text" class="form-control" placeholder="Storage"
+                                                id="storage"></div>
+                                        <div class="col-md-3"><input type="text" class="form-control"
+                                                placeholder="Battery Health" id="battery_health"></div>
+                                        <div class="col-md-3"><input type="number" class="form-control"
+                                                placeholder="Cost Price" id="cost_price"></div>
+                                        
+                                        <!-- //Company -->
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-3"><input type="number" class="form-control"
+                                                placeholder="Selling Price" id="selling_price"></div>
+                                        
                                         <div class="col-md-3"><input type="text" class="form-control" placeholder="IMEI"
                                                 id="imei_number" maxlength="15"></div>
                                     </div>
@@ -131,177 +139,360 @@
                             </form>
                         </div>
 
-                        <script>
-                            let previewData = [];
 
-                            $('#vendor_id').on('change', function () {
-                                if ($(this).val()) {
-                                    $(this).prop('disabled', true);
-                                }
-                            });
-
-                            $('#addMobileBtn').click(function () {
-                                const imei = $('#imei_number').val().trim();
-
-                                if (!imei || imei.length !== 15) {
-                                    alert('IMEI must be 15 digits');
-                                    return;
-                                }
-
-                                if (previewData.find(m => m.imei_number === imei)) {
-                                    alert('This IMEI already added in the list.');
-                                    return;
-                                }
-
-                                $.ajax({
-                                    url: '{{ route("checkIMEI") }}',
-                                    method: 'POST',
-                                    data: {
-                                        imei: imei,
-                                        _token: '{{ csrf_token() }}'
-                                    },
-                                    success: function (res) {
-                                        if (res.exists) {
-                                            alert('This IMEI already exists in the database.');
-                                            return;
-                                        }
-
-                                        const mobile = {
-                                            mobile_name: $('#mobile_name').val(),
-                                            imei_number: imei,
-                                            sim_lock: $('#sim_lock').val(),
-                                            color: $('#color').val(),
-                                            storage: $('#storage').val(),
-                                            battery_health: $('#battery_health').val(),
-                                            cost_price: parseFloat($('#cost_price').val()) || 0,
-                                            selling_price: parseFloat($('#selling_price').val()) || 0,
-                                            company_id: $('#company_id').val(),
-                                            group_id: $('#group_id').val(),
-                                        };
-                                        previewData.push(mobile);
-                                        updatePreviewTable();
-                                        clearFields();
-                                    }
-                                });
-                            });
-
-                            function updatePreviewTable() {
-                                const tbody = $('#previewTable tbody');
-                                tbody.empty();
-
-                                let totalCost = 0, totalSell = 0;
-
-                                previewData.forEach((item, index) => {
-                                    const profit = item.selling_price - item.cost_price;
-                                    totalCost += item.cost_price;
-                                    totalSell += item.selling_price;
-
-                                    tbody.append(`
-                                                    <tr>
-                                                        <td>${item.mobile_name}</td>
-                                                        <td>${item.imei_number}</td>
-                                                        <td>${item.sim_lock}</td>
-                                                        <td>${item.color}</td>
-                                                        <td>${item.storage}</td>
-                                                        <td>${item.battery_health}</td>
-                                                        <td>${item.cost_price.toFixed(2)}</td>
-                                                        <td>${item.selling_price.toFixed(2)}</td>
-                                                        <td>${profit.toFixed(2)}</td>
-                                                        <td><button class="btn btn-danger btn-sm" onclick="removeRow(${index})">Delete</button></td>
-                                                    </tr>
-                                                `);
-                                });
-
-                                $('#totalCost').text(totalCost.toFixed(2));
-                                $('#totalSell').text(totalSell.toFixed(2));
-                                $('#totalProfit').text((totalSell - totalCost).toFixed(2));
-                            }
-
-                            function removeRow(index) {
-                                previewData.splice(index, 1);
-                                updatePreviewTable();
-                            }
-
-                            function clearFields() {
-                                $('#imei_number').val('');
-                                // $('#mobile_name, #sim_lock, #color, #storage, #battery_health, #cost_price, #selling_price, #company_id, #group_id').val('');
-                                $('#imei_number').focus();
-                            }
-
-                            $('#multiMobileForm').submit(function (e) {
-                                e.preventDefault();
-
-                                if (!previewData.length) {
-                                    alert("Please add at least one mobile.");
-                                    return;
-                                }
-
-                                $.ajax({
-                                    url: '{{ route("storeMultipleMobiles") }}',
-                                    method: 'POST',
-                                    data: {
-                                        vendor_id: $('#vendor_id').val(),
-                                        mobiles: previewData,
-                                        _token: '{{ csrf_token() }}'
-                                    },
-                                    success: function (res) {
-                                        alert('Mobiles stored successfully.');
-                                        location.reload();
-                                    },
-                                    error: function () {
-                                        alert('An error occurred.');
-                                    }
-                                });
-                            });
-
-
-                            //Shortcut keys
-                            $(document).ready(function () {
-                                // Press Enter on IMEI field to trigger Add Mobile
-                                $('#imei_number').keypress(function (e) {
-                                    if (e.which === 13) {
-                                        $('#addMobileBtn').click();
-                                        return false; // Prevent form submission
-                                    }
-                                });
-
-                                // Ctrl + Enter on price fields also adds mobile
-                                $('#cost_price, #selling_price').keydown(function (e) {
-                                    if (e.ctrlKey && e.key === 'Enter') {
-                                        $('#addMobileBtn').click();
-                                        return false;
-                                    }
-                                });
-
-                                // Esc key clears only IMEI field
-                                $(document).keydown(function (e) {
-                                    if (e.key === "Escape") {
-                                        $('#imei_number').val('').focus();
-                                    }
-                                });
-
-                                // Ctrl + S to submit the entire form
-                                $(document).keydown(function (e) {
-                                    if (e.ctrlKey && e.key === 's') {
-                                        e.preventDefault();
-                                        $('#multiMobileForm').submit();
-                                    }
-                                });
-                            });
-
-                            $(document).ready(function () {
-                                $('#vendor_id').select2({
-                                    placeholder: "Select a vendor",
-                                    allowClear: true,
-                                    width: '100%' // Optional to make it responsive
-                                });
-                            });
-                        </script>
 
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        let previewData = [];
+        let lastMobile = {}; // Store last entered mobile data
+
+        $(document).ready(function () {
+
+            // Initialize Select2
+            $('#vendor_id').select2({
+                placeholder: "Select a vendor",
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Lock vendor after selection
+            $('#vendor_id').on('change', function () {
+                if ($(this).val()) {
+                    $(this).prop('disabled', true).trigger("change.select2");
+                    $('.select2-selection').css('pointer-events', 'none');
+                    $('.select2-selection__arrow').hide();
+                }
+            });
+
+            // Add Mobile Button
+            $('#addMobileBtn').click(function () {
+                const imei = $('#imei_number').val().trim();
+
+                if (!imei || imei.length !== 15) {
+                    alert('IMEI must be 15 digits');
+                    return;
+                }
+
+                if (previewData.find(m => m.imei_number === imei)) {
+                    alert('This IMEI already added in the list.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '{{ route("checkIMEI") }}',
+                    method: 'POST',
+                    data: {
+                        imei: imei,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function (res) {
+                        if (res.exists) {
+                            alert('This IMEI already exists in the database.');
+                            return;
+                        }
+
+                        const mobile = {
+                            mobile_name: $('#mobile_name').val(),
+                            imei_number: imei,
+                            sim_lock: $('#sim_lock').val(),
+                            color: $('#color').val(),
+                            storage: $('#storage').val(),
+                            battery_health: $('#battery_health').val(),
+                            cost_price: parseFloat($('#cost_price').val()) || 0,
+                            selling_price: parseFloat($('#selling_price').val()) || 0,
+                            company_id: $('#company_id').val(),
+                            group_id: $('#group_id').val()
+                        };
+
+                        previewData.push(mobile);
+                        lastMobile = { ...mobile }; // Save last values (except IMEI)
+                        updatePreviewTable();
+                        clearFields();
+                    }
+                });
+            });
+
+            // Update preview table
+            function updatePreviewTable() {
+                const tbody = $('#previewTable tbody');
+                tbody.empty();
+
+                let totalCost = 0, totalSell = 0;
+
+                previewData.forEach((item, index) => {
+                    const profit = item.selling_price - item.cost_price;
+                    totalCost += item.cost_price;
+                    totalSell += item.selling_price;
+
+                    tbody.append(`
+                            <tr>
+                                <td>${item.mobile_name}</td>
+                                <td>${item.imei_number}</td>
+                                <td>${item.sim_lock}</td>
+                                <td>${item.color}</td>
+                                <td>${item.storage}</td>
+                                <td>${item.battery_health}</td>
+                                <td>${item.cost_price.toFixed(2)}</td>
+                                <td>${item.selling_price.toFixed(2)}</td>
+                                <td>${profit.toFixed(2)}</td>
+                                <td><button class="btn btn-danger btn-sm" onclick="removeRow(${index})">Delete</button></td>
+                            </tr>
+                        `);
+                });
+
+                $('#totalCost').text(totalCost.toFixed(2));
+                $('#totalSell').text(totalSell.toFixed(2));
+                $('#totalProfit').text((totalSell - totalCost).toFixed(2));
+            }
+
+            // Remove row
+            window.removeRow = function (index) {
+                previewData.splice(index, 1);
+                updatePreviewTable();
+            };
+
+            // Clear and prefill fields
+            function clearFields() {
+                $('#imei_number').val('').focus();
+
+                $('#mobile_name').val(lastMobile.mobile_name || '');
+                $('#sim_lock').val(lastMobile.sim_lock || '');
+                $('#color').val(lastMobile.color || '');
+                $('#storage').val(lastMobile.storage || '');
+                $('#battery_health').val(lastMobile.battery_health || '');
+                $('#cost_price').val(lastMobile.cost_price || '');
+                $('#selling_price').val(lastMobile.selling_price || '');
+                $('#company_id').val(lastMobile.company_id || '');
+                $('#group_id').val(lastMobile.group_id || '');
+            }
+
+            // Submit all
+            $('#multiMobileForm').submit(function (e) {
+                e.preventDefault();
+
+                if (!previewData.length) {
+                    alert("Please add at least one mobile.");
+                    return;
+                }
+
+                $.ajax({
+                    url: '{{ route("storeMultipleMobiles") }}',
+                    method: 'POST',
+                    data: {
+                        vendor_id: $('#vendor_id').val(),
+                        mobiles: previewData,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function (res) {
+                        alert('Mobiles stored successfully.');
+                        location.reload();
+                    },
+                    error: function () {
+                        alert('An error occurred.');
+                    }
+                });
+            });
+
+            // Keyboard shortcuts
+            $('#imei_number').keypress(function (e) {
+                if (e.which === 13) {
+                    $('#addMobileBtn').click();
+                    return false;
+                }
+            });
+
+            $('#cost_price, #selling_price').keydown(function (e) {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    $('#addMobileBtn').click();
+                    return false;
+                }
+            });
+
+            $(document).keydown(function (e) {
+                if (e.key === "Escape") {
+                    $('#imei_number').val('').focus();
+                }
+
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    $('#multiMobileForm').submit();
+                }
+            });
+
+        });
+    </script>
+
+
+    <!-- <script>
+                let previewData = [];
+
+                $('#vendor_id').on('change', function () {
+                    if ($(this).val()) {
+                        $(this).prop('disabled', true);
+                    }
+                });
+
+                $('#addMobileBtn').click(function () {
+                    const imei = $('#imei_number').val().trim();
+
+                    if (!imei || imei.length !== 15) {
+                        alert('IMEI must be 15 digits');
+                        return;
+                    }
+
+                    if (previewData.find(m => m.imei_number === imei)) {
+                        alert('This IMEI already added in the list.');
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '{{ route("checkIMEI") }}',
+                        method: 'POST',
+                        data: {
+                            imei: imei,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function (res) {
+                            if (res.exists) {
+                                alert('This IMEI already exists in the database.');
+                                return;
+                            }
+
+                            const mobile = {
+                                mobile_name: $('#mobile_name').val(),
+                                imei_number: imei,
+                                sim_lock: $('#sim_lock').val(),
+                                color: $('#color').val(),
+                                storage: $('#storage').val(),
+                                battery_health: $('#battery_health').val(),
+                                cost_price: parseFloat($('#cost_price').val()) || 0,
+                                selling_price: parseFloat($('#selling_price').val()) || 0,
+                                company_id: $('#company_id').val(),
+                                group_id: $('#group_id').val(),
+                            };
+                            previewData.push(mobile);
+                            updatePreviewTable();
+                            clearFields();
+                        }
+                    });
+                });
+
+                function updatePreviewTable() {
+                    const tbody = $('#previewTable tbody');
+                    tbody.empty();
+
+                    let totalCost = 0, totalSell = 0;
+
+                    previewData.forEach((item, index) => {
+                        const profit = item.selling_price - item.cost_price;
+                        totalCost += item.cost_price;
+                        totalSell += item.selling_price;
+
+                        tbody.append(`
+                                                                <tr>
+                                                                    <td>${item.mobile_name}</td>
+                                                                    <td>${item.imei_number}</td>
+                                                                    <td>${item.sim_lock}</td>
+                                                                    <td>${item.color}</td>
+                                                                    <td>${item.storage}</td>
+                                                                    <td>${item.battery_health}</td>
+                                                                    <td>${item.cost_price.toFixed(2)}</td>
+                                                                    <td>${item.selling_price.toFixed(2)}</td>
+                                                                    <td>${profit.toFixed(2)}</td>
+                                                                    <td><button class="btn btn-danger btn-sm" onclick="removeRow(${index})">Delete</button></td>
+                                                                </tr>
+                                                            `);
+                    });
+
+                    $('#totalCost').text(totalCost.toFixed(2));
+                    $('#totalSell').text(totalSell.toFixed(2));
+                    $('#totalProfit').text((totalSell - totalCost).toFixed(2));
+                }
+
+                function removeRow(index) {
+                    previewData.splice(index, 1);
+                    updatePreviewTable();
+                }
+
+                function clearFields() {
+                    $('#imei_number').val('');
+                    // $('#mobile_name, #sim_lock, #color, #storage, #battery_health, #cost_price, #selling_price, #company_id, #group_id').val('');
+                    $('#imei_number').focus();
+                }
+
+                $('#multiMobileForm').submit(function (e) {
+                    e.preventDefault();
+
+                    if (!previewData.length) {
+                        alert("Please add at least one mobile.");
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '{{ route("storeMultipleMobiles") }}',
+                        method: 'POST',
+                        data: {
+                            vendor_id: $('#vendor_id').val(),
+                            mobiles: previewData,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function (res) {
+                            alert('Mobiles stored successfully.');
+                            location.reload();
+                        },
+                        error: function () {
+                            alert('An error occurred.');
+                        }
+                    });
+                });
+
+
+                //Shortcut keys
+                $(document).ready(function () {
+                    // Press Enter on IMEI field to trigger Add Mobile
+                    $('#imei_number').keypress(function (e) {
+                        if (e.which === 13) {
+                            $('#addMobileBtn').click();
+                            return false; // Prevent form submission
+                        }
+                    });
+
+                    // Ctrl + Enter on price fields also adds mobile
+                    $('#cost_price, #selling_price').keydown(function (e) {
+                        if (e.ctrlKey && e.key === 'Enter') {
+                            $('#addMobileBtn').click();
+                            return false;
+                        }
+                    });
+
+                    // Esc key clears only IMEI field
+                    $(document).keydown(function (e) {
+                        if (e.key === "Escape") {
+                            $('#imei_number').val('').focus();
+                        }
+                    });
+
+                    // Ctrl + S to submit the entire form
+                    $(document).keydown(function (e) {
+                        if (e.ctrlKey && e.key === 's') {
+                            e.preventDefault();
+                            $('#multiMobileForm').submit();
+                        }
+                    });
+                });
+
+                $(document).ready(function () {
+                    $('#vendor_id').select2({
+                        placeholder: "Select a vendor",
+                        allowClear: true,
+                        width: '100%' // Optional to make it responsive
+                    });
+                });
+            </script> -->
 
 @endsection

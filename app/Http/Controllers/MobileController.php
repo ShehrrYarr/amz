@@ -741,12 +741,15 @@ class MobileController extends Controller
 
     public function storeMultipleMobiles(Request $request)
     {
+
+        // dd($request->all());
         $vendorId = $request->vendor_id;
         $mobiles = $request->mobiles;
 
         foreach ($mobiles as $entry) {
             $mobile = new Mobile($entry);
             $mobile->user_id = auth()->id();
+             $mobile->battery_health = $entry['battery_health'] ?? null;
             $mobile->original_owner_id = auth()->id();
             $mobile->availability = 'Available';
             $mobile->is_approve = 'Not_Approved';
