@@ -55,86 +55,7 @@ class MobileController extends Controller
 
 
 
-    // public function storeMobile(Request $request)
-    // {
-    //     $validatedData = $request->validate([
-    //         'mobile_name' => 'required',
-    //         'imei_number' => 'required',
-    //         'sim_lock' => 'required|in:J.V,PTA,Non-PTA',
-    //         'color' => 'required',
-    //         'storage' => 'required',
-    //         'cost_price' => 'required|numeric',
-    //         'selling_price' => 'required|numeric',
-    //         'company_id' => 'required|exists:companies,id',
-    //         'group_id' => 'required|exists:groups,id',
-    //         'vendor_id' => 'nullable|exists:vendors,id',
-    //     ]);
 
-    //     $mobile = new Mobile($validatedData);
-    //     $mobile->user()->associate(auth()->user());
-    //     $mobile->original_owner()->associate(auth()->user());
-    //     $mobile->battery_health = $request->battery_health;
-    //     $mobile->availability = 'Available';
-    //     $mobile->is_approve = 'Not_Approved';
-
-    //     $mobile->save();
-
-    //     // Create account entry if vendor is involved
-    //     if ($mobile->vendor_id) {
-    //         Accounts::create([
-    //             'vendor_id' => $mobile->vendor_id,
-    //             'category' => 'DB',
-    //             'amount' => $mobile->cost_price,
-    //             'description' => 'Purchased ' . $mobile->mobile_name,
-    //         ]);
-    //     }
-
-    //     return redirect()->back()->with('success', 'Mobile created successfully.');
-    // }
-
-    // public function storeMobile(Request $request)
-    // {
-    //     $validatedData = $request->validate([
-    //         'mobile_name' => 'required',
-    //         'imei_number' => 'required',
-    //         'sim_lock' => 'required|in:J.V,PTA,Non-PTA',
-    //         'color' => 'required',
-    //         'storage' => 'required',
-    //         'cost_price' => 'required|numeric',
-    //         'selling_price' => 'required|numeric',
-    //         'company_id' => 'required|exists:companies,id',
-    //         'group_id' => 'required|exists:groups,id',
-    //         'vendor_id' => 'nullable|exists:vendors,id',
-    //     ]);
-
-    //     $mobile = new Mobile($validatedData);
-    //     $mobile->user()->associate(auth()->user());
-    //     $mobile->original_owner()->associate(auth()->user());
-    //     $mobile->battery_health = $request->battery_health;
-    //     $mobile->availability = 'Available';
-    //     $mobile->is_approve = 'Not_Approved';
-    //     $mobile->save();
-
-    //     // Account entry if vendor is involved
-    //     if ($mobile->vendor_id) {
-    //         // Get the last balance
-    //         $lastEntry = Accounts::where('vendor_id', $mobile->vendor_id)->latest()->first();
-    //         $previousBalance = $lastEntry ? $lastEntry->balance : 0;
-
-    //         $debitAmount = $mobile->cost_price;
-    //         $newBalance = $previousBalance + $debitAmount;
-
-    //         Accounts::create([
-    //             'vendor_id' => $mobile->vendor_id,
-    //             'category' => 'DB', // Debit
-    //             'amount' => $debitAmount,
-    //             'balance' => $newBalance,
-    //             'description' => 'Purchased ' . $mobile->mobile_name,
-    //         ]);
-    //     }
-
-    //     return redirect()->back()->with('success', 'Mobile created and account updated successfully.');
-    // }
 
     public function bulkStoreMobile(Request $request)
     {
@@ -212,6 +133,12 @@ class MobileController extends Controller
             'vendor_id' => 'nullable|exists:vendors,id',
         ]);
 
+        $existingMobile = Mobile::where('imei_number', $validatedData['imei_number'])->first();
+
+        if ($existingMobile) {
+            return redirect()->back()->with('danger', 'A mobile with this IMEI number already exists.');
+        }
+
         $mobile = new Mobile($validatedData);
         $mobile->user()->associate(auth()->user());
         $mobile->original_owner()->associate(auth()->user());
@@ -265,7 +192,7 @@ class MobileController extends Controller
 
         $data = Mobile::findOrFail($request->id);
 
-        if ($request->filled('vendor_id')&& $request->availability !== 'Pending') {
+        if ($request->filled('vendor_id') && $request->availability !== 'Pending') {
             $vendorId = $request->vendor_id;
             $data->sold_vendor_id = $vendorId;
 
@@ -329,166 +256,15 @@ class MobileController extends Controller
 
 
 
-
-    // public function sellMobile(Request $request)
-    // {
-    //     if ($request->availability == 'Available') {
-    //         return redirect()->back()->with('danger', 'Please select a different availability option.');
-    //     }
-
-    //     if (!$request->filled('customer_name') && !$request->filled('vendor_id')) {
-    //         return redirect()->back()->with('danger', 'Enter customer name or select a vendor.');
-    //     }
-
-    //     $data = Mobile::findOrFail($request->id);
-
-    //     if ($request->filled('vendor_id')) {
-    //         $vendorId = $request->vendor_id;
-    //         $data->sold_vendor_id = $vendorId;
-
-    //         $vendor = Vendor::find($vendorId);
-    //         $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
-    //         $data->customer_name = $vendorName;
-
-    //         $sellingPrice = (float) $request->selling_price;
-    //         $paidAmount = (float) $request->pay_amount;
-    //         $mobileName = $data->mobile_name;
-
-    //         $lastEntry = Accounts::where('vendor_id', $vendorId)->latest()->first();
-    //         $currentBalance = $lastEntry ? $lastEntry->balance : 0;
-
-    //         // Vendor buys mobile from you → vendor owes you → balance increases
-    //         if ($sellingPrice > 0) {
-    //             $newBalance = $currentBalance + $sellingPrice;
-
-    //             Accounts::create([
-    //                 'vendor_id' => $vendorId,
-    //                 'category' => 'CR',
-    //                 'amount' => $sellingPrice,
-    //                 'balance' => $newBalance,
-    //                 'description' => "Vendor purchase: Mobile {$mobileName}",
-    //             ]);
-
-    //             $currentBalance = $newBalance;
-    //         }
-
-    //         // Vendor pays you → reduces their debt → balance decreases
-    //         if ($paidAmount > 0) {
-    //             $newBalance = $currentBalance - $paidAmount;
-
-    //             Accounts::create([
-    //                 'vendor_id' => $vendorId,
-    //                 'category' => 'CR',
-    //                 'amount' => $paidAmount,
-    //                 'balance' => $newBalance,
-    //                 'description' => "Vendor paid: Mobile {$mobileName}",
-    //             ]);
-
-    //             $currentBalance = $newBalance;
-    //         }
-    //     } else {
-    //         // Sale to customer (no vendor balance impact)
-    //         $data->customer_name = $request->input('customer_name');
-    //         $data->sold_vendor_id = null;
-    //     }
-
-    //     // Update mobile data
-    //     $data->selling_price = $request->input('selling_price');
-    //     $data->availability = $request->input('availability');
-    //     $data->sold_at = Carbon::now();
-    //     $data->is_approve = $request->input('is_approve');
-    //     $data->save();
-
-    //     // Record mobile history
-    //     $historyCustomerName = $data->sold_vendor_id
-    //         ? ($vendor ? $vendor->name : 'Unknown Vendor')
-    //         : $data->customer_name;
-
-    //     MobileHistory::create([
-    //         'mobile_id' => $data->id,
-    //         'mobile_name' => $data->mobile_name,
-    //         'customer_name' => $historyCustomerName,
-    //         'battery_health' => $data->battery_health,
-    //         'cost_price' => $data->cost_price,
-    //         'selling_price' => $data->selling_price,
-    //         'availability_status' => $data->availability,
-    //     ]);
-
-    //     return redirect()->back()->with('success', 'Mobile status changed successfully.');
-    // }
-
-
-
-
-
-
-
-
-    // public function sellMobile(Request $request)
-    // {
-
-    //     if ($request->availability == 'Available') {
-    //         return redirect()->back()->with('danger', 'please select a different option');
-    //     }
-
-    //     if (!$request->filled('customer_name') && !$request->filled('vendor_id')) {
-    //         return redirect()->back()->with('danger', 'Enter customer name or select a vendor.');
-    //     }
-
-    //     $data = Mobile::findOrFail($request->id);
-
-    //     // Check if vendor_id is present
-    //     if ($request->filled('vendor_id')) {
-    //         // Vendor sale
-    //         $data->sold_vendor_id = $request->vendor_id;
-    //         $vendorName = vendor::find($data->sold_vendor_id);
-    //         $historyVendorName = $vendorName ? $vendorName->name : 'Unknown Vendor';
-    //         $data->customer_name = $historyVendorName; // Optional: clear customer field if vendor sale
-    //     } else {
-    //         // Customer sale
-    //         $data->customer_name = $request->input('customer_name');
-    //         $data->sold_vendor_id = null; // Optional: clear vendor field if customer sale
-    //     }
-
-    //     $data->selling_price = $request->input('selling_price');
-    //     $data->availability = $request->input('availability');
-    //     $data->sold_at = Carbon::now();
-    //     $data->is_approve = $request->input('is_approve');
-
-    //     $data->save();
-
-    //     // Determine customer name for history
-    //     if ($data->sold_vendor_id) {
-    //         $vendor = vendor::find($data->sold_vendor_id);
-    //         $historyCustomerName = $vendor ? $vendor->name : 'Unknown Vendor';
-    //     } else {
-    //         $historyCustomerName = $data->customer_name;
-    //     }
-
-    //     // Save history record
-    //     MobileHistory::create([
-    //         'mobile_id' => $data->id,
-    //         'mobile_name' => $data->mobile_name,
-    //         'customer_name' => $historyCustomerName,
-    //         'battery_health' => $data->battery_health,
-    //         'cost_price' => $data->cost_price,
-    //         'selling_price' => $data->selling_price,
-    //         'availability_status' => $data->availability,
-    //     ]);
-
-    //     return redirect()->back()->with('success', 'Mobile status changed successfully.');
-    // }
-
     public function updateMobile(Request $request)
     {
         $data = Mobile::findOrFail($request->id);
         $password = $request->input('password');
-        $masterPassword = MasterPassword::first();
-        $mPass = $masterPassword->password;
 
-        // Check if the authenticated user ID is 2
-        if ($password == $mPass) {
-            // Update publication data
+        $masterPassword = MasterPassword::first();
+
+        // Check against update_password instead of general password
+        if ($password === $masterPassword->update_password) {
             $data->mobile_name = $request->input('mobile_name');
             $data->imei_number = $request->input('imei_number');
             $data->sim_lock = $request->input('sim_lock');
@@ -498,7 +274,6 @@ class MobileController extends Controller
             $data->selling_price = $request->input('selling_price');
             $data->availability = $request->input('availability');
             $data->customer_name = $request->input('customer_name');
-            // $data->sold_at = now();
             $data->battery_health = $request->input('battery_health');
             $data->is_approve = $request->input('is_approve');
             $data->company_id = $request->input('company_id');
@@ -509,7 +284,7 @@ class MobileController extends Controller
 
             return redirect()->back()->with('success', 'Mobile updated successfully.');
         } else {
-            return redirect()->back()->with('danger', "incorrect Password.");
+            return redirect()->back()->with('danger', 'Incorrect update password.');
         }
     }
 
@@ -598,32 +373,6 @@ class MobileController extends Controller
 
 
 
-
-
-    // public function updateMobile(Request $request)
-// {
-//     $data = Mobile::findOrFail($request->id);
-
-    //     // Update mobile data
-//     $data->mobile_name = $request->input('mobile_name');
-//     $data->imei_number = $request->input('imei_number');
-//     $data->sim_lock = $request->input('sim_lock');
-//     $data->color = $request->input('color');
-//     $data->storage = $request->input('storage');
-//     $data->cost_price = $request->input('cost_price');
-//     $data->selling_price = $request->input('selling_price');
-//     $data->availability = $request->input('availability');
-//     $data->sold_at = now();
-
-    //     // Update the is_approve field
-//     $data->is_approve = $request->input('is_approve');
-
-    //     $data->save();
-
-    //     return redirect()->back()->with('success', 'Mobile updated successfully.');
-// }
-
-
     public function findMobile($id)
     {
         $filterId = Mobile::find($id);
@@ -651,43 +400,6 @@ class MobileController extends Controller
 
     }
 
-    //     public function transferMobile(Request $request)
-// {
-
-    //     // Validate the request data
-//     $request->validate([
-//         'to_user_id' => 'required',
-//         'mobile_id' => 'required',
-//         // Add other validation rules if needed
-//     ]);
-
-    //     // Find the authenticated user
-//     $fromUser = auth()->user();
-
-    //     // Find the user to transfer the mobile to
-//     $toUser = User::findOrFail($request->to_user_id);
-
-    //     // Find the mobile device to be transferred
-//     $mobile = Mobile::findOrFail($request->mobile_id);
-
-
-
-    //     // Update the mobile device's ownership
-//     $mobile->user_id = $toUser->id;
-//     $mobile->is_transfer = true;
-//     $mobile->save();
-
-    //     // Create the transfer record
-//     $transferRecord = new TransferRecord();
-//     $transferRecord->from_user_id = $fromUser->id;
-//     $transferRecord->to_user_id = $toUser->id;
-//     $transferRecord->mobile_id = $mobile->id;
-//     $transferRecord->transfer_time = Carbon::now(); // Set the current timestamp
-//     // Set other transfer record data if needed
-//     $transferRecord->save();
-
-    //     return redirect()->back()->with('success', 'Mobile Trnsfered successfully.');
-// }
 
     public function transferMobile(Request $request)
     {
@@ -758,29 +470,13 @@ class MobileController extends Controller
     }
 
 
-
-
-
-    // public function findTransferId($id)
-// {
-//     $filterId = Mobile::find($id);
-//     // dd($filterId);
-//     if (!$filterId) {
-
-    //         return response()->json(['message' => 'Id not found'], 404);
-//     }
-
-    //     return response()->json(['result' => $filterId]);
-
-    // }
-
-
     public function approve(Request $request)
     {
         $mobile = Mobile::findOrFail($request->id);
-
+        $password = $request->input('password');
+        $masterPassword = MasterPassword::first();
         // Check if the authenticated user ID matches the original owner ID
-        if (auth()->user()->id === $mobile->original_owner_id) {
+        if (auth()->user()->id === $mobile->original_owner_id && $password === $masterPassword->approve_password) {
             $mobile->is_approve = $request->input('is_approve');
             $mobile->save();
 
@@ -790,19 +486,24 @@ class MobileController extends Controller
         }
     }
 
+
     public function approveMobile(Request $request)
     {
-        $data = Mobile::findOrFail($request->id);
+        $mobile = Mobile::findOrFail($request->id);
+        $password = $request->input('password');
+        $masterPassword = MasterPassword::first();
 
-        // Check if the authenticated user has ID 3
-        if (auth()->user()->id === 3) {
-            $data->is_approve = $request->input('is_approve');
-            $data->save();
-            return redirect()->back()->with('success', 'Mobile Approved successfully.');
+        // Check if password matches the approve_password
+        if ($password === $masterPassword->approve_password) {
+            $mobile->is_approve = $request->input('is_approve');
+            $mobile->save();
+
+            return redirect()->back()->with('success', 'Mobile has been approved successfully.');
         } else {
-            return redirect()->back()->with('danger', 'You cannot approve this mobile.');
+            return redirect()->back()->with('danger', 'Incorrect approve password.');
         }
     }
+
 
     public function moveToOwner(Request $request)
     {
@@ -903,20 +604,24 @@ class MobileController extends Controller
 
     public function destroy(Request $request)
     {
-        $filterId = Mobile::find($request->id);
+        $mobile = Mobile::find($request->id);
+
+        if (!$mobile) {
+            return redirect()->back()->with('danger', 'Mobile not found.');
+        }
 
         $password = $request->input('password');
         $masterPassword = MasterPassword::first();
-        $mPass = $masterPassword->password;
 
-        // Check if the authenticated user ID is 2
-        if ($password == $mPass) {
-            $filterId->delete();
-            return redirect()->back()->with('success', 'Mobile Deleted Successfully');
+        // Check against delete_password
+        if ($password === $masterPassword->delete_password) {
+            $mobile->delete();
+            return redirect()->back()->with('success', 'Mobile deleted successfully.');
         } else {
-            return redirect()->back()->with('danger', "Incorrect Password.");
+            return redirect()->back()->with('danger', 'Incorrect delete password.');
         }
     }
+
 
 
 
@@ -1018,7 +723,51 @@ class MobileController extends Controller
     }
 
 
+    public function multipleEntries()
+    {
+        $companies = Company::all();
+        $groups = Group::all();
+        $vendors = Vendor::all();
 
+        return view('multipleEntries', compact('companies', 'groups', 'vendors'));
+    }
+
+
+    public function checkIMEI(Request $request)
+    {
+        $exists = Mobile::where('imei_number', $request->imei)->exists();
+        return response()->json(['exists' => $exists]);
+    }
+
+    public function storeMultipleMobiles(Request $request)
+    {
+        $vendorId = $request->vendor_id;
+        $mobiles = $request->mobiles;
+
+        foreach ($mobiles as $entry) {
+            $mobile = new Mobile($entry);
+            $mobile->user_id = auth()->id();
+            $mobile->original_owner_id = auth()->id();
+            $mobile->availability = 'Available';
+            $mobile->is_approve = 'Not_Approved';
+            $mobile->vendor_id = $vendorId;
+            $mobile->save();
+        }
+
+        // Account entry for total cost
+        if ($vendorId) {
+            $vendor = Vendor::find($vendorId);
+            $totalCost = collect($mobiles)->sum('cost_price');
+            Accounts::create([
+                'vendor_id' => $vendorId,
+                'category' => 'CR',
+                'amount' => $totalCost,
+                'description' => "Purchased " . count($mobiles) . " mobiles from {$vendor->name} (Bulk Entry)"
+            ]);
+        }
+
+        return response()->json(['success' => true]);
+    }
 
 
 

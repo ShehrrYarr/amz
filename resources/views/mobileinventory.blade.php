@@ -109,7 +109,7 @@
                             </div>
 
                             <div class="mb-1">
-                                <label for="password" class="form-label">Password</label>
+                                <label for="password" class="form-label">Edit Password</label>
                                 <input type="password" class="form-control" name="password" required>
                             </div>
                         </div>
@@ -522,7 +522,7 @@
 
     <!-- Multiple entries Modal -->
 
-    <div class="modal fade" id="bulkMobileModal" tabindex="-1" role="dialog" aria-labelledby="bulkMobileLabel"
+    <!-- <div class="modal fade" id="bulkMobileModal" tabindex="-1" role="dialog" aria-labelledby="bulkMobileLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -537,7 +537,6 @@
 
                     <div class="modal-body">
                         <div class="form-row">
-                            <!-- Shared Fields -->
                             <div class="col-md-6 mb-2">
                                 <label>Mobile Name</label>
                                 <input type="text" name="mobile_name" class="form-control" required>
@@ -604,7 +603,6 @@
                             </div>
                         </div>
 
-                        <!-- IMEI Fields Will Be Appended Here -->
                         <div id="imeiFields" class="mt-3"></div>
                     </div>
 
@@ -619,7 +617,9 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> -->
+
+
     <style>
         .gradient-button3 {
             background: linear-gradient(to right, #74a8e0, #1779e2);
@@ -664,10 +664,9 @@
                     <i class="feather icon-smartphone" style="font-size: 20px;"></i>
                 </button>
 
-                <button type="button" class="btn btn-primary gradient-button4 ml-1" data-toggle="modal"
-                    data-target="#bulkMobileModal">
+                <a href="/multipleentries" type="button" class="btn btn-primary gradient-button4 ml-1" >
                     <i class="feather icon-smartphone" style="font-size: 20px;"></i>
-                </button>
+                </a>
 
 
 
@@ -959,18 +958,36 @@
         //End Message Time Out
 
         $(document).ready(function () {
-            $('select[name="vendor_id"]').on('change', function () {
-                let vendorSelected = $(this).val();
+            function togglePayAndCustomerFields() {
+                const availability = $('#savailability').val();
+                const vendorSelected = $('#vendorSelect').val();
 
-                if (vendorSelected) {
-                    // Vendor selected: Hide customer_name and show pay_amount
-                    $('#customer_name').closest('.mb-1').hide();
-                    $('#payAmountContainer').show();
-                } else {
-                    // Vendor not selected: Show customer_name and hide pay_amount
-                    $('#customer_name').closest('.mb-1').show();
+                if (availability === 'Pending') {
+                    // If pending, hide both fields
                     $('#payAmountContainer').hide();
+                    $('#customer_name').closest('.mb-1').hide();
+                } else if (vendorSelected) {
+                    // If vendor selected, show Pay Amount and hide Customer Name
+                    $('#payAmountContainer').show();
+                    $('#customer_name').closest('.mb-1').hide();
+                } else {
+                    // No vendor selected, show Customer Name and hide Pay Amount
+                    $('#payAmountContainer').hide();
+                    $('#customer_name').closest('.mb-1').show();
                 }
+            }
+
+            // Initial run on page load
+            togglePayAndCustomerFields();
+
+            // On vendor select change
+            $('#vendorSelect').on('change', function () {
+                togglePayAndCustomerFields();
+            });
+
+            // On availability select change
+            $('#savailability').on('change', function () {
+                togglePayAndCustomerFields();
             });
         });
 
@@ -1006,12 +1023,12 @@
                         const wrapper = document.createElement('div');
                         wrapper.className = 'mb-2';
                         wrapper.innerHTML = `
-                            <label for="imei_${i}">IMEI #${i}</label>
-                            <input type="text" id="imei_${i}" name="imeis[]" class="form-control imei-input"
-                                required pattern="\\d{15}" minlength="15" maxlength="15"
-                                placeholder="Enter 15-digit IMEI or scan">
-                            <small class="text-danger d-none" id="duplicate_${i}">Duplicate IMEI detected!</small>
-                        `;
+                                <label for="imei_${i}">IMEI #${i}</label>
+                                <input type="text" id="imei_${i}" name="imeis[]" class="form-control imei-input"
+                                    required pattern="\\d{15}" minlength="15" maxlength="15"
+                                    placeholder="Enter 15-digit IMEI or scan">
+                                <small class="text-danger d-none" id="duplicate_${i}">Duplicate IMEI detected!</small>
+                            `;
                         imeiFieldsContainer.appendChild(wrapper);
                     }
 

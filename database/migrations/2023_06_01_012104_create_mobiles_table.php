@@ -16,7 +16,7 @@ class CreateMobilesTable extends Migration
         Schema::create('mobiles', function (Blueprint $table) {
             $table->id();
             $table->string('mobile_name');
-            $table->string('imei_number');
+            $table->string('imei_number')->unique();
             $table->string('sim_lock');
             $table->string('color');
             $table->string('storage');

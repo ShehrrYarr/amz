@@ -82,6 +82,11 @@
                                     <option value="Not_Approved">Not Approve</option>
                                 </select>
                             </div>
+
+                            <div class="mb-1">
+                                <label for="password" class="form-label">Approve Password</label>
+                                <input type="password" class="form-control" name="password" required>
+                            </div>
                         </div>
                         <div class="form-actions">
                             <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">

@@ -101,9 +101,9 @@ Route::get('/index', [App\Http\Controllers\UserController::class, 'index'])->nam
 
 
 Route::get('/manageinventory', function () {
-    
+
     $users = User::all();
-  $companies = Company::all();
+    $companies = Company::all();
     $groups = Group::all();
     $vendors = Vendor::all();
     $totalCostPrice = DB::table('mobiles')
@@ -116,11 +116,11 @@ Route::get('/manageinventory', function () {
         ->where('availability', 'Available')
         ->where('is_transfer', false)->with(['group', 'company', 'vendor'])
         ->get();
-        // dd($mobile);
+    // dd($mobile);
 
-       
 
-    return view('mobileinventory', compact('mobile', 'users', 'totalCostPrice','companies', 'groups', 'vendors'));
+
+    return view('mobileinventory', compact('mobile', 'users', 'totalCostPrice', 'companies', 'groups', 'vendors'));
 })->middleware('auth')->name('homeRoute');
 
 
@@ -142,13 +142,13 @@ Route::get('/managerecentinventory', function () {
         ->where('is_transfer', false)
         ->where('created_at', '>=', $fifteenDaysAgo)
         ->get();
-        
-        $transferMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
+
+    $transferMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
         ->where('from_user_id', Auth::id())
         ->where('created_at', '>=', $fifteenDaysAgo)
         ->get();
 
-    return view('managerecentinventory', compact('mobile', 'users', 'totalCostPrice','transferMobiles'));
+    return view('managerecentinventory', compact('mobile', 'users', 'totalCostPrice', 'transferMobiles'));
 })->middleware('auth');
 
 
@@ -208,24 +208,24 @@ Route::get('/soldinventory', function () {
 Route::get('/soldapprovedinventory', function () {
 
     $mobile = Mobile::where('user_id', auth()->user()->id)->where('availability', 'Sold')->where('is_transfer', false)
-    ->where('is_approve', 'Approved')
-    ->get();
-    
-     $startOfWeek = Carbon::now()->startOfWeek(Carbon::FRIDAY);
-         $endOfWeek = Carbon::now()->endOfWeek(Carbon::FRIDAY);
-    
-      $profit = Mobile::where('user_id', auth()->user()->id)
-             ->where('availability', 'Sold')
-             ->where('is_transfer', false)
-             ->where('is_approve', 'Approved')
-             ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
-             ->sum('selling_price') - Mobile::where('user_id', auth()->user()->id)
-             ->where('availability', 'Sold')
-             ->where('is_transfer', false)
-             ->where('is_approve', 'Approved')
-             ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
-             ->sum('cost_price');
-    return view('soldapprovedinventory', compact('mobile','profit'));
+        ->where('is_approve', 'Approved')
+        ->get();
+
+    $startOfWeek = Carbon::now()->startOfWeek(Carbon::FRIDAY);
+    $endOfWeek = Carbon::now()->endOfWeek(Carbon::FRIDAY);
+
+    $profit = Mobile::where('user_id', auth()->user()->id)
+        ->where('availability', 'Sold')
+        ->where('is_transfer', false)
+        ->where('is_approve', 'Approved')
+        ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
+        ->sum('selling_price') - Mobile::where('user_id', auth()->user()->id)
+            ->where('availability', 'Sold')
+            ->where('is_transfer', false)
+            ->where('is_approve', 'Approved')
+            ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
+            ->sum('cost_price');
+    return view('soldapprovedinventory', compact('mobile', 'profit'));
 })->middleware('auth');
 
 
@@ -246,6 +246,7 @@ Route::get('/receivedpendinginventory', function () {
 })->middleware('auth');
 
 Route::post('/storemobile', [App\Http\Controllers\MobileController::class, 'storeMobile'])->name('storeMobile');
+Route::get('/multipleentries', [App\Http\Controllers\MobileController::class, 'multipleEntries'])->name('multipleEntries');
 Route::get('/editmobile/{id}', [App\Http\Controllers\MobileController::class, 'editMobile'])->name('editMobile');
 Route::put('/updatemobile', [App\Http\Controllers\MobileController::class, 'updateMobile'])->name('updateMobile');
 Route::put('/restoremobile', [App\Http\Controllers\MobileController::class, 'restoreMobile'])->name('restoreMobile');
@@ -257,6 +258,9 @@ Route::get('/findapmobile/{id}', [App\Http\Controllers\MobileController::class, 
 Route::get('/deletemobile', [App\Http\Controllers\MobileController::class, 'destroy'])->name('deleteMobile');
 
 Route::get('/restoremobiles', [App\Http\Controllers\RestoreController::class, 'restoreMobiles'])->name('restoremobiles');
+
+Route::post('/check-imei', [MobileController::class, 'checkIMEI'])->name('checkIMEI');
+Route::post('/store-multiple-mobiles', [MobileController::class, 'storeMultipleMobiles'])->name('storeMultipleMobiles');
 
 
 
@@ -417,13 +421,13 @@ Route::get('/soldapprovetransferinventory', function () {
 
 Route::get('/totalinventory', function () {
     $users = User::all();
-    
+
 
     // Fetch available mobile devices owned by the authenticated user
     $result = Mobile::where('original_owner_id', Auth::id())
         ->get();
 
-   
+
     return view('totalinventory', compact('result', 'users'));
 })->middleware('auth');
 
@@ -465,7 +469,7 @@ Route::get('/othertransferinventory/{id}', [App\Http\Controllers\MobileControlle
 Route::get('/othertransfersoldinventory/{id}', [App\Http\Controllers\MobileController::class, 'otherTransferSoldInventory'])->name('otherTransferSoldInventory');
 Route::post('/mobiles/export', 'App\Http\Controllers\MobileController@exportMobiles')
     ->name('mobiles.export');
-     Route::post('/mobiles/export-sold', 'App\Http\Controllers\MobileController@exportSoldMobiles')
+Route::post('/mobiles/export-sold', 'App\Http\Controllers\MobileController@exportSoldMobiles')
     ->name('mobiles.exportSold');
 
 
@@ -520,4 +524,5 @@ Route::post('/mobiles/bulk-store', [MobileController::class, 'bulkStoreMobile'])
 
 //Report Routes
 Route::get('/report/fetch', [MobileController::class, 'fetch'])->name('report.fetch');
-Route::get('/report', function () { return view('report');})->middleware('auth');
+Route::get('/report', function () {
+    return view('report'); })->middleware('auth');

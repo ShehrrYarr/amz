@@ -16,12 +16,16 @@ class CreateMasterPasswordsTable extends Migration
         Schema::create('master_passwords', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('password');
+            $table->string('update_password');
+            $table->string('delete_password');
+            $table->string('approve_password');
 
         });
         // Now the table exists — insert the default record
         DB::table('master_passwords')->insert([
-            'password' => 'abcd1234',
+            'update_password' => '1111',
+            'delete_password' => '2222',
+            'approve_password' => '3333',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

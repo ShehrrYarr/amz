@@ -22,7 +22,8 @@
                             <div class="mb-1">
                                 <label for="mobile_name" class="form-label">Mobile Name</label>
                                 <input class="form-control" type="hidden" name="id" id="id">
-                                <input type="text" class="form-control" id="mobile_name" name="mobile_name" required readonly>
+                                <input type="text" class="form-control" id="mobile_name" name="mobile_name" required
+                                    readonly>
                             </div>
 
                             <div class="mb-1" style="display: none;">
@@ -81,6 +82,8 @@
                                     <option value="Not_Approved">Not Approve</option>
                                 </select>
                             </div>
+
+                           
                         </div>
                         <div class="form-actions">
                             <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
@@ -97,9 +100,9 @@
         </div>
     </div>
     {{-- End Approve Modal --}}
-    
-    
-     {{-- Restore Modal --}}
+
+
+    {{-- Restore Modal --}}
     <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -124,7 +127,7 @@
                                 <input type="text" class="form-control" id="rmobile_name" name="mobile_name" disabled>
                             </div>
 
-                          <div class="mb-1" style="display: none">
+                            <div class="mb-1" style="display: none">
                                 <label for="availability" class="form-label">Availability</label>
                                 <select class="form-control" id="ravailability" name="availability" required>
                                     <option value="Available">Available</option>
@@ -132,18 +135,18 @@
                                 </select>
                             </div>
 
-                            <div class="mb-1" >
+                            <div class="mb-1">
                                 <label for="battery_health" class="form-label">Battery Health</label>
                                 <input type="text" class="form-control" id="rbattery_health" name="battery_health" required>
                             </div>
 
 
-                            <div class="mb-1" >
+                            <div class="mb-1">
                                 <label for="cost_price" class="form-label">Cost Price</label>
                                 <input type="number" class="form-control" id="rcost_price" name="cost_price" required>
                             </div>
 
-                            <div class="mb-1" >
+                            <div class="mb-1">
                                 <label for="selling_price" class="form-label">Selling Price</label>
                                 <input type="number" class="form-control" id="rselling_price" name="selling_price" required>
                             </div>
@@ -173,9 +176,9 @@
             <div class="content-body">
 
                 @if (session('success'))
-                <div class="alert alert-success" id="successMessage">
-                    {{ session('success') }}
-                </div>
+                    <div class="alert alert-success" id="successMessage">
+                        {{ session('success') }}
+                    </div>
                 @endif
 
                 <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
@@ -208,9 +211,9 @@
                                 <tbody>
                                     @foreach ($mobile as $key)
                                         <tr>
-                                            
-                                              <!--<td>{{ \Carbon\Carbon::parse($key->sold_at)->tz('Asia/Karachi')->format('M d, Y, h:i A') }}</td>-->
-                                              <td>{{ \Carbon\Carbon::parse($key->sold_at)->format(' Y-m-d / h:i ') }}</td>
+
+                                            <!--<td>{{ \Carbon\Carbon::parse($key->sold_at)->tz('Asia/Karachi')->format('M d, Y, h:i A') }}</td>-->
+                                            <td>{{ \Carbon\Carbon::parse($key->sold_at)->format(' Y-m-d / h:i ') }}</td>
 
                                             <td>{{ $key->mobile_name }}</td>
                                             <td>{{ $key->imei_number }}</td>
@@ -223,16 +226,16 @@
                                             <td>{{ $key->selling_price }}</td>
                                             <td>{{ $key->customer_name }}</td>
                                             <td>{{ $key->availability }}</td>
-                                            <td><a href="" onclick="approve({{ $key->id }})"
-                                                    data-toggle="modal" data-target="#exampleModal1">
+                                            <td><a href="" onclick="approve({{ $key->id }})" data-toggle="modal"
+                                                    data-target="#exampleModal1">
                                                     @if ($key->is_approve == 'Not_Approved')
                                                         <span class="badge badge-danger">{{ $key->is_approve }}</span>
                                                     @else
                                                         <span class="badge badge-success">{{ $key->is_approve }}</span>
                                                     @endif
                                                 </a></td>
-                                                <td><a href="" onclick="restore({{ $key->id }})"
-                                                    data-toggle="modal" data-target="#exampleModal2">
+                                            <td><a href="" onclick="restore({{ $key->id }})" data-toggle="modal"
+                                                    data-target="#exampleModal2">
                                                     <i class="fa fa-exchange" style="font-size: 20px"></i></a></td>
 
 
@@ -243,7 +246,7 @@
                         </div>
                     </div>
                 </div>
-                 <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
+                <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
                     <div class="card"
                         style="background-image: linear-gradient(47deg, #1e7fd3, #6490b7); color: #8fa0af; transition: all 0.2s ease; margin-right: 20px; background-repeat: repeat;">
                         <div class="card-header latest-update-heading d-flex justify-content-between">
@@ -266,7 +269,7 @@
             $.ajax({
                 type: "GET",
                 url: '/findapmobile/' + id,
-                success: function(data) {
+                success: function (data) {
                     $("#approvemobile").trigger("reset");
 
                     $('#id').val(data.result.id);
@@ -286,7 +289,7 @@
 
 
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log('Error:', error);
                 }
             });
@@ -294,14 +297,14 @@
 
         // End Edit Function
 
-           //  restore Function
+        //  restore Function
         function restore(value) {
             console.log(value);
             var id = value;
             $.ajax({
                 type: "GET",
                 url: '/findapmobile/' + id,
-                success: function(data) {
+                success: function (data) {
                     $("#restoremobile").trigger("reset");
 
                     $('#rid').val(data.result.id);
@@ -315,7 +318,7 @@
 
 
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log('Error:', error);
                 }
             });
@@ -324,7 +327,7 @@
         // End Restore Function
 
         //Message Time Out
-        setTimeout(function() {
+        setTimeout(function () {
             document.getElementById('successMessage').style.display = 'none';
         }, 5000); // 15 seconds in milliseconds
         //End Message Time Out
