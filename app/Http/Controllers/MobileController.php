@@ -241,15 +241,29 @@ class MobileController extends Controller
             ? ($vendor ? $vendor->name : 'Unknown Vendor')
             : $data->customer_name;
 
-        MobileHistory::create([
-            'mobile_id' => $data->id,
-            'mobile_name' => $data->mobile_name,
-            'customer_name' => $historyCustomerName,
-            'battery_health' => $data->battery_health,
-            'cost_price' => $data->cost_price,
-            'selling_price' => $data->selling_price,
-            'availability_status' => $data->availability,
-        ]);
+        if ($data->availability == 'Sold') {
+            MobileHistory::create([
+                'mobile_id' => $data->id,
+                'mobile_name' => $data->mobile_name,
+                'customer_name' => $historyCustomerName,
+                'battery_health' => $data->battery_health,
+                'cost_price' => $data->cost_price,
+                'selling_price' => $data->selling_price,
+                'availability_status' => 'Sold',
+            ]);
+        } elseif ($data->availability == 'Pending') {
+            MobileHistory::create([
+                'mobile_id' => $data->id,
+                'mobile_name' => $data->mobile_name,
+                'customer_name' => $historyCustomerName,
+                'battery_health' => $data->battery_health,
+                'cost_price' => $data->cost_price,
+                'selling_price' => $data->selling_price,
+                'availability_status' => 'Pending',
+            ]);
+        }
+
+
 
         return redirect()->back()->with('success', 'Mobile status changed and account updated successfully.');
     }
@@ -320,7 +334,7 @@ class MobileController extends Controller
             'battery_health' => $data->battery_health,
             'cost_price' => $data->cost_price,
             'selling_price' => $data->selling_price,
-            'availability_status' => $data->availability,
+            'availability_status' => 'Restored',
         ]);
 
         return redirect()->back()->with('success', 'Mobile Restored successfully.');
@@ -349,7 +363,7 @@ class MobileController extends Controller
             'battery_health' => $data->battery_health,
             'cost_price' => $data->cost_price,
             'selling_price' => $data->selling_price,
-            'availability_status' => $data->availability,
+            'availability_status' => 'Got back the mobile',
         ]);
         return redirect()->back()->with('success', 'Mobile Restored successfully.');
     }
@@ -741,26 +755,38 @@ class MobileController extends Controller
 
     public function storeMultipleMobiles(Request $request)
     {
-
-        // dd($request->all());
         $vendorId = $request->vendor_id;
         $mobiles = $request->mobiles;
+
+        $vendor = Vendor::find($vendorId);
+        $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
 
         foreach ($mobiles as $entry) {
             $mobile = new Mobile($entry);
             $mobile->user_id = auth()->id();
-             $mobile->battery_health = $entry['battery_health'] ?? null;
             $mobile->original_owner_id = auth()->id();
+            $mobile->battery_health = $entry['battery_health'] ?? null;
             $mobile->availability = 'Available';
             $mobile->is_approve = 'Not_Approved';
             $mobile->vendor_id = $vendorId;
             $mobile->save();
+
+            // Create mobile history
+            MobileHistory::create([
+                'mobile_id' => $mobile->id,
+                'mobile_name' => $mobile->mobile_name,
+                'customer_name' => $vendorName,
+                'battery_health' => $mobile->battery_health,
+                'cost_price' => $mobile->cost_price,
+                'selling_price' => $mobile->selling_price,
+                'availability_status' => 'Purchased',
+            ]);
         }
 
         // Account entry for total cost
-        if ($vendorId) {
-            $vendor = Vendor::find($vendorId);
+        if ($vendorId && isset($vendor)) {
             $totalCost = collect($mobiles)->sum('cost_price');
+
             Accounts::create([
                 'vendor_id' => $vendorId,
                 'category' => 'CR',
@@ -771,6 +797,7 @@ class MobileController extends Controller
 
         return response()->json(['success' => true]);
     }
+
 
 
 

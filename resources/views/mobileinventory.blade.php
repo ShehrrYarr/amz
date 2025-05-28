@@ -965,7 +965,7 @@
                 if (availability === 'Pending') {
                     // If pending, hide both fields
                     $('#payAmountContainer').hide();
-                    $('#customer_name').closest('.mb-1').hide();
+                    // $('#customer_name').closest('.mb-1').hide();
                 } else if (vendorSelected) {
                     // If vendor selected, show Pay Amount and hide Customer Name
                     $('#payAmountContainer').show();

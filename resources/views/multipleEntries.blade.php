@@ -6,7 +6,30 @@
             height: 38px !important;
             padding: 5px 10px;
         }
+
+        ,
+        #savingOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
     </style>
+
+
+
     <div class="app-content content">
         <div class="content-overlay"></div>
         <div class="content-wrapper">
@@ -74,26 +97,26 @@
                                                 <option value="Non-PTA">Non-PTA</option>
                                             </select>
                                         </div>
-                                        
-                                        
+
+
                                     </div>
                                     <div class="row mt-2">
 
-                                    <div class="col-md-3"><input type="text" class="form-control" placeholder="Color"
+                                        <div class="col-md-3"><input type="text" class="form-control" placeholder="Color"
                                                 id="color"></div>
-                                                <div class="col-md-3"><input type="text" class="form-control" placeholder="Storage"
+                                        <div class="col-md-3"><input type="text" class="form-control" placeholder="Storage"
                                                 id="storage"></div>
                                         <div class="col-md-3"><input type="text" class="form-control"
                                                 placeholder="Battery Health" id="battery_health"></div>
                                         <div class="col-md-3"><input type="number" class="form-control"
                                                 placeholder="Cost Price" id="cost_price"></div>
-                                        
+
                                         <!-- //Company -->
                                     </div>
                                     <div class="row mt-2">
                                         <div class="col-md-3"><input type="number" class="form-control"
                                                 placeholder="Selling Price" id="selling_price"></div>
-                                        
+
                                         <div class="col-md-3"><input type="text" class="form-control" placeholder="IMEI"
                                                 id="imei_number" maxlength="15"></div>
                                     </div>
@@ -146,6 +169,34 @@
             </div>
         </div>
     </div>
+
+    <!-- Saving Overlay -->
+    <div id="savingOverlay" style="
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex-direction: column;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;">
+
+        <div id="savingSpinner" class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Saving...</span>
+        </div>
+        <div id="savingText" class="mt-3">Saving the entries, please wait...</div>
+    </div>
+
 
     <script>
         let previewData = [];
@@ -230,19 +281,19 @@
                     totalSell += item.selling_price;
 
                     tbody.append(`
-                            <tr>
-                                <td>${item.mobile_name}</td>
-                                <td>${item.imei_number}</td>
-                                <td>${item.sim_lock}</td>
-                                <td>${item.color}</td>
-                                <td>${item.storage}</td>
-                                <td>${item.battery_health}</td>
-                                <td>${item.cost_price.toFixed(2)}</td>
-                                <td>${item.selling_price.toFixed(2)}</td>
-                                <td>${profit.toFixed(2)}</td>
-                                <td><button class="btn btn-danger btn-sm" onclick="removeRow(${index})">Delete</button></td>
-                            </tr>
-                        `);
+                                                <tr>
+                                                    <td>${item.mobile_name}</td>
+                                                    <td>${item.imei_number}</td>
+                                                    <td>${item.sim_lock}</td>
+                                                    <td>${item.color}</td>
+                                                    <td>${item.storage}</td>
+                                                    <td>${item.battery_health}</td>
+                                                    <td>${item.cost_price.toFixed(2)}</td>
+                                                    <td>${item.selling_price.toFixed(2)}</td>
+                                                    <td>${profit.toFixed(2)}</td>
+                                                    <td><button class="btn btn-danger btn-sm" onclick="removeRow(${index})">Delete</button></td>
+                                                </tr>
+                                            `);
                 });
 
                 $('#totalCost').text(totalCost.toFixed(2));
@@ -280,6 +331,14 @@
                     return;
                 }
 
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
+
+                // Show overlay and spinner
+                $('#savingOverlay').show();
+                $('#savingText').text('Saving the entries, please wait...');
+                $('#savingSpinner').removeClass('d-none');
+
                 $.ajax({
                     url: '{{ route("storeMultipleMobiles") }}',
                     method: 'POST',
@@ -288,15 +347,21 @@
                         mobiles: previewData,
                         _token: '{{ csrf_token() }}'
                     },
-                    success: function (res) {
-                        alert('Mobiles stored successfully.');
-                        location.reload();
+                    success: function () {
+                        $('#savingSpinner').removeClass('spinner-border').html('✅');
+                        $('#savingText').text('All mobiles stored successfully.');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
                     },
                     error: function () {
+                        $('#savingOverlay').hide();
+                        submitBtn.prop('disabled', false).html('Submit All');
                         alert('An error occurred.');
                     }
                 });
             });
+
 
             // Keyboard shortcuts
             $('#imei_number').keypress(function (e) {
@@ -328,171 +393,6 @@
     </script>
 
 
-    <!-- <script>
-                let previewData = [];
 
-                $('#vendor_id').on('change', function () {
-                    if ($(this).val()) {
-                        $(this).prop('disabled', true);
-                    }
-                });
-
-                $('#addMobileBtn').click(function () {
-                    const imei = $('#imei_number').val().trim();
-
-                    if (!imei || imei.length !== 15) {
-                        alert('IMEI must be 15 digits');
-                        return;
-                    }
-
-                    if (previewData.find(m => m.imei_number === imei)) {
-                        alert('This IMEI already added in the list.');
-                        return;
-                    }
-
-                    $.ajax({
-                        url: '{{ route("checkIMEI") }}',
-                        method: 'POST',
-                        data: {
-                            imei: imei,
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function (res) {
-                            if (res.exists) {
-                                alert('This IMEI already exists in the database.');
-                                return;
-                            }
-
-                            const mobile = {
-                                mobile_name: $('#mobile_name').val(),
-                                imei_number: imei,
-                                sim_lock: $('#sim_lock').val(),
-                                color: $('#color').val(),
-                                storage: $('#storage').val(),
-                                battery_health: $('#battery_health').val(),
-                                cost_price: parseFloat($('#cost_price').val()) || 0,
-                                selling_price: parseFloat($('#selling_price').val()) || 0,
-                                company_id: $('#company_id').val(),
-                                group_id: $('#group_id').val(),
-                            };
-                            previewData.push(mobile);
-                            updatePreviewTable();
-                            clearFields();
-                        }
-                    });
-                });
-
-                function updatePreviewTable() {
-                    const tbody = $('#previewTable tbody');
-                    tbody.empty();
-
-                    let totalCost = 0, totalSell = 0;
-
-                    previewData.forEach((item, index) => {
-                        const profit = item.selling_price - item.cost_price;
-                        totalCost += item.cost_price;
-                        totalSell += item.selling_price;
-
-                        tbody.append(`
-                                                                <tr>
-                                                                    <td>${item.mobile_name}</td>
-                                                                    <td>${item.imei_number}</td>
-                                                                    <td>${item.sim_lock}</td>
-                                                                    <td>${item.color}</td>
-                                                                    <td>${item.storage}</td>
-                                                                    <td>${item.battery_health}</td>
-                                                                    <td>${item.cost_price.toFixed(2)}</td>
-                                                                    <td>${item.selling_price.toFixed(2)}</td>
-                                                                    <td>${profit.toFixed(2)}</td>
-                                                                    <td><button class="btn btn-danger btn-sm" onclick="removeRow(${index})">Delete</button></td>
-                                                                </tr>
-                                                            `);
-                    });
-
-                    $('#totalCost').text(totalCost.toFixed(2));
-                    $('#totalSell').text(totalSell.toFixed(2));
-                    $('#totalProfit').text((totalSell - totalCost).toFixed(2));
-                }
-
-                function removeRow(index) {
-                    previewData.splice(index, 1);
-                    updatePreviewTable();
-                }
-
-                function clearFields() {
-                    $('#imei_number').val('');
-                    // $('#mobile_name, #sim_lock, #color, #storage, #battery_health, #cost_price, #selling_price, #company_id, #group_id').val('');
-                    $('#imei_number').focus();
-                }
-
-                $('#multiMobileForm').submit(function (e) {
-                    e.preventDefault();
-
-                    if (!previewData.length) {
-                        alert("Please add at least one mobile.");
-                        return;
-                    }
-
-                    $.ajax({
-                        url: '{{ route("storeMultipleMobiles") }}',
-                        method: 'POST',
-                        data: {
-                            vendor_id: $('#vendor_id').val(),
-                            mobiles: previewData,
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function (res) {
-                            alert('Mobiles stored successfully.');
-                            location.reload();
-                        },
-                        error: function () {
-                            alert('An error occurred.');
-                        }
-                    });
-                });
-
-
-                //Shortcut keys
-                $(document).ready(function () {
-                    // Press Enter on IMEI field to trigger Add Mobile
-                    $('#imei_number').keypress(function (e) {
-                        if (e.which === 13) {
-                            $('#addMobileBtn').click();
-                            return false; // Prevent form submission
-                        }
-                    });
-
-                    // Ctrl + Enter on price fields also adds mobile
-                    $('#cost_price, #selling_price').keydown(function (e) {
-                        if (e.ctrlKey && e.key === 'Enter') {
-                            $('#addMobileBtn').click();
-                            return false;
-                        }
-                    });
-
-                    // Esc key clears only IMEI field
-                    $(document).keydown(function (e) {
-                        if (e.key === "Escape") {
-                            $('#imei_number').val('').focus();
-                        }
-                    });
-
-                    // Ctrl + S to submit the entire form
-                    $(document).keydown(function (e) {
-                        if (e.ctrlKey && e.key === 's') {
-                            e.preventDefault();
-                            $('#multiMobileForm').submit();
-                        }
-                    });
-                });
-
-                $(document).ready(function () {
-                    $('#vendor_id').select2({
-                        placeholder: "Select a vendor",
-                        allowClear: true,
-                        width: '100%' // Optional to make it responsive
-                    });
-                });
-            </script> -->
 
 @endsection

@@ -27,7 +27,7 @@
                     </div>
                 @endif
 
-          
+
 
                 <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1 ">
                     <div class="card ">
@@ -36,7 +36,7 @@
 
                         </div>
                         <div class="table-responsive">
-                            <table class="table table-striped table-bordered zero-configuration">
+                            <table class="table table-striped table-bordered zero-configuration" id="mobileTable">
                                 <thead>
                                     <tr>
                                         <th>Created At</th>
@@ -73,6 +73,15 @@
         </div>
     </div>
 
+    <script>
+        $(document).ready(function () {
+            $('#mobileTable').DataTable({
+                order: [
+                    [0, 'desc']
+                ]
+            });
+        });
+    </script>
 
 
 
