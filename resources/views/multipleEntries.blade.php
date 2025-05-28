@@ -1,35 +1,31 @@
 @extends('user_navbar')
 @section('content')
 
+    <style>
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            padding: 5px 10px;
+        }
+    </style>
     <div class="app-content content">
         <div class="content-overlay"></div>
         <div class="content-wrapper">
-            <div class="content-header row">
-            </div>
+            <div class="content-header row"></div>
             <div class="content-body">
                 @if (session('success'))
-                    <div class="alert alert-success" id="successMessage">
-                        {{ session('success') }}
-                    </div>
+                    <div class="alert alert-success" id="successMessage">{{ session('success') }}</div>
                 @endif
-
                 @if (session('danger'))
-                    <div class="alert alert-danger" id="dangerMessage" style="color: red;">
-                        {{ session('danger') }}
-                    </div>
+                    <div class="alert alert-danger" id="dangerMessage" style="color: red;">{{ session('danger') }}</div>
                 @endif
 
-
-                <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1 ">
-                    <div class="card ">
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Multiple Entries</h4>
-
+                <div class="col-12 latest-update-tracking mt-1">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <h4 class="text-bold-500">Multiple Entries</h4>
                         </div>
 
                         <div class="container">
-                            <h3>Add Multiple Mobiles</h3>
-
                             <form id="multiMobileForm">
                                 @csrf
 
@@ -73,6 +69,24 @@
                                                 placeholder="Cost Price" id="cost_price"></div>
                                         <div class="col-md-2"><input type="number" class="form-control"
                                                 placeholder="Selling Price" id="selling_price"></div>
+                                        <div class="col-md-3">
+                                            <select class="form-control" id="company_id">
+                                                <option value="">Select Company</option>
+                                                @foreach ($companies as $company)
+                                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-control" id="group_id">
+                                                <option value="">Select Group</option>
+                                                @foreach ($groups as $group)
+                                                    <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
                                         <div class="col-md-2">
                                             <button type="button" class="btn btn-success w-100" id="addMobileBtn">Add
                                                 Mobile</button>
@@ -112,8 +126,6 @@
                             </form>
                         </div>
 
-
-
                         <script>
                             let previewData = [];
 
@@ -131,13 +143,11 @@
                                     return;
                                 }
 
-                                // Check for duplicate in previewData
                                 if (previewData.find(m => m.imei_number === imei)) {
                                     alert('This IMEI already added in the list.');
                                     return;
                                 }
 
-                                // AJAX check in DB
                                 $.ajax({
                                     url: '{{ route("checkIMEI") }}',
                                     method: 'POST',
@@ -159,7 +169,9 @@
                                             storage: $('#storage').val(),
                                             battery_health: $('#battery_health').val(),
                                             cost_price: parseFloat($('#cost_price').val()) || 0,
-                                            selling_price: parseFloat($('#selling_price').val()) || 0
+                                            selling_price: parseFloat($('#selling_price').val()) || 0,
+                                            company_id: $('#company_id').val(),
+                                            group_id: $('#group_id').val(),
                                         };
                                         previewData.push(mobile);
                                         updatePreviewTable();
@@ -180,21 +192,19 @@
                                     totalSell += item.selling_price;
 
                                     tbody.append(`
-                                            <tr>
-                                                <td>${item.mobile_name}</td>
-                                                <td>${item.imei_number}</td>
-                                                <td>${item.sim_lock}</td>
-                                                <td>${item.color}</td>
-                                                <td>${item.storage}</td>
-                                                <td>${item.battery_health}</td>
-                                                <td>${item.cost_price.toFixed(2)}</td>
-                                                <td>${item.selling_price.toFixed(2)}</td>
-                                                <td>${profit.toFixed(2)}</td>
-                                                <td>
-                                                    <button class="btn btn-danger btn-sm" onclick="removeRow(${index})">Delete</button>
-                                                </td>
-                                            </tr>
-                                        `);
+                                                <tr>
+                                                    <td>${item.mobile_name}</td>
+                                                    <td>${item.imei_number}</td>
+                                                    <td>${item.sim_lock}</td>
+                                                    <td>${item.color}</td>
+                                                    <td>${item.storage}</td>
+                                                    <td>${item.battery_health}</td>
+                                                    <td>${item.cost_price.toFixed(2)}</td>
+                                                    <td>${item.selling_price.toFixed(2)}</td>
+                                                    <td>${profit.toFixed(2)}</td>
+                                                    <td><button class="btn btn-danger btn-sm" onclick="removeRow(${index})">Delete</button></td>
+                                                </tr>
+                                            `);
                                 });
 
                                 $('#totalCost').text(totalCost.toFixed(2));
@@ -209,7 +219,7 @@
 
                             function clearFields() {
                                 $('#imei_number').val('');
-                                $('#mobile_name, #sim_lock, #color, #storage, #battery_health, #cost_price, #selling_price').val('');
+                                // $('#mobile_name, #sim_lock, #color, #storage, #battery_health, #cost_price, #selling_price, #company_id, #group_id').val('');
                                 $('#imei_number').focus();
                             }
 
@@ -238,30 +248,55 @@
                                     }
                                 });
                             });
+
+
+                            //Shortcut keys
+                            $(document).ready(function () {
+                                // Press Enter on IMEI field to trigger Add Mobile
+                                $('#imei_number').keypress(function (e) {
+                                    if (e.which === 13) {
+                                        $('#addMobileBtn').click();
+                                        return false; // Prevent form submission
+                                    }
+                                });
+
+                                // Ctrl + Enter on price fields also adds mobile
+                                $('#cost_price, #selling_price').keydown(function (e) {
+                                    if (e.ctrlKey && e.key === 'Enter') {
+                                        $('#addMobileBtn').click();
+                                        return false;
+                                    }
+                                });
+
+                                // Esc key clears only IMEI field
+                                $(document).keydown(function (e) {
+                                    if (e.key === "Escape") {
+                                        $('#imei_number').val('').focus();
+                                    }
+                                });
+
+                                // Ctrl + S to submit the entire form
+                                $(document).keydown(function (e) {
+                                    if (e.ctrlKey && e.key === 's') {
+                                        e.preventDefault();
+                                        $('#multiMobileForm').submit();
+                                    }
+                                });
+                            });
+
+                            $(document).ready(function () {
+                                $('#vendor_id').select2({
+                                    placeholder: "Select a vendor",
+                                    allowClear: true,
+                                    width: '100%' // Optional to make it responsive
+                                });
+                            });
                         </script>
 
                     </div>
                 </div>
-
-
             </div>
         </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @endsection

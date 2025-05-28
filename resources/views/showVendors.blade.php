@@ -102,7 +102,7 @@
                             </div>
                             <div class="mb-1">
                                 <label for="city" class="form-label">City</label>
-                                <input type="text" class="form-control" id="vcity" name="city" >
+                                <input type="text" class="form-control" id="vcity" name="city">
                             </div>
                             <div class="mb-1">
                                 <label for="mobile_no" class="form-label">Mobile #</label>
@@ -110,7 +110,7 @@
                             </div>
                             <div class="mb-1">
                                 <label for="CNIC" class="form-label">CNIC</label>
-                                <input type="text" class="form-control" id="vCNIC" name="CNIC" >
+                                <input type="text" class="form-control" id="vCNIC" name="CNIC">
                             </div>
                             <div class="mb-1">
                                 <label for="vendor_picture" class="form-label">Vendor Picture</label><br>
@@ -220,6 +220,7 @@
                                 <thead>
                                     <tr>
                                         <th>Created At</th>
+                                        <th>Accounts</th>
                                         <th>Picture</th>
 
                                         <th>Vendor Name</th>
@@ -229,7 +230,6 @@
                                         <th>CNIC</th>
                                         <th>Sent to Vendor Mobiles</th>
                                         <th>Mobiles Receive From Vendor</th>
-                                        <th>Accounts</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -237,6 +237,11 @@
                                     @foreach ($vendors as $key)
                                         <tr>
                                             <td>{{ $key->created_at }}</td>
+                                            <td>
+                                                <a href="{{ route('showAccounts', $key->id) }}" class="btn btn-sm btn-primary">
+                                                    <i class="fa fa-book"></i>
+                                                </a>
+                                            </td>
                                             <td>
                                                 @if($key->picture)
                                                     <a href="{{ asset('storage/' . $key->picture) }}" target="_blank">
@@ -265,18 +270,14 @@
                                                     <i class="fa fa-eye"></i>
                                                 </a>
                                             </td>
-                                              <td>
-                                                <a href="{{ route('showAccounts', $key->id) }}" class="btn btn-sm btn-primary">
-                                                    <i class="fa fa-book"></i>
-                                                </a>
-                                            </td>
+
                                             <td>
                                                 <a href="" onclick="edit({{ $key->id }})" data-toggle="modal"
                                                     data-target="#exampleModal1">
-                                                    <i class="feather icon-edit"></i></a> |
-                                                <a href="" onclick="remove({{ $key->id }})" data-toggle="modal"
-                                                    data-target="#exampleModal2"><i style="color:red"
-                                                        class="feather icon-trash"></i></a>
+                                                    <i class="feather icon-edit"></i></a>
+                                                <!-- <a href="" onclick="remove({{ $key->id }})" data-toggle="modal"
+                                                            data-target="#exampleModal2"><i style="color:red"
+                                                                class="feather icon-trash"></i></a> -->
                                             </td>
                                         </tr>
                                     @endforeach
@@ -366,7 +367,7 @@
             });
         }
 
-       
+
 
         //Preview mb-2// Live preview of selected image
         $('#edit_vendor_picture').on('change', function () {
