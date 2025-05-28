@@ -47,9 +47,8 @@
                                     <div class="row">
                                         <div class="col-md-3"><input type="text" class="form-control"
                                                 placeholder="Mobile Name" id="mobile_name"></div>
-                                        <div class="col-md-3"><input type="text" class="form-control" placeholder="IMEI"
-                                                id="imei_number" maxlength="15"></div>
-                                        <div class="col-md-2">
+
+                                        <div class="col-md-3">
                                             <select class="form-control" id="sim_lock">
                                                 <option value="">SIM Lock</option>
                                                 <option value="J.V">J.V</option>
@@ -57,17 +56,17 @@
                                                 <option value="Non-PTA">Non-PTA</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-2"><input type="text" class="form-control" placeholder="Color"
+                                        <div class="col-md-3"><input type="text" class="form-control" placeholder="Color"
                                                 id="color"></div>
-                                        <div class="col-md-2"><input type="text" class="form-control" placeholder="Storage"
+                                        <div class="col-md-3"><input type="text" class="form-control" placeholder="Storage"
                                                 id="storage"></div>
                                     </div>
                                     <div class="row mt-2">
-                                        <div class="col-md-2"><input type="text" class="form-control"
+                                        <div class="col-md-3"><input type="text" class="form-control"
                                                 placeholder="Battery Health" id="battery_health"></div>
-                                        <div class="col-md-2"><input type="number" class="form-control"
+                                        <div class="col-md-3"><input type="number" class="form-control"
                                                 placeholder="Cost Price" id="cost_price"></div>
-                                        <div class="col-md-2"><input type="number" class="form-control"
+                                        <div class="col-md-3"><input type="number" class="form-control"
                                                 placeholder="Selling Price" id="selling_price"></div>
                                         <div class="col-md-3">
                                             <select class="form-control" id="company_id">
@@ -77,6 +76,8 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                    </div>
+                                    <div class="row mt-2">
                                         <div class="col-md-3">
                                             <select class="form-control" id="group_id">
                                                 <option value="">Select Group</option>
@@ -85,7 +86,11 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                        <div class="col-md-3"><input type="text" class="form-control" placeholder="IMEI"
+                                                id="imei_number" maxlength="15"></div>
                                     </div>
+
+
                                     <div class="row mt-2">
                                         <div class="col-md-2">
                                             <button type="button" class="btn btn-success w-100" id="addMobileBtn">Add
@@ -192,19 +197,19 @@
                                     totalSell += item.selling_price;
 
                                     tbody.append(`
-                                                <tr>
-                                                    <td>${item.mobile_name}</td>
-                                                    <td>${item.imei_number}</td>
-                                                    <td>${item.sim_lock}</td>
-                                                    <td>${item.color}</td>
-                                                    <td>${item.storage}</td>
-                                                    <td>${item.battery_health}</td>
-                                                    <td>${item.cost_price.toFixed(2)}</td>
-                                                    <td>${item.selling_price.toFixed(2)}</td>
-                                                    <td>${profit.toFixed(2)}</td>
-                                                    <td><button class="btn btn-danger btn-sm" onclick="removeRow(${index})">Delete</button></td>
-                                                </tr>
-                                            `);
+                                                    <tr>
+                                                        <td>${item.mobile_name}</td>
+                                                        <td>${item.imei_number}</td>
+                                                        <td>${item.sim_lock}</td>
+                                                        <td>${item.color}</td>
+                                                        <td>${item.storage}</td>
+                                                        <td>${item.battery_health}</td>
+                                                        <td>${item.cost_price.toFixed(2)}</td>
+                                                        <td>${item.selling_price.toFixed(2)}</td>
+                                                        <td>${profit.toFixed(2)}</td>
+                                                        <td><button class="btn btn-danger btn-sm" onclick="removeRow(${index})">Delete</button></td>
+                                                    </tr>
+                                                `);
                                 });
 
                                 $('#totalCost').text(totalCost.toFixed(2));
