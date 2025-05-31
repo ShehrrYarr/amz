@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Accounts;
 use App\Models\Mobile;
 use App\Models\TransferRecord;
 use Illuminate\Http\Request;
@@ -32,7 +33,6 @@ class UserController extends Controller
         $pendingMobilesCost = Mobile::where('availability', 'Pending')->where('is_approve', 'Not_Approved')
             ->where('is_transfer', false)->sum('cost_price');
 
-        // Received sold mobiles
 
         // Total Cost Price
         $totalCostPrice = DB::table('mobiles')->where('availability', 'Available')
@@ -78,6 +78,14 @@ class UserController extends Controller
                 ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
                 ->sum('cost_price');
 
+        //Debit/Credit calculation
+        $totalDebit = Accounts::where('category', 'DB')
+            ->sum('amount');
+
+        // Total Credit (Purchases from Vendors)
+        $totalCredit = Accounts::where('category', 'CR')
+            ->sum('amount');
+
 
 
 
@@ -89,7 +97,9 @@ class UserController extends Controller
             'sumCostPrice',
             'profit',
             'pendingMobiles',
-            'pendingMobilesCost'
+            'pendingMobilesCost',
+            'totalDebit',
+            'totalCredit'
         ));
     }
 

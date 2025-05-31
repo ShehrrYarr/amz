@@ -36,6 +36,10 @@ class CreateMobilesTable extends Migration
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('original_owner_id')->references('id')->on('users')->onDelete('set null');
+
+             $table->unsignedBigInteger('sold_user_id')->nullable();
+            $table->foreign('sold_user_id')->references('id')->on('users')->onDelete('set null');
+
             $table->unsignedBigInteger('vendor_id')->nullable();
             $table->foreign('vendor_id')->references('id')->on('vendors')->onDelete('set null');
              $table->unsignedBigInteger('sold_vendor_id')->nullable();
