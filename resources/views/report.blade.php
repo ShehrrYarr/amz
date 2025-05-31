@@ -42,6 +42,29 @@
                                 <option value="Sold">Sold</option>
                             </select>
                         </div>
+
+                        <div class="col-md-3">
+                            <label>Company</label>
+                            <select id="company_id" class="form-control">
+                                <option value="">-- Select Company --</option>
+                                @foreach($company as $c)
+                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-2">
+                            <label>Group</label>
+                            <select id="group_id" class="form-control">
+                                <option value="">-- Select Group --</option>
+                                @foreach($group as $g)
+                                    <option value="{{ $g->id }}">{{ $g->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="col-md-3 d-flex align-items-end">
                             <button class="btn btn-primary w-100" id="filterButton">Generate Report</button>
                         </div>
@@ -95,75 +118,87 @@
     </div>
 
     <script>
-        $('#filterButton').click(function () {
-            let start = $('#start_date').val();
-            let end = $('#end_date').val();
-            let availability = $('#availability').val();
-
-            $.ajax({
-                url: "{{ route('report.fetch') }}",
-                method: "GET",
-                data: {
-                    start_date: start,
-                    end_date: end,
-                    availability: availability
-                },
-                success: function (response) {
-                    // Summary
-                    $('#reportResults').html(`<h5>${response.summary.label}: <strong>Rs. ${Number(response.summary.value).toLocaleString()}</strong></h5>`);
-
-                    // Clear existing table
-                    $('#mobileTable tbody').html('');
-
-                    response.mobiles.forEach(function (mobile) {
-                        let customer = '-';
-                        if (response.availability === 'Sold') {
-                            if (mobile.sold_vendor) {
-                                customer = mobile.sold_vendor.name;
-                            } else if (mobile.customer_name) {
-                                customer = mobile.customer_name;
-                            }
-                        }
-
-                        const row = `
-                        <tr>
-                            <td>${mobile.created_at}</td>
-                            <td>${mobile.sold_at ?? '-'}</td>
-                            <td>${mobile.mobile_name}</td>
-                            <td>${mobile.company?.name ?? '-'}</td>
-                            <td>${mobile.group?.name ?? '-'}</td>
-                            <td>${mobile.vendor?.name ?? '-'}</td>
-                            <td>${customer}</td>
-                            <td>${mobile.imei_number}</td>
-                            <td>${mobile.sim_lock}</td>
-                            <td>${mobile.color}</td>
-                            <td>${mobile.storage}</td>
-                            <td>${mobile.battery_health ?? '-'}</td>
-                            <td>Rs. ${Number(mobile.cost_price).toLocaleString()}</td>
-                            <td>Rs. ${Number(mobile.selling_price).toLocaleString()}</td>
-                            <td>-</td>
-                            <td>${mobile.availability}</td>
-                        </tr>
-                    `;
-                        $('#mobileTable tbody').append(row);
-                    });
-
-                    // Hide/show columns
-                    toggleColumnVisibility(1, response.availability === 'Sold'); // Sold at
-                    toggleColumnVisibility(6, response.availability === 'Sold'); // Customer Name
-                },
-                error: function () {
-                    $('#reportResults').html('<div class="alert alert-danger">Error loading report</div>');
-                }
+        $(document).ready(function () {
+            const table = $('#mobileTable').DataTable({
+                destroy: true,
+                ordering: true,
+                paging: true,
+                searching: true,
+                info: true
             });
+
+            $('#filterButton').click(function () {
+                let start = $('#start_date').val();
+                let end = $('#end_date').val();
+                let availability = $('#availability').val();
+                let company_id = $('#company_id').val();
+                let group_id = $('#group_id').val();
+
+                $.ajax({
+                    url: "{{ route('report.fetch') }}",
+                    method: "GET",
+                    data: {
+                        start_date: start,
+                        end_date: end,
+                        availability: availability,
+                        company_id: company_id,
+                        group_id: group_id
+                    },
+                    success: function (response) {
+                        // Show summary
+                        $('#reportResults').html(`
+                        <h5>${response.summary.label}: 
+                        <strong>Rs. ${Number(response.summary.value).toLocaleString()}</strong></h5>
+                    `);
+
+                        // Clear existing rows in DataTable
+                        table.clear();
+
+                        // Append rows
+                        response.mobiles.forEach(function (mobile) {
+                            let customer = '-';
+                            if (response.availability === 'Sold') {
+                                customer = mobile.sold_vendor?.name || mobile.customer_name || '-';
+                            }
+
+                            table.row.add([
+                                mobile.created_at,
+                                mobile.sold_at ?? '-',
+                                mobile.mobile_name,
+                                mobile.company?.name ?? '-',
+                                mobile.group?.name ?? '-',
+                                mobile.vendor?.name ?? '-',
+                                customer,
+                                mobile.imei_number,
+                                mobile.sim_lock,
+                                mobile.color,
+                                mobile.storage,
+                                mobile.battery_health ?? '-',
+                                `Rs. ${Number(mobile.cost_price).toLocaleString()}`,
+                                `Rs. ${Number(mobile.selling_price).toLocaleString()}`,
+                                '-', // For Mobile History
+                                mobile.availability
+                            ]);
+                        });
+
+                        table.draw();
+
+                        // Show/hide columns
+                        toggleColumnVisibility(table, 1, response.availability === 'Sold'); // Sold at
+                        toggleColumnVisibility(table, 6, response.availability === 'Sold'); // Customer Name
+                    },
+                    error: function () {
+                        $('#reportResults').html('<div class="alert alert-danger">Error loading report</div>');
+                    }
+                });
+            });
+
+            function toggleColumnVisibility(table, columnIndex, visible) {
+                table.column(columnIndex).visible(visible);
+            }
         });
 
-        function toggleColumnVisibility(index, show) {
-            $('#mobileTable tr').each(function () {
-                const cell = $(this).find('td, th').eq(index);
-                show ? cell.show() : cell.hide();
-            });
-        }
+
 
     </script>
 

@@ -22,31 +22,25 @@ class UserController extends Controller
     {
         //User Mobile Count
         $userMobileCount = Mobile::where('availability', 'Available')
-            ->where('is_transfer', false)->where('user_id', Auth::id())
-            ->count();
-      
+            ->where('is_transfer', false)->count();
+
 
         // User Sold Mobiles
-        $soldMobile = Mobile::where('user_id', auth()->user()->id)->where('availability', 'Sold')->where('is_approve', 'Not_Approved')->where('is_transfer', false)->count();
-        $pendingMobiles = Mobile::where('user_id', auth()->user()->id)
-        ->where('availability', 'Pending')->where('is_approve', 'Not_Approved')
-        ->where('is_transfer', false)->count();
-         $pendingMobilesCost = Mobile::where('user_id', auth()->user()->id)
-        ->where('availability', 'Pending')->where('is_approve', 'Not_Approved')
-        ->where('is_transfer', false) ->sum('cost_price');
+        $soldMobile = Mobile::where('availability', 'Sold')->where('is_approve', 'Not_Approved')->where('is_transfer', false)->count();
+        $pendingMobiles = Mobile::where('availability', 'Pending')->where('is_approve', 'Not_Approved')
+            ->where('is_transfer', false)->count();
+        $pendingMobilesCost = Mobile::where('availability', 'Pending')->where('is_approve', 'Not_Approved')
+            ->where('is_transfer', false)->sum('cost_price');
 
         // Received sold mobiles
-       
+
         // Total Cost Price
-        $totalCostPrice = DB::table('mobiles')
-            ->where('user_id', auth()->user()->id)
-            ->where('availability', 'Available')
+        $totalCostPrice = DB::table('mobiles')->where('availability', 'Available')
             ->where('is_transfer', false)
             ->sum('cost_price');
 
         // Total Sold mobile Cost
-        $totals = Mobile::where('user_id', auth()->user()->id)
-            ->where('availability', 'Sold')
+        $totals = Mobile::where('availability', 'Sold')
             ->where('is_transfer', false)
             ->where('is_approve', 'Not_Approved')
             ->selectRaw('SUM(cost_price) as total_cost, SUM(selling_price) as total_selling_price')
@@ -73,8 +67,7 @@ class UserController extends Controller
         $startOfWeek = Carbon::now()->startOfWeek(Carbon::FRIDAY);
         $endOfWeek = Carbon::now()->endOfWeek(Carbon::FRIDAY);
 
-        $profit = Mobile::where('user_id', auth()->user()->id)
-            ->where('availability', 'Sold')
+        $profit = Mobile::where('availability', 'Sold')
             ->where('is_transfer', false)
             ->where('is_approve', 'Not_Approved')
             ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
@@ -85,10 +78,19 @@ class UserController extends Controller
                 ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
                 ->sum('cost_price');
 
-        
 
 
-        return view('user_dashboard', compact('userMobileCount',  'soldMobile', 'totalCostPrice', 'totalSellingPrice', 'sumCostPrice', 'profit', 'pendingMobiles','pendingMobilesCost'));
+
+        return view('user_dashboard', compact(
+            'userMobileCount',
+            'soldMobile',
+            'totalCostPrice',
+            'totalSellingPrice',
+            'sumCostPrice',
+            'profit',
+            'pendingMobiles',
+            'pendingMobilesCost'
+        ));
     }
 
     /**

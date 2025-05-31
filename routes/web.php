@@ -525,4 +525,6 @@ Route::post('/mobiles/bulk-store', [MobileController::class, 'bulkStoreMobile'])
 //Report Routes
 Route::get('/report/fetch', [MobileController::class, 'fetch'])->name('report.fetch');
 Route::get('/report', function () {
-    return view('report'); })->middleware('auth');
+    $company = company::all ();
+    $group = group::all ();
+    return view('report',compact('company','group')); })->middleware('auth');

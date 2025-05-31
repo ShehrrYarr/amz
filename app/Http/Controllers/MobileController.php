@@ -706,6 +706,14 @@ class MobileController extends Controller
             $query->where('availability', $request->availability);
         }
 
+        if ($request->filled('company_id')) {
+            $query->where('company_id', $request->company_id);
+        }
+
+        if ($request->filled('group_id')) {
+            $query->where('group_id', $request->group_id);
+        }
+
         $mobiles = $query->get();
 
         // Calculate summary
@@ -735,6 +743,7 @@ class MobileController extends Controller
             'availability' => $request->availability,
         ]);
     }
+
 
 
     public function multipleEntries()
