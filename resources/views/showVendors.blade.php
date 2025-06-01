@@ -220,6 +220,7 @@
                                 <thead>
                                     <tr>
                                         <th>Created At</th>
+                                        <th>Created by</th>
                                         <th>Accounts</th>
                                         <th>Picture</th>
 
@@ -237,6 +238,7 @@
                                     @foreach ($vendors as $key)
                                         <tr>
                                             <td>{{ $key->created_at }}</td>
+                                            <td>{{ $key->creator->name }}</td>
                                             <td>
                                                 <a href="{{ route('showAccounts', $key->id) }}" class="btn btn-sm btn-primary">
                                                     <i class="fa fa-book"></i>

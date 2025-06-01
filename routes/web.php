@@ -112,9 +112,8 @@ Route::get('/manageinventory', function () {
         ->where('is_transfer', false)
         ->sum('cost_price');
 
-    $mobile = Mobile::where('user_id', auth()->user()->id)
-        ->where('availability', 'Available')
-        ->where('is_transfer', false)->with(['group', 'company', 'vendor'])
+    $mobile = Mobile::where('availability', 'Available')
+        ->where('is_transfer', false)->with(['group', 'company', 'vendor','creator'])
         ->get();
     // dd($mobile);
 
@@ -154,11 +153,12 @@ Route::get('/managerecentinventory', function () {
 
 
 Route::get('/soldinventory', function () {
-    $mobile = Mobile::where('user_id', auth()->user()->id)
-        ->where('availability', 'Sold')
+    $mobile = Mobile::where('availability', 'Sold')
         ->where('is_transfer', false)
-        ->where('is_approve', 'Not_Approved')
+        ->where('is_approve', 'Not_Approved')->with('soldBy')
         ->get();
+
+        // dd($mobile);
 
     // Calculate the sum of the profit for the $mobile collection
     $totalProfitMobile = $mobile->sum(function ($mobile) {
@@ -231,9 +231,10 @@ Route::get('/soldapprovedinventory', function () {
 
 Route::get('/pendinginventory', function () {
 
-    $mobile = Mobile::where('user_id', auth()->user()->id)->where('availability', 'Pending')->where('is_transfer', false)
-        ->where('is_approve', 'Not_Approved')
+    $mobile = Mobile::where('availability', 'Pending')->where('is_transfer', false)
+        ->where('is_approve', 'Not_Approved')->with('pendingBy')
         ->get();
+        // dd($mobile);
     return view('pendinginventory', compact('mobile'));
 })->middleware('auth');
 

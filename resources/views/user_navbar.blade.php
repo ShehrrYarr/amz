@@ -251,50 +251,8 @@
                                 </li>
 
 
-                                <li class=" navigation-header"><span>Other shops</span><i class=" feather icon-minus"
-                                                data-toggle="tooltip" data-placement="right"
-                                                data-original-title="Components"></i>
-                                </li>
-                                @foreach ($userData as $data)
-                                                                        <li class="nav-item"><a href="app-contacts.html"><i
-                                                                                                                        class="feather icon-credit-card"></i><span class="menu-title"
-                                                                                                                        data-i18n="Contacts">{{$data['user']->name}}</span></a>
-                                                                                        <ul class="menu-content">
-                                                                                                        <li class="@if (\Request::is('othertotalinventory')) active @endif"><a
-                                                                                                                                        class="menu-item"
-                                                                                                                                        href="/othertotalinventory/{{ $data['user']->id }}"
-                                                                                                                                        data-i18n="1 columns">Total
-                                                                                                                                        Inventory</a>
-                                                                                                        </li>
-                                                                                                        <li class="@if(\Request::is('otherinventory')) active @endif"><a
-                                                                                                                                        class="menu-item"
-                                                                                                                                        href="/otherinventory/{{$data['user']->id}}"
-                                                                                                                                        data-i18n="1 columns">Inventory</a></li>
-
-                                                                                                        <li class="@if(\Request::is('othersoldinventory')) active @endif"><a
-                                                                                                                                        class="menu-item"
-                                                                                                                                        href="/othersoldinventory/{{$data['user']->id}}"
-                                                                                                                                        data-i18n="2 columns">Sold
-                                                                                                                                        Inventory</a></li>
-                                                                                                        <li class="@if (\Request::is('otherpendinginventory')) active @endif"><a
-                                                                                                                                        class="menu-item"
-                                                                                                                                        href="/otherpendinginventory/{{ $data['user']->id }}"
-                                                                                                                                        data-i18n="2 columns">Pending
-                                                                                                                                        Inventory</a></li>
-                                                                                                        <li class="@if(\Request::is('othertransferinventory')) active @endif"><a
-                                                                                                                                        class="menu-item"
-                                                                                                                                        href="/othertransferinventory/{{$data['user']->id}}"
-                                                                                                                                        data-i18n="3 columns">Received
-                                                                                                                                        Inventory</a></li>
-                                                                                                        <li
-                                                                                                                        class="@if(\Request::is('othertransfersoldinventory')) active @endif">
-                                                                                                                        <a class="menu-item"
-                                                                                                                                        href="/othertransfersoldinventory/{{$data['user']->id}}"
-                                                                                                                                        data-i18n="4 columns">Sold
-                                                                                                                                        Received Inventory</a></li>
-                                                                                        </ul>
-                                                                        </li>
-                                                                @endforeach
+                                
+                                
 
                         </ul>
                 </div>

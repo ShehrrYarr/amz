@@ -17,6 +17,7 @@ class CreateMobileHistoriesTable extends Migration
              $table->id();
             $table->unsignedBigInteger('mobile_id');
             $table->string('mobile_name');
+            $table->string('created_by');
             
             $table->string('customer_name')->nullable();
             $table->string('battery_health')->nullable();

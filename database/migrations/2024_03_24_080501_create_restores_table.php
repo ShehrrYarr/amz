@@ -16,8 +16,6 @@ class CreateRestoresTable extends Migration
         Schema::create('restores', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->string('mobile_name');
             $table->string('restore_by');
             $table->string('customer_name')->nullable();
@@ -26,6 +24,9 @@ class CreateRestoresTable extends Migration
             $table->decimal('old_selling_price', 12, 2);
             $table->decimal('new_cost_price', 12, 2);
             $table->decimal('new_selling_price', 12, 2);
+            $table->unsignedBigInteger('restored_by')->nullable(); // who performed restore
+            $table->foreign('restored_by')->references('id')->on('users')->onDelete('set null');
+
         });
     }
 

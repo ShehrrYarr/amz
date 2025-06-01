@@ -156,6 +156,7 @@
                                 <thead>
                                     <tr>
                                         <th>Date</th>
+                                        <th>Created By</th>
                                         <th>Description</th>
                                         <th>Debit (DB)</th>
                                         <th>Credit (CR)</th>
@@ -166,6 +167,7 @@
                                     @foreach ($formatted as $row)
                                         <tr>
                                             <td>{{ $row['created_at'] }}</td>
+                                            <td>{{ $row['created_by'] }}</td>
                                             <td>{{ $row['description'] }}</td>
 
                                             {{-- Debit --}}
@@ -190,6 +192,7 @@
                                 <tfoot>
                                     <tr>
                                         <th>Total</th>
+                                        <th></th>
                                         <th></th>
                                         <th>{{ number_format($totalDebit, ) }}</th>
                                         <th>{{ number_format($totalCredit, ) }}</th>

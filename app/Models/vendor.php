@@ -10,7 +10,13 @@ class vendor extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'office_address', 'city', 'CNIC', 'mobile_no','picture'
+        'name',
+        'office_address',
+        'city',
+        'CNIC',
+        'mobile_no',
+        'picture',
+        'created_by'
     ];
 
     public function mobiles()
@@ -18,7 +24,12 @@ class vendor extends Model
         return $this->hasMany(Mobile::class);
     }
     public function accounts()
+    {
+        return $this->hasMany(Accounts::class);
+    }
+
+   public function creator()
 {
-    return $this->hasMany(Accounts::class);
+    return $this->belongsTo(User::class, 'created_by');
 }
 }

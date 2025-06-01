@@ -256,6 +256,7 @@
                                 <thead>
                                     <tr>
                                         <th>Pending at</th>
+                                        <th>Pending by</th>
                                         <th>Mobile Name</th>
                                         <th>IMEI#</th>
                                         <th>SIM Lock</th>
@@ -275,6 +276,7 @@
                                     @foreach ($mobile as $key)
                                         <tr>
                                             <td>{{ $key->sold_at }}</td>
+                                            <td>{{ $key->pendingBy->name }}</td>
                                             <td>{{ $key->mobile_name }}</td>
                                             <td>{{ $key->imei_number }}</td>
                                             <td>{{ $key->sim_lock }}</td>

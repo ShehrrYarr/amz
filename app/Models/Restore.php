@@ -9,4 +9,8 @@ class Restore extends Model
 {
     use HasFactory;
     protected $guarded =[];
+
+    public function restoredBy() {
+    return $this->belongsTo(User::class, 'restored_by');
+}
 }

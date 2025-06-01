@@ -16,9 +16,11 @@ class VendorController extends Controller
     }
     public function showVendors()
     {
-        $vendors = vendor::all();
+        $vendors = Vendor::with('creator')->get(); // eager load the user who added the vendor
+        // dd($vendors);
         return view('showVendors', compact('vendors'));
     }
+
 
     public function storeVendor(Request $request)
     {
@@ -28,8 +30,11 @@ class VendorController extends Controller
             'city' => 'nullable|string|max:100',
             'mobile_no' => 'required|string|max:20',
             'CNIC' => 'nullable|string|max:25',
-            'picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // validate picture
+            'picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+
+        $userId = auth()->user()->id;
+        // dd($userId);
 
         if (Vendor::where('name', $validated['name'])->exists()) {
             return redirect()->back()->withInput()->withErrors([
@@ -62,10 +67,12 @@ class VendorController extends Controller
             'mobile_no' => $validated['mobile_no'],
             'CNIC' => $validated['CNIC'],
             'picture' => $filePath,
+            'created_by' => $userId, // 👈 track who added the vendor
         ]);
 
         return redirect()->back()->with('success', 'Vendor added successfully!');
     }
+
 
 
     public function editVendor($id)

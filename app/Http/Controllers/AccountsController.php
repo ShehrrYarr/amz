@@ -34,40 +34,46 @@ class AccountsController extends Controller
     //     return view('showAccounts', compact('formatted', 'vendor', 'totalCredit', 'totalDebit'));
 // }
 
-   public function showAccounts($id)
-{
-    $accounts = Accounts::where('vendor_id', $id)->orderBy('created_at')->get();
-    $vendor = Vendor::findOrFail($id);
+    public function showAccounts($id)
+    {
+        $accounts = Accounts::with('creator') // eager load the user who created each entry
+            ->where('vendor_id', $id)
+            ->orderBy('created_at')
+            ->get();
 
-    $runningBalance = 0;
-    $formatted = $accounts->map(function ($item) use (&$runningBalance) {
-        if ($item->category === 'DB') {
-            $runningBalance += $item->amount;
-        } elseif ($item->category === 'CR') {
-            $runningBalance -= $item->amount;
-        }
+        $vendor = Vendor::findOrFail($id);
+        $runningBalance = 0;
 
-        return [
-            'created_at' => $item->created_at->format('Y-m-d H:i'),
-            'cr' => $item->category === 'CR' ? $item->amount : null,
-            'db' => $item->category === 'DB' ? $item->amount : null,
-            'balance' => $runningBalance,
-            'description' => $item->description ?? '-',
-        ];
-    });
+        $formatted = $accounts->map(function ($item) use (&$runningBalance) {
+            if ($item->category === 'DB') {
+                $runningBalance += $item->amount;
+            } elseif ($item->category === 'CR') {
+                $runningBalance -= $item->amount;
+            }
 
-    $totalCredit = $accounts->where('category', 'CR')->sum('amount');
-    $totalDebit = $accounts->where('category', 'DB')->sum('amount');
-    $netBalance = $runningBalance;
+            return [
+                'created_at' => $item->created_at->format('Y-m-d H:i'),
+                'cr' => $item->category === 'CR' ? $item->amount : null,
+                'db' => $item->category === 'DB' ? $item->amount : null,
+                'balance' => $runningBalance,
+                'description' => $item->description ?? '-',
+                'created_by' => $item->creator ? $item->creator->name : 'N/A',
+            ];
+        });
 
-    return view('showAccounts', compact(
-        'formatted',
-        'vendor',
-        'totalCredit',
-        'totalDebit',
-        'netBalance'
-    ));
-}
+        $totalCredit = $accounts->where('category', 'CR')->sum('amount');
+        $totalDebit = $accounts->where('category', 'DB')->sum('amount');
+        $netBalance = $runningBalance;
+
+        return view('showAccounts', compact(
+            'formatted',
+            'vendor',
+            'totalCredit',
+            'totalDebit',
+            'netBalance'
+        ));
+    }
+
 
 
 
@@ -82,11 +88,14 @@ class AccountsController extends Controller
             'description' => 'nullable|string|max:255',
         ]);
 
+        $userId = auth()->user()->id;
+
         Accounts::create([
             'vendor_id' => $request->vendor_id,
             'category' => 'CR', // Credit
             'amount' => $request->amount,
             'description' => $request->description ?? 'Manual credit entry',
+            'created_by' => $userId,
         ]);
 
         return redirect()->back()->with('success', 'Credit amount recorded successfully.');
@@ -102,11 +111,15 @@ class AccountsController extends Controller
             'description' => 'nullable|string|max:255',
         ]);
 
+        $userId = auth()->user()->id;
+
         Accounts::create([
             'vendor_id' => $request->vendor_id,
             'category' => 'DB', // Debit
             'amount' => $request->amount,
             'description' => $request->description ?? 'Manual debit entry',
+            'created_by' => $userId,
+
         ]);
 
         return redirect()->back()->with('success', 'Debit amount recorded successfully.');

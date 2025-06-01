@@ -41,6 +41,7 @@
                                     <tr>
                                         <th>Created At</th>
 
+                                        <th>Added By</th>
                                         <th>Mobile Name</th>
                                         <th>Customer Name</th>
                                         <th>Availability Status</th>
@@ -53,6 +54,7 @@
                                     @foreach ($history as $key)
                                         <tr>
                                             <td>{{ $key->created_at }}</td>
+                                            <td>{{ $key->created_by }}</td>
                                             <td>{{ $key->mobile_name }}</td>
                                             <td>{{ $key->customer_name }}</td>
                                             <td>{{ $key->availability_status }}</td>

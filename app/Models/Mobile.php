@@ -19,7 +19,7 @@ class Mobile extends Model
         'vendor_id',
         'company_id',
         'group_id',
-       ' battery_health'
+        ' battery_health'
 
     ];
 
@@ -36,21 +36,41 @@ class Mobile extends Model
         return $this->hasMany(mobile_transfer::class);
     }
 
-       public function vendor()
+    public function vendor()
     {
         return $this->belongsTo(vendor::class);
     }
-      public function soldVendor()
+    public function soldVendor()
     {
         return $this->belongsTo(vendor::class);
     }
     public function company()
-{
-    return $this->belongsTo(company::class);
-}
+    {
+        return $this->belongsTo(company::class);
+    }
 
-public function group()
-{
-    return $this->belongsTo(group::class);
-}
+    public function group()
+    {
+        return $this->belongsTo(group::class);
+    }
+
+    // Who added the mobile
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'added_by');
+    }
+
+    // Who sold the mobile
+    public function soldBy()
+    {
+        return $this->belongsTo(User::class, 'sold_by');
+    }
+
+    // Who marked the mobile as pending
+    public function pendingBy()
+    {
+        return $this->belongsTo(User::class, 'pending_by');
+    }
+
+
 }

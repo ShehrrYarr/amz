@@ -327,6 +327,7 @@
                                 <thead>
                                     <tr>
                                         <th>Sold at</th>
+                                        <th>Sold By</th>
                                         <th>Mobile Name</th>
                                         <th>IMEI#</th>
                                         <th>SIM Lock</th>
@@ -353,6 +354,7 @@
                                         <tr>
                                             <!--<td>{{ $key->sold_at }}</td>-->
                                             <td>{{ \Carbon\Carbon::parse($key->sold_at)->format(' Y-m-d / h:i ') }}</td>
+                                            <td>{{ $key->soldBy->name }}</td>
                                             <td>{{ $key->mobile_name }}</td>
                                             <td>{{ $key->imei_number }}</td>
                                             <td>{{ $key->sim_lock }}</td>
