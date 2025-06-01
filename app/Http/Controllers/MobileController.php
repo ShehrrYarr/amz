@@ -134,6 +134,8 @@ class MobileController extends Controller
         ]);
 
         $userId = auth()->user()->id;
+        $user = auth()->user();
+
 
         // Check if IMEI already exists
         $existingMobile = Mobile::where('imei_number', $validatedData['imei_number'])->first();
@@ -165,6 +167,17 @@ class MobileController extends Controller
                 'created_by' => $userId,
             ]);
         }
+
+          MobileHistory::create([
+                'mobile_id' => $mobile->id,
+                'mobile_name' => $mobile->mobile_name,
+                'customer_name' => $vendorName,
+                'battery_health' => $mobile->battery_health,
+                'cost_price' => $mobile->cost_price,
+                'selling_price' => $mobile->selling_price,
+                'availability_status' => 'Purchased',
+                'created_by' => $user->name, // Storing username here
+            ]);
 
         return redirect()->back()->with('success', 'Mobile created and account updated successfully.');
     }
