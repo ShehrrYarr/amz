@@ -484,6 +484,9 @@ Route::put('/updatevendor', [VendorController::class, 'updateVendor'])->name('up
 Route::post('/deletevendor', [VendorController::class, 'destroyVendor'])->name('destroyVendor');
 Route::get('/showvrHistory/{id}', [VendorController::class, 'showVRHistory'])->name('showVRHistory');
 Route::get('/showvsHistory/{id}', [VendorController::class, 'showVSHistory'])->name('showVSHistory');
+Route::get('/vendor-balance/{id}', [VendorController::class, 'getBalance'])->name('vendor.balance');
+Route::get('/vendor-balance', [VendorController::class, 'getBalance'])->name('getVendorBalance');
+
 
 
 

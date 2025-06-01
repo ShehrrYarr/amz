@@ -186,24 +186,24 @@
 
     <!-- Saving Overlay -->
     <div id="savingOverlay" style="
-                                                                                                            display: none;
-                                                                                                            position: fixed;
-                                                                                                            top: 0;
-                                                                                                            left: 0;
-                                                                                                            width: 100vw;
-                                                                                                            height: 100vh;
-                                                                                                            background-color: rgba(255, 255, 255, 0.8);
-                                                                                                            z-index: 9999;
-                                                                                                            backdrop-filter: blur(3px);
-                                                                                                            -webkit-backdrop-filter: blur(3px);
-                                                                                                            display: none;
-                                                                                                            justify-content: center;
-                                                                                                            align-items: center;
-                                                                                                            text-align: center;
-                                                                                                            flex-direction: column;
-                                                                                                            font-size: 1.5rem;
-                                                                                                            font-weight: bold;
-                                                                                                            color: #333;">
+                                                                                                    display: none;
+                                                                                                    position: fixed;
+                                                                                                    top: 0;
+                                                                                                    left: 0;
+                                                                                                    width: 100vw;
+                                                                                                    height: 100vh;
+                                                                                                    background-color: rgba(255, 255, 255, 0.8);
+                                                                                                    z-index: 9999;
+                                                                                                    backdrop-filter: blur(3px);
+                                                                                                    -webkit-backdrop-filter: blur(3px);
+                                                                                                    display: none;
+                                                                                                    justify-content: center;
+                                                                                                    align-items: center;
+                                                                                                    text-align: center;
+                                                                                                    flex-direction: column;
+                                                                                                    font-size: 1.5rem;
+                                                                                                    font-weight: bold;
+                                                                                                    color: #333;">
 
         <div id="savingSpinner" class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
             <span class="visually-hidden">Saving...</span>
@@ -322,19 +322,19 @@
                     totalSell += item.selling_price;
 
                     tbody.append(`
-                                                                                                    <tr>
-                                                                                                        <td>${item.mobile_name}</td>
-                                                                                                        <td>${item.imei_number}</td>
-                                                                                                        <td>${item.sim_lock}</td>
-                                                                                                        <td>${item.color}</td>
-                                                                                                        <td>${item.storage}</td>
-                                                                                                        <td>${item.battery_health}</td>
-                                                                                                        <td>${item.cost_price.toFixed(2)}</td>
-                                                                                                        <td>${item.selling_price.toFixed(2)}</td>
-                                                                                                        <td>${profit.toFixed(2)}</td>
-                                                                                                        <td><button class="btn btn-danger btn-sm" onclick="removeRow(${index})">Delete</button></td>
-                                                                                                    </tr>
-                                                                                                `);
+                                                                                            <tr>
+                                                                                                <td>${item.mobile_name}</td>
+                                                                                                <td>${item.imei_number}</td>
+                                                                                                <td>${item.sim_lock}</td>
+                                                                                                <td>${item.color}</td>
+                                                                                                <td>${item.storage}</td>
+                                                                                                <td>${item.battery_health}</td>
+                                                                                                <td>${item.cost_price.toFixed(2)}</td>
+                                                                                                <td>${item.selling_price.toFixed(2)}</td>
+                                                                                                <td>${profit.toFixed(2)}</td>
+                                                                                                <td><button class="btn btn-danger btn-sm" onclick="removeRow(${index})">Delete</button></td>
+                                                                                            </tr>
+                                                                                        `);
                 });
 
                 $('#totalCost').text(totalCost.toFixed(2));
@@ -345,45 +345,41 @@
             }
 
             function updateAdjustedBalance() {
-                const vendorText = $('#vendorBalanceValue').text().trim();
-                const totalCost = parseFloat($('#totalCost').text()) || 0;
+                let vendorText = $('#vendorBalanceText span').text();
+                let vendorBalance = parseFloat(vendorText.replace(/[^\d.-]/g, '')) || 0;
+                let isCredit = vendorText.includes('CREDIT');
+                let isDebit = vendorText.includes('DEBIT');
 
-                const balanceMatch = vendorText.match(/(CREDIT|DEBIT)\s*-\s*Rs\.\s*([0-9.]+)/i);
-                if (!balanceMatch) {
-                    $('#adjustedBalance').html('<span class="badge badge-secondary">Settled - Rs. 0</span>');
-                    return;
-                }
-
-                const type = balanceMatch[1].toUpperCase();
-                let currentBalance = parseFloat(balanceMatch[2]);
-                let adjustedBalance = 0;
-                let finalType = '';
+                let totalCost = parseFloat($('#totalCost').text()) || 0;
+                let adjusted = 0;
+                let finalLabel = '';
                 let badgeClass = '';
 
-                if (type === 'CREDIT') {
-                    adjustedBalance = currentBalance + totalCost;
-                    finalType = 'CREDIT';
+                if (isCredit) {
+                    adjusted = vendorBalance + totalCost;
+                    finalLabel = `Rs. ${adjusted.toFixed(2)} (CR)`;
                     badgeClass = 'badge-danger';
-                } else {
-                    adjustedBalance = currentBalance - totalCost;
+                } else if (isDebit) {
+                    adjusted = vendorBalance - totalCost;
 
-                    if (adjustedBalance > 0) {
-                        finalType = 'DEBIT';
+                    if (adjusted > 0) {
+                        finalLabel = `Rs. ${adjusted.toFixed(2)} (DB)`;
                         badgeClass = 'badge-success';
-                    } else if (adjustedBalance < 0) {
-                        finalType = 'CREDIT';
+                    } else if (adjusted < 0) {
+                        finalLabel = `Rs. ${Math.abs(adjusted).toFixed(2)} (CR)`;
                         badgeClass = 'badge-danger';
-                        adjustedBalance = Math.abs(adjustedBalance);
                     } else {
-                        finalType = 'Settled';
+                        finalLabel = `Rs. 0 (Settled)`;
                         badgeClass = 'badge-secondary';
                     }
+                } else {
+                    adjusted = totalCost;
+                    finalLabel = `Rs. ${adjusted.toFixed(2)} (DB)`;
+                    badgeClass = 'badge-success';
                 }
 
-                $('#adjustedBalance').html(`<span class="badge ${badgeClass}">${finalType} - Rs. ${adjustedBalance.toFixed(2)}</span>`);
+                $('#adjustedBalance').html(`<span class="badge ${badgeClass}">${finalLabel}</span>`);
             }
-
-
 
 
 

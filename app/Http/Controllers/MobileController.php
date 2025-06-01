@@ -746,15 +746,38 @@ class MobileController extends Controller
 
 
 
+    // public function multipleEntries()
+    // {
+    //     $companies = Company::all();
+    //     $groups = Group::all();
+    //     $vendors = Vendor::all();
+
+    //     return view('multipleEntries', compact('companies', 'groups', 'vendors'));
+    // }
+
     public function multipleEntries()
     {
         $companies = Company::all();
         $groups = Group::all();
         $vendors = Vendor::all();
 
-        return view('multipleEntries', compact('companies', 'groups', 'vendors'));
-    }
+        // If vendor is preselected (optional logic depending on your setup)
+        $selectedVendorId = request()->vendor_id;
 
+        $vendorBalance = null;
+        $vendorStatus = null;
+
+        if ($selectedVendorId) {
+            $debit = Accounts::where('vendor_id', $selectedVendorId)->sum('debit');
+            $credit = Accounts::where('vendor_id', $selectedVendorId)->sum('credit');
+            $balance = $credit - $debit;
+
+            $vendorBalance = abs($balance);
+            $vendorStatus = $balance < 0 ? 'Debit' : ($balance > 0 ? 'Credit' : 'Settled');
+        }
+
+        return view('multipleEntries', compact('companies', 'groups', 'vendors', 'vendorBalance', 'vendorStatus'));
+    }
 
     public function checkIMEI(Request $request)
     {

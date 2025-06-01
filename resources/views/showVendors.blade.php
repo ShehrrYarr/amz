@@ -228,8 +228,8 @@
                                         <th>City</th>
                                         <th>Mobile Number</th>
                                         <th>CNIC</th>
-                                        <th>Sent to Vendor Mobiles</th>
-                                        <th>Mobiles Receive From Vendor</th>
+                                        <th>Sent Mobiles</th>
+                                        <th>Received Mobiles</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>

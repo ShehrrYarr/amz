@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Accounts;
 use App\Models\Mobile;
 use App\Models\vendor;
 use Illuminate\Support\Facades\Storage;
@@ -135,5 +136,23 @@ class VendorController extends Controller
         $mobile = Mobile::where('vendor_id', $id)->get();
         return view('showVSHistory', compact('mobile'));
     }
+
+    public function getBalance(Request $request)
+    {
+        $vendorId = $request->vendor_id;
+
+        $credit = Accounts::where('vendor_id', $vendorId)->where('category', 'CR')->sum('amount');
+        $debit = Accounts::where('vendor_id', $vendorId)->where('category', 'DB')->sum('amount');
+
+        $balance = $credit - $debit;
+
+        return response()->json([
+            'balance' => abs($balance),
+            'status' => $balance < 0 ? 'Debit' : ($balance > 0 ? 'Credit' : 'Settled')
+        ]);
+    }
+
+
+
 
 }
