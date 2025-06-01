@@ -83,7 +83,7 @@
                                 </select>
                             </div>
 
-                           
+
                         </div>
                         <div class="form-actions">
                             <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
@@ -108,7 +108,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Restore Mobile</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Restore Mobile?</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -124,7 +124,7 @@
                             <div class="mb-1">
                                 <label for="mobile_name" class="form-label">Mobile Name</label>
                                 <input class="form-control" type="hidden" name="id" id="rid">
-                                <input type="text" class="form-control" id="rmobile_name" name="mobile_name" disabled>
+                                <input type="text" class="form-control" id="rmobile_name" name="mobile_name" readonly>
                             </div>
 
                             <div class="mb-1" style="display: none">
@@ -133,6 +133,11 @@
                                     <option value="Available">Available</option>
                                     <option value="Sold">Sold</option>
                                 </select>
+                            </div>
+                            <div class="mb-1">
+                                <label for="customer_name" class="form-label">Customer Name</label>
+
+                                <input type="text" class="form-control" id="customer_name" name="customer_name" required>
                             </div>
 
                             <div class="mb-1">

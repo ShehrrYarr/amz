@@ -434,43 +434,7 @@ class MobileController extends Controller
     }
 
 
-    // public function restoreMobile(Request $request)
-    // {
-    //     $data = Mobile::findOrFail($request->id);
-
-    //     $restoreMobile = new Restore();
-    //     $restoreMobile->mobile_name = $request->input('mobile_name');
-    //     $restoreMobile->imei_number = $request->input('imei_number');
-    //     $restoreMobile->customer_name = $data->customer_name;
-    //     $restoreMobile->old_cost_price = $data->cost_price;
-    //     $restoreMobile->old_selling_price = $data->selling_price;
-    //     $restoreMobile->new_cost_price = $request->input('cost_price');
-    //     $restoreMobile->new_selling_price = $request->input('selling_price');
-    //     $restoreMobile->restore_by = auth()->user()->name;
-    //     $restoreMobile->save();
-
-    //     // dd($request);
-    //     $data->cost_price = $request->input('cost_price');
-    //     $data->selling_price = $request->input('selling_price');
-    //     $data->availability = $request->input('availability');
-    //     $data->customer_name = $request->input('customer_name');
-    //     $data->battery_health = $request->input('battery_health');
-    //     $data->is_approve = 'Not_Approved';
-    //     $data->save();
-
-    //     MobileHistory::create([
-    //         'mobile_id' => $data->id,
-    //         'mobile_name' => $data->mobile_name,
-    //         'customer_name' => $data->customer_name,
-    //         'battery_health' => $data->battery_health,
-    //         'cost_price' => $data->cost_price,
-    //         'selling_price' => $data->selling_price,
-    //         'availability_status' => 'Restored',
-    //     ]);
-
-    //     return redirect()->back()->with('success', 'Mobile Restored successfully.');
-
-    // }
+   
 
     public function restoreMobile(Request $request)
     {
@@ -480,8 +444,8 @@ class MobileController extends Controller
         // Log the restore details
         $restoreMobile = new Restore();
         $restoreMobile->mobile_name = $request->input('mobile_name');
-        $restoreMobile->imei_number = $request->input('imei_number');
-        $restoreMobile->customer_name = $data->customer_name;
+        $restoreMobile->imei_number = $data->imei_number;
+        $restoreMobile->customer_name = $request->customer_name;
         $restoreMobile->old_cost_price = $data->cost_price;
         $restoreMobile->old_selling_price = $data->selling_price;
         $restoreMobile->new_cost_price = $request->input('cost_price');
