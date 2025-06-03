@@ -17,45 +17,48 @@
                                         <div
                                             class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
                                             <span class="card-icon primary d-flex justify-content-center mr-3">
-                                            <a href="/manageinventory"> <i class="icon p-1 fa fa-mobile customize-icon font-large-5 p-1"></i></a>   
+                                                <a href="/manageinventory"> <i
+                                                        class="icon p-1 fa fa-mobile customize-icon font-large-5 p-1"></i></a>
                                             </span>
                                             <div class="stats-amount mr-3">
                                                 <h3 class="heading-text text-bold-600">{{$userMobileCount}}</h3>
                                                 <p class="sub-heading">My Mobiles</p>
                                             </div>
                                             <!-- <span class="inc-dec-percentage">
-                                                        <small class="success"><i class="fa fa-long-arrow-up"></i> 5.2%</small>
-                                                    </span> -->
+                                                            <small class="success"><i class="fa fa-long-arrow-up"></i> 5.2%</small>
+                                                        </span> -->
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
                                         <div class="d-flex align-items-start border-right-blue-grey border-right-lighten-5">
                                             <span class="card-icon success d-flex justify-content-center mr-3">
-                                              <a href="/soldinventory"> <i class="icon p-1 fa fa-mobile customize-icon font-large-5 p-1"></i></a> 
+                                                <a href="/soldinventory"> <i
+                                                        class="icon p-1 fa fa-mobile customize-icon font-large-5 p-1"></i></a>
                                             </span>
                                             <div class="stats-amount mr-3">
                                                 <h3 class="heading-text text-bold-600">{{$soldMobile}}</h3>
                                                 <p class="sub-heading">Sold Mobiles</p>
                                             </div>
                                             <!-- <span class="inc-dec-percentage">
-                                                        <small class="success"><i class="fa fa-long-arrow-up"></i> 10.0%</small>
-                                                    </span> -->
+                                                            <small class="success"><i class="fa fa-long-arrow-up"></i> 10.0%</small>
+                                                        </span> -->
                                         </div>
                                     </div>
 
                                     <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
                                         <div class="d-flex align-items-start">
                                             <span class="card-icon warning d-flex justify-content-center mr-3">
-                                               <a href="/pendinginventory"><i class="icon p-1 fa fa-mobile customize-icon font-large-5 p-1"></i></a> 
+                                                <a href="/pendinginventory"><i
+                                                        class="icon p-1 fa fa-mobile customize-icon font-large-5 p-1"></i></a>
                                             </span>
                                             <div class="stats-amount mr-3">
                                                 <h3 class="heading-text text-bold-600">{{ $pendingMobiles }}</h3>
                                                 <p class="sub-heading">Pending Mobiles</p>
                                             </div>
                                             <!-- <span class="inc-dec-percentage">
-                                                            <small class="danger"><i class="fa fa-long-arrow-down"></i> 13.6%</small>
-                                                        </span> -->
+                                                                <small class="danger"><i class="fa fa-long-arrow-down"></i> 13.6%</small>
+                                                            </span> -->
                                         </div>
                                     </div>
 
@@ -65,95 +68,98 @@
                     </div>
                 </div>
                 <!-- <div class="row grouped-multiple-statistics-card">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+                @if($userId == 1)
+                    <div class="row grouped-multiple-statistics-card">
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row">
+                                        <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
+                                            <div
+                                                class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
 
-
-
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-                <div class="row grouped-multiple-statistics-card">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
-                                        <div
-                                            class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
-
-                                            <div class="stats-amount mr-3">
-                                                <h3 class="heading-text text-bold-600">Rs.{{$totalCostPrice}}</h3>
-                                                <p class="sub-heading">Total Mobiles Cost</p>
+                                                <div class="stats-amount mr-3">
+                                                    <h3 class="heading-text text-bold-600">Rs.{{$totalCostPrice}}</h3>
+                                                    <p class="sub-heading">Total Mobiles Cost</p>
+                                                </div>
+                                                <!-- <span class="inc-dec-percentage">
+                                                                <small class="success"><i class="fa fa-long-arrow-up"></i> 5.2%</small>
+                                                            </span> -->
                                             </div>
-                                            <!-- <span class="inc-dec-percentage">
-                                                        <small class="success"><i class="fa fa-long-arrow-up"></i> 5.2%</small>
-                                                    </span> -->
                                         </div>
-                                    </div>
-                                    <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
-                                        <div
-                                            class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
+                                        <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
+                                            <div
+                                                class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
 
-                                            <div class="stats-amount mr-3">
-                                                <h3 class="heading-text text-bold-600"> Rs.{{$totalSellingPrice}}</h3>
-                                                <p class="sub-heading">Total Sold Mobile Sellings</p>
+                                                <div class="stats-amount mr-3">
+                                                    <h3 class="heading-text text-bold-600"> Rs.{{$totalSellingPrice}}</h3>
+                                                    <p class="sub-heading">Total Sold Mobile Sellings</p>
+                                                </div>
+                                                <!-- <span class="inc-dec-percentage">
+                                                                <small class="danger"><i class="fa fa-long-arrow-down"></i> 2.0%</small>
+                                                            </span> -->
                                             </div>
-                                            <!-- <span class="inc-dec-percentage">
-                                                        <small class="danger"><i class="fa fa-long-arrow-down"></i> 2.0%</small>
-                                                    </span> -->
                                         </div>
-                                    </div>
-                                    <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
-                                        <div
-                                            class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
+                                        <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
+                                            <div
+                                                class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
 
-                                            <div class="stats-amount mr-3">
-                                                <h3 class="heading-text text-bold-600"> Rs.{{$pendingMobilesCost}}</h3>
-                                                <p class="sub-heading">Total Pending Mobile Cost</p>
+                                                <div class="stats-amount mr-3">
+                                                    <h3 class="heading-text text-bold-600"> Rs.{{$pendingMobilesCost}}</h3>
+                                                    <p class="sub-heading">Total Pending Mobile Cost</p>
+                                                </div>
+                                                <!-- <span class="inc-dec-percentage">
+                                                                <small class="danger"><i class="fa fa-long-arrow-down"></i> 2.0%</small>
+                                                            </span> -->
                                             </div>
-                                            <!-- <span class="inc-dec-percentage">
-                                                        <small class="danger"><i class="fa fa-long-arrow-down"></i> 2.0%</small>
-                                                    </span> -->
                                         </div>
-                                    </div>
 
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row grouped-multiple-statistics-card">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
-                                        <div
-                                            class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
+                    <div class="row grouped-multiple-statistics-card">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
+                                            <div
+                                                class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
 
-                                            <div class="stats-amount mr-3">
-                                                <h3 class="heading-text text-bold-600">Rs.{{ number_format($totalReceivable) }}</h3>
-                                                <p class="sub-heading">Total Receivable</p>
+                                                <div class="stats-amount mr-3">
+                                                    <h3 class="heading-text text-bold-600">
+                                                        Rs.{{ number_format($totalReceivable) }}</h3>
+                                                    <p class="sub-heading">Total Receivable</p>
+                                                </div>
+                                                <!-- <span class="inc-dec-percentage">
+                                                                <small class="success"><i class="fa fa-long-arrow-up"></i> 5.2%</small>
+                                                            </span> -->
                                             </div>
-                                            <!-- <span class="inc-dec-percentage">
-                                                        <small class="success"><i class="fa fa-long-arrow-up"></i> 5.2%</small>
-                                                    </span> -->
                                         </div>
-                                    </div>
-                                    
-                                    
 
+
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endif
                 <!-- Grouped multiple cards for statistics ends here -->
 
 

@@ -202,7 +202,8 @@ class UserController extends Controller
             'profit',
             'pendingMobiles',
             'pendingMobilesCost',
-            'totalReceivable'
+            'totalReceivable',
+            'userId'
         ));
     }
 
