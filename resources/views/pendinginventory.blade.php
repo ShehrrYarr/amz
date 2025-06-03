@@ -276,7 +276,7 @@
                                     @foreach ($mobile as $key)
                                         <tr>
                                             <td>{{ $key->sold_at }}</td>
-                                            <td>{{ $key->pendingBy->name }}</td>
+                                            <td>{{ optional($key->pendingBy)->name ?? 'null' }}</td>
                                             <td>{{ $key->mobile_name }}</td>
                                             <td>{{ $key->imei_number }}</td>
                                             <td>{{ $key->sim_lock }}</td>
