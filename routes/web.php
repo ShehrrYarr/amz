@@ -7,6 +7,7 @@ use App\Http\Controllers\LoginRestrictionController;
 use App\Http\Controllers\MasterPasswordController;
 use App\Http\Controllers\MobileController;
 use App\Http\Controllers\MobileHistoryController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorController;
 use App\Models\TransferRecord;
 use Illuminate\Support\Facades\Route;
@@ -547,4 +548,11 @@ Route::get('/showlogin', [LoginRestrictionController::class, 'showLogin'])->name
 
 Route::post('/admin/login-window', [LoginRestrictionController::class, 'updateLoginWindow'])
     ->name('admin.updateLoginWindow');
+
+//Manage user routes
+Route::get('/showusers', [UserController::class, 'showUsers'])->name('showusers');
+Route::post('/store-user', [UserController::class, 'store'])->name('storeUser');
+Route::get('/edituser/{id}', [App\Http\Controllers\UserController::class, 'editUser'])->name('editUser');
+Route::put('/update-user', [UserController::class, 'update'])->name('updateUser');
+
 

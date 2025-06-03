@@ -243,20 +243,38 @@
                                                                 class="menu-item" href="/showgroups"
                                                                 data-i18n="1 columns">Groups</a>
                                                 </li>
-                                                <li class="@if (\Request::is('showpassword')) active @endif"><a
-                                                                class="menu-item" href="/showpassword"
-                                                                data-i18n="1 columns">Password</a>
-                                                </li>
-                                                 <li class="@if (\Request::is('showlogin')) active @endif"><a
-                                                                class="menu-item" href="/showlogin"
-                                                                data-i18n="1 columns">Set login Time</a>
-                                                </li>
+
                                         </ul>
                                 </li>
+                                @php
+                                                                        $userId = auth()->id();
+                                                                @endphp
+
+                                @if (in_array($userId, [1, 2]))
+                                                                        <li class="nav-item">
+                                                                                        <a href="#"><i class="feather icon-tv"></i>
+                                                                                                        <span class="menu-title" data-i18n="Templates">Settings</span>
+                                                                                        </a>
+                                                                                        <ul class="menu-content">
+                                                                                                        <li class="@if (\Request::is('showpassword')) active @endif">
+                                                                                                                        <a class="menu-item" href="/showpassword"
+                                                                                                                                        data-i18n="1 columns">Password</a>
+                                                                                                        </li>
+                                                                                                        <li class="@if (\Request::is('showlogin')) active @endif">
+                                                                                                                        <a class="menu-item" href="/showlogin" data-i18n="1 columns">Set
+                                                                                                                                        login Time</a>
+                                                                                                        </li>
+                                                                                                        <li class="@if (\Request::is('showusers')) active @endif">
+                                                                                                                        <a class="menu-item" href="/showusers"
+                                                                                                                                        data-i18n="1 columns">Manage Users</a>
+                                                                                                        </li>
+                                                                                        </ul>
+                                                                        </li>
+                                                                @endif
 
 
-                                
-                                
+
+
 
                         </ul>
                 </div>
