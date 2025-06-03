@@ -934,5 +934,28 @@ class MobileController extends Controller
     }
 
 
+    public function filterMobiles(Request $request)
+{
+    $query = Mobile::where('availability', 'Available')
+        ->where('is_transfer', false)
+        ->with(['group', 'company', 'vendor', 'creator']);
+
+    if ($request->filled('company_id')) {
+        $query->where('company_id', $request->company_id);
+    }
+
+    if ($request->filled('group_id')) {
+        $query->where('group_id', $request->group_id);
+    }
+
+    $mobiles = $query->get();
+
+    $html = view('partials.mobile_table_rows', compact('mobiles'))->render();
+
+    return response()->json(['html' => $html]);
+}
+
+
+
 
 }

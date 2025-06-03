@@ -523,101 +523,101 @@
     <!-- Multiple entries Modal -->
 
     <!-- <div class="modal fade" id="bulkMobileModal" tabindex="-1" role="dialog" aria-labelledby="bulkMobileLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <form id="bulkMobileForm" method="POST" action="{{ route('bulkStoreMobile') }}">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="bulkMobileLabel">Add Multiple Mobiles</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span>&times;</span>
-                        </button>
-                    </div>
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <form id="bulkMobileForm" method="POST" action="{{ route('bulkStoreMobile') }}">
+                                @csrf
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="bulkMobileLabel">Add Multiple Mobiles</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span>&times;</span>
+                                    </button>
+                                </div>
 
-                    <div class="modal-body">
-                        <div class="form-row">
-                            <div class="col-md-6 mb-2">
-                                <label>Mobile Name</label>
-                                <input type="text" name="mobile_name" class="form-control" required>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>SIM Lock</label>
-                                <select name="sim_lock" class="form-control" required>
-                                    <option value="J.V">J.V</option>
-                                    <option value="PTA">PTA</option>
-                                    <option value="Non-PTA">Non-PTA</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Color</label>
-                                <input type="text" name="color" class="form-control" required>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Storage</label>
-                                <input type="text" name="storage" class="form-control" required>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Battery Health</label>
-                                <input type="text" name="battery_health" class="form-control">
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Cost Price</label>
-                                <input type="number" name="cost_price" class="form-control" required>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Selling Price</label>
-                                <input type="number" name="selling_price" class="form-control" required>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Company</label>
-                                <select name="company_id" class="form-control" required>
-                                    <option value="">Select Company</option>
-                                    @foreach($companies as $company)
-                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Group</label>
-                                <select name="group_id" class="form-control" required>
-                                    <option value="">Select Group</option>
-                                    @foreach($groups as $group)
-                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Vendor</label>
-                                <select name="vendor_id" class="form-control">
-                                    <option value="">Select Vendor</option>
-                                    @foreach ($vendors as $vendor)
-                                        <option value="{{ $vendor->id }}">{{ $vendor->name }} ({{ $vendor->mobile_no }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <label>Number of Mobiles</label>
-                                <input type="number" id="imeiCount" class="form-control" min="1" placeholder="e.g. 5">
-                            </div>
+                                <div class="modal-body">
+                                    <div class="form-row">
+                                        <div class="col-md-6 mb-2">
+                                            <label>Mobile Name</label>
+                                            <input type="text" name="mobile_name" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label>SIM Lock</label>
+                                            <select name="sim_lock" class="form-control" required>
+                                                <option value="J.V">J.V</option>
+                                                <option value="PTA">PTA</option>
+                                                <option value="Non-PTA">Non-PTA</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label>Color</label>
+                                            <input type="text" name="color" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label>Storage</label>
+                                            <input type="text" name="storage" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label>Battery Health</label>
+                                            <input type="text" name="battery_health" class="form-control">
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label>Cost Price</label>
+                                            <input type="number" name="cost_price" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label>Selling Price</label>
+                                            <input type="number" name="selling_price" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label>Company</label>
+                                            <select name="company_id" class="form-control" required>
+                                                <option value="">Select Company</option>
+                                                @foreach($companies as $company)
+                                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label>Group</label>
+                                            <select name="group_id" class="form-control" required>
+                                                <option value="">Select Group</option>
+                                                @foreach($groups as $group)
+                                                    <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label>Vendor</label>
+                                            <select name="vendor_id" class="form-control">
+                                                <option value="">Select Vendor</option>
+                                                @foreach ($vendors as $vendor)
+                                                    <option value="{{ $vendor->id }}">{{ $vendor->name }} ({{ $vendor->mobile_no }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label>Number of Mobiles</label>
+                                            <input type="number" id="imeiCount" class="form-control" min="1" placeholder="e.g. 5">
+                                        </div>
+                                    </div>
+
+                                    <div id="imeiFields" class="mt-3"></div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                        <i class="fa fa-times"></i> Cancel
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa fa-save"></i> Save All
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-
-                        <div id="imeiFields" class="mt-3"></div>
                     </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                            <i class="fa fa-times"></i> Cancel
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa fa-save"></i> Save All
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div> -->
+                </div> -->
 
 
     <style>
@@ -664,9 +664,37 @@
                     <i class="feather icon-smartphone" style="font-size: 20px;"></i>
                 </button>
 
-                <a href="/multipleentries" type="button" class="btn btn-primary gradient-button4 ml-1" >
+                <a href="/multipleentries" type="button" class="btn btn-primary gradient-button4 ml-1">
                     <i class="feather icon-copy" style="font-size: 20px;"></i>
                 </a>
+                <div class="row mb-2 mt-2" >
+                    <div class="col-lg-3 col-md-6 col-sm-12 mb-1">
+                        <select id="companyFilter" class="form-control">
+                            <option value="">All Companies</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 col-sm-12 mb-1">
+                        <select id="groupFilter" class="form-control">
+                            <option value="">All Groups</option>
+                            @foreach ($groups as $group)
+                                <option value="{{ $group->id }}">{{ $group->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 col-sm-6 mb-1">
+                        <button id="filterBtn" class="btn btn-primary w-100">Filter</button>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 col-sm-6 mb-1">
+                        <button type="button" id="resetFilterBtn" class="btn btn-secondary w-100">Reset</button>
+                    </div>
+                </div>
+
 
 
 
@@ -1025,12 +1053,12 @@
                         const wrapper = document.createElement('div');
                         wrapper.className = 'mb-2';
                         wrapper.innerHTML = `
-                                <label for="imei_${i}">IMEI #${i}</label>
-                                <input type="text" id="imei_${i}" name="imeis[]" class="form-control imei-input"
-                                    required pattern="\\d{15}" minlength="15" maxlength="15"
-                                    placeholder="Enter 15-digit IMEI or scan">
-                                <small class="text-danger d-none" id="duplicate_${i}">Duplicate IMEI detected!</small>
-                            `;
+                                            <label for="imei_${i}">IMEI #${i}</label>
+                                            <input type="text" id="imei_${i}" name="imeis[]" class="form-control imei-input"
+                                                required pattern="\\d{15}" minlength="15" maxlength="15"
+                                                placeholder="Enter 15-digit IMEI or scan">
+                                            <small class="text-danger d-none" id="duplicate_${i}">Duplicate IMEI detected!</small>
+                                        `;
                         imeiFieldsContainer.appendChild(wrapper);
                     }
 
@@ -1101,6 +1129,52 @@
         if (!NodeList.prototype.filter) {
             NodeList.prototype.filter = Array.prototype.filter;
         }
+
+
+
+
+
+        $('#filterBtn').click(function () {
+            let companyId = $('#companyFilter').val();
+            let groupId = $('#groupFilter').val();
+
+            $.ajax({
+                url: '{{ route("filter.mobiles") }}',
+                type: 'GET',
+                data: {
+                    company_id: companyId,
+                    group_id: groupId
+                },
+                success: function (response) {
+                    $('#mobileTable tbody').html(response.html);
+                },
+                error: function () {
+                    alert('Something went wrong. Please try again.');
+                }
+            });
+        });
+
+
+        $('#resetFilterBtn').on('click', function () {
+            $('#companyFilter').val('');
+            $('#groupFilter').val('');
+
+            $.ajax({
+                url: '{{ route("filter.mobiles") }}',
+                method: 'GET',
+                data: {
+                    company_id: '',
+                    group_id: ''
+                },
+                success: function (response) {
+                    $('#mobileTable tbody').html(response.html);
+                },
+                error: function () {
+                    alert('Something went wrong while resetting. Please try again.');
+                }
+            });
+        });
+
 
     </script>
 @endsection

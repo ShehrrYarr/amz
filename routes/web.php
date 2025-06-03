@@ -128,6 +128,10 @@ Route::get('/manageinventory', function () {
 })->middleware('auth', 'login.time.restrict')->name('homeRoute');
 
 
+Route::get('/filter-mobiles', [MobileController::class, 'filterMobiles'])
+    ->name('filter.mobiles')
+    ->middleware(['auth', 'login.time.restrict']);
+
 
 
 
