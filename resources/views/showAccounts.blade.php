@@ -166,7 +166,9 @@
                                 <tbody>
                                     @foreach ($formatted as $row)
                                         <tr>
-                                            <td>{{ $row['created_at'] }}</td>
+                                            <!-- <td>{{ $row['created_at'] }}</td> -->
+                                             <td>{{ \Carbon\Carbon::parse($row['created_at'])->format('Y-m-d H:i:s') }}</td>
+
                                             <td>{{ $row['created_by'] }}</td>
                                             <td>{{ $row['description'] }}</td>
 

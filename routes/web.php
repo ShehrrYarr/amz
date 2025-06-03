@@ -207,7 +207,7 @@ Route::get('/soldinventory', function () {
 
 Route::get('/soldapprovedinventory', function () {
 
-    $mobile = Mobile::where('user_id', auth()->user()->id)->where('availability', 'Sold')->where('is_transfer', false)
+    $mobile = Mobile::where('availability', 'Sold')->where('is_transfer', false)
         ->where('is_approve', 'Approved')
         ->get();
 
@@ -532,3 +532,8 @@ Route::get('/report', function () {
     $company = company::all ();
     $group = group::all ();
     return view('report',compact('company','group')); })->middleware('auth');
+
+
+
+
+    //Sold inventory sy approvre nhi horha mobile
