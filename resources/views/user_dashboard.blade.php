@@ -35,8 +35,8 @@
                                                 <p class="sub-heading">My Mobiles</p>
                                             </div>
                                             <!-- <span class="inc-dec-percentage">
-                                                                    <small class="success"><i class="fa fa-long-arrow-up"></i> 5.2%</small>
-                                                                </span> -->
+                                                                        <small class="success"><i class="fa fa-long-arrow-up"></i> 5.2%</small>
+                                                                    </span> -->
                                         </div>
                                     </div>
 
@@ -51,8 +51,8 @@
                                                 <p class="sub-heading">Sold Mobiles</p>
                                             </div>
                                             <!-- <span class="inc-dec-percentage">
-                                                                    <small class="success"><i class="fa fa-long-arrow-up"></i> 10.0%</small>
-                                                                </span> -->
+                                                                        <small class="success"><i class="fa fa-long-arrow-up"></i> 10.0%</small>
+                                                                    </span> -->
                                         </div>
                                     </div>
 
@@ -67,8 +67,8 @@
                                                 <p class="sub-heading">Pending Mobiles</p>
                                             </div>
                                             <!-- <span class="inc-dec-percentage">
-                                                                        <small class="danger"><i class="fa fa-long-arrow-down"></i> 13.6%</small>
-                                                                    </span> -->
+                                                                            <small class="danger"><i class="fa fa-long-arrow-down"></i> 13.6%</small>
+                                                                        </span> -->
                                         </div>
                                     </div>
 
@@ -78,19 +78,19 @@
                     </div>
                 </div>
                 <!-- <div class="row grouped-multiple-statistics-card">
-                                    <div class="col-12">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="row">
+                                        <div class="col-12">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="row">
 
 
+
+                                                    </div>
 
                                                 </div>
-
                                             </div>
                                         </div>
-                                    </div>
-                                </div> -->
+                                    </div> -->
                 @if($userId == 1)
                     <div class="row grouped-multiple-statistics-card">
                         <div class="col-12">
@@ -106,8 +106,8 @@
                                                     <p class="sub-heading">Total Mobiles Cost</p>
                                                 </div>
                                                 <!-- <span class="inc-dec-percentage">
-                                                                                <small class="success"><i class="fa fa-long-arrow-up"></i> 5.2%</small>
-                                                                            </span> -->
+                                                                                        <small class="success"><i class="fa fa-long-arrow-up"></i> 5.2%</small>
+                                                                                    </span> -->
                                             </div>
                                         </div>
                                         <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
@@ -119,8 +119,8 @@
                                                     <p class="sub-heading">Total Sold Mobile Sellings</p>
                                                 </div>
                                                 <!-- <span class="inc-dec-percentage">
-                                                                                <small class="danger"><i class="fa fa-long-arrow-down"></i> 2.0%</small>
-                                                                            </span> -->
+                                                                                        <small class="danger"><i class="fa fa-long-arrow-down"></i> 2.0%</small>
+                                                                                    </span> -->
                                             </div>
                                         </div>
                                         <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
@@ -132,21 +132,10 @@
                                                     <p class="sub-heading">Total Pending Mobile Cost</p>
                                                 </div>
                                                 <!-- <span class="inc-dec-percentage">
-                                                                                <small class="danger"><i class="fa fa-long-arrow-down"></i> 2.0%</small>
-                                                                            </span> -->
+                                                                                        <small class="danger"><i class="fa fa-long-arrow-down"></i> 2.0%</small>
+                                                                                    </span> -->
                                             </div>
                                         </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row grouped-multiple-statistics-card">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="row">
                                         <div class="col-lg-6 col-xl-3 col-sm-6 col-12">
                                             <div
                                                 class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
@@ -157,10 +146,22 @@
                                                     <p class="sub-heading">Total Receivable</p>
                                                 </div>
                                                 <!-- <span class="inc-dec-percentage">
-                                                                                <small class="success"><i class="fa fa-long-arrow-up"></i> 5.2%</small>
-                                                                            </span> -->
+                                                                                        <small class="success"><i class="fa fa-long-arrow-up"></i> 5.2%</small>
+                                                                                    </span> -->
                                             </div>
                                         </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="row grouped-multiple-statistics-card">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+
 
 
 
@@ -168,7 +169,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 @endif
                 <!-- Grouped multiple cards for statistics ends here -->
 
