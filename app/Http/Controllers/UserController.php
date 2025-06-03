@@ -102,102 +102,109 @@ class UserController extends Controller
     //         'totalCredit'
     //     ));
     // }
-public function index()
-{
-    $userId = auth()->id();
+    public function index()
+    {
+        $userId = auth()->id();
 
-    // 1. User Mobile Count (Available & not transferred)
-    $userMobileCount = Mobile::where('availability', 'Available')
-        ->where('is_transfer', false)
-        ->count();
+        // 1. User Mobile Count (Available & not transferred)
+        $userMobileCount = Mobile::where('availability', 'Available')
+            ->where('is_transfer', false)
+            ->count();
 
-    // 2. Sold Mobiles (Not Approved & not transferred)
-    $soldMobile = Mobile::where('availability', 'Sold')
-        ->where('is_approve', 'Not_Approved')
-        ->where('is_transfer', false)
-        ->count();
+        // 2. Sold Mobiles (Not Approved & not transferred)
+        $soldMobile = Mobile::where('availability', 'Sold')
+            ->where('is_approve', 'Not_Approved')
+            ->where('is_transfer', false)
+            ->count();
 
-    // 3. Pending Mobiles Count & Cost
-    $pendingMobiles = Mobile::where('availability', 'Pending')
-        ->where('is_approve', 'Not_Approved')
-        ->where('is_transfer', false)
-        ->count();
+        // 3. Pending Mobiles Count & Cost
+        $pendingMobiles = Mobile::where('availability', 'Pending')
+            ->where('is_approve', 'Not_Approved')
+            ->where('is_transfer', false)
+            ->count();
 
-    $pendingMobilesCost = Mobile::where('availability', 'Pending')
-        ->where('is_approve', 'Not_Approved')
-        ->where('is_transfer', false)
-        ->sum('cost_price');
+        $pendingMobilesCost = Mobile::where('availability', 'Pending')
+            ->where('is_approve', 'Not_Approved')
+            ->where('is_transfer', false)
+            ->sum('cost_price');
 
-    // 4. Total Cost Price (Available)
-    $totalCostPrice = Mobile::where('availability', 'Available')
-        ->where('is_transfer', false)
-        ->sum('cost_price');
+        // 4. Total Cost Price (Available)
+        $totalCostPrice = Mobile::where('availability', 'Available')
+            ->where('is_transfer', false)
+            ->sum('cost_price');
 
-    // 5. Total Selling Price of Sold Mobiles (Not Approved)
-    $totals = Mobile::where('availability', 'Sold')
-        ->where('is_transfer', false)
-        ->where('is_approve', 'Not_Approved')
-        ->selectRaw('SUM(cost_price) as total_cost, SUM(selling_price) as total_selling_price')
-        ->first();
+        // 5. Total Selling Price of Sold Mobiles (Not Approved)
+        $totals = Mobile::where('availability', 'Sold')
+            ->where('is_transfer', false)
+            ->where('is_approve', 'Not_Approved')
+            ->selectRaw('SUM(cost_price) as total_cost, SUM(selling_price) as total_selling_price')
+            ->first();
 
-    $totalSellingPrice = $totals->total_selling_price ?? 0;
+        $totalSellingPrice = $totals->total_selling_price ?? 0;
 
-    // 6. Total Cost of Received Mobiles
-    $sumCostPrice = Mobile::join('transfer_records', function ($join) {
-        $join->on('mobiles.id', '=', 'transfer_records.mobile_id')
-            ->where('transfer_records.id', function ($query) {
-                $query->selectRaw('MAX(id)')
-                    ->from('transfer_records')
-                    ->whereColumn('mobile_id', 'mobiles.id');
-            });
-    })
-        ->where('mobiles.user_id', $userId)
-        ->where('mobiles.availability', 'Available')
-        ->where('mobiles.is_transfer', true)
-        ->sum('mobiles.cost_price');
+        // 6. Total Cost of Received Mobiles
+        $sumCostPrice = Mobile::join('transfer_records', function ($join) {
+            $join->on('mobiles.id', '=', 'transfer_records.mobile_id')
+                ->where('transfer_records.id', function ($query) {
+                    $query->selectRaw('MAX(id)')
+                        ->from('transfer_records')
+                        ->whereColumn('mobile_id', 'mobiles.id');
+                });
+        })
+            ->where('mobiles.user_id', $userId)
+            ->where('mobiles.availability', 'Available')
+            ->where('mobiles.is_transfer', true)
+            ->sum('mobiles.cost_price');
 
-    // 7. Weekly Profit (Friday to Friday)
-    $startOfWeek = Carbon::now()->startOfWeek(Carbon::FRIDAY);
-    $endOfWeek = Carbon::now()->endOfWeek(Carbon::FRIDAY);
+        // 7. Weekly Profit (Friday to Friday)
+        $startOfWeek = Carbon::now()->startOfWeek(Carbon::FRIDAY);
+        $endOfWeek = Carbon::now()->endOfWeek(Carbon::FRIDAY);
 
-    $weeklySelling = Mobile::where('availability', 'Sold')
-        ->where('is_transfer', false)
-        ->where('is_approve', 'Not_Approved')
-        ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
-        ->sum('selling_price');
+        $weeklySelling = Mobile::where('availability', 'Sold')
+            ->where('is_transfer', false)
+            ->where('is_approve', 'Not_Approved')
+            ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
+            ->sum('selling_price');
 
-    $weeklyCost = Mobile::where('availability', 'Sold')
-        ->where('user_id', $userId)
-        ->where('is_transfer', false)
-        ->where('is_approve', 'Not_Approved')
-        ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
-        ->sum('cost_price');
+        $weeklyCost = Mobile::where('availability', 'Sold')
+            ->where('user_id', $userId)
+            ->where('is_transfer', false)
+            ->where('is_approve', 'Not_Approved')
+            ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
+            ->sum('cost_price');
 
-    $profit = $weeklySelling - $weeklyCost;
+        $profit = $weeklySelling - $weeklyCost;
 
-    // 8. Total Receivable from Vendors (DB - CR)
-    $vendorReceivables = DB::table('accounts')
-        ->select(DB::raw("
-            SUM(CASE WHEN category = 'DB' THEN amount ELSE 0 END) -
-            SUM(CASE WHEN category = 'CR' THEN amount ELSE 0 END) AS total_due
-        "))
-        ->whereNotNull('vendor_id')
-        ->first();
+        // 8. Total Receivable from Vendors (sum of DB - CR where balance > 0)
+        $vendorReceivables = DB::table('accounts')
+            ->select(
+                'vendor_id',
+                DB::raw("
+                SUM(CASE WHEN category = 'DB' THEN amount ELSE 0 END) AS total_debit,
+                SUM(CASE WHEN category = 'CR' THEN amount ELSE 0 END) AS total_credit
+            ")
+            )
+            ->whereNotNull('vendor_id')
+            ->groupBy('vendor_id')
+            ->get();
 
-    $totalReceivable = $vendorReceivables->total_due ?? 0;
+        $totalReceivable = $vendorReceivables->reduce(function ($carry, $vendor) {
+            $balance = $vendor->total_debit - $vendor->total_credit;
+            return $balance > 0 ? $carry + $balance : $carry;
+        }, 0);
 
-    return view('user_dashboard', compact(
-        'userMobileCount',
-        'soldMobile',
-        'totalCostPrice',
-        'totalSellingPrice',
-        'sumCostPrice',
-        'profit',
-        'pendingMobiles',
-        'pendingMobilesCost',
-        'totalReceivable'
-    ));
-}
+        return view('user_dashboard', compact(
+            'userMobileCount',
+            'soldMobile',
+            'totalCostPrice',
+            'totalSellingPrice',
+            'sumCostPrice',
+            'profit',
+            'pendingMobiles',
+            'pendingMobilesCost',
+            'totalReceivable'
+        ));
+    }
 
     /**
      * Show the form for creating a new resource.
