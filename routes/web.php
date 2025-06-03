@@ -556,3 +556,5 @@ Route::get('/edituser/{id}', [App\Http\Controllers\UserController::class, 'editU
 Route::put('/update-user', [UserController::class, 'update'])->name('updateUser');
 
 
+//Sold logic change 
+//Receivable Vendor bnana h new 

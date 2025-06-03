@@ -220,10 +220,9 @@
                                 <thead>
                                     <tr>
                                         <th>Created At</th>
-                                        <th>Created by</th>
                                         <th>Accounts</th>
                                         <th>Picture</th>
-
+                                        
                                         <th>Vendor Name</th>
                                         <th>Office Address</th>
                                         <th>City</th>
@@ -232,13 +231,14 @@
                                         <th>Sent Mobiles</th>
                                         <th>Received Mobiles</th>
                                         <th>Action</th>
+                                        <th>Created by</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($vendors as $key)
                                         <tr>
                                             <td>{{ $key->created_at }}</td>
-                                            <td>{{ $key->creator->name }}</td>
+
                                             <td>
                                                 <a href="{{ route('showAccounts', $key->id) }}" class="btn btn-sm btn-primary">
                                                     <i class="fa fa-book"></i>
@@ -246,41 +246,43 @@
                                             </td>
                                             <td>
                                                 @if($key->picture)
-                                                    <a href="{{ asset('storage/' . $key->picture) }}" target="_blank">
-                                                        <img src="{{ asset('storage/' . $key->picture) }}" alt="Vendor Picture"
-                                                            width="100" style="cursor: zoom-in;">
-                                                    </a>
+                                                <a href="{{ asset('storage/' . $key->picture) }}" target="_blank">
+                                                    <img src="{{ asset('storage/' . $key->picture) }}" alt="Vendor Picture"
+                                                    width="100" style="cursor: zoom-in;">
+                                                </a>
                                                 @else
-                                                    N/A
+                                                N/A
                                                 @endif
                                             </td>
-
+                                            
                                             <td>{{ $key->name }}</td>
                                             <td>{{ $key->office_address }}</td>
                                             <td>{{ $key->city }}</td>
                                             <td>{{ $key->mobile_no }}</td>
                                             <td>{{ $key->CNIC }}</td>
-
+                                            
                                             <td>
                                                 <a href="{{ route('showVRHistory', $key->id) }}" class="btn btn-sm btn-success">
                                                     <i class="fa fa-eye"></i>
                                                 </a>
                                             </td>
-
+                                            
                                             <td>
                                                 <a href="{{ route('showVSHistory', $key->id) }}" class="btn btn-sm btn-danger">
                                                     <i class="fa fa-eye"></i>
                                                 </a>
                                             </td>
-
+                                            
                                             <td>
                                                 <a href="" onclick="edit({{ $key->id }})" data-toggle="modal"
-                                                    data-target="#exampleModal1">
-                                                    <i class="feather icon-edit"></i></a>
+                                                data-target="#exampleModal1">
+                                                <i class="feather icon-edit"></i></a>
                                                 <!-- <a href="" onclick="remove({{ $key->id }})" data-toggle="modal"
-                                                            data-target="#exampleModal2"><i style="color:red"
-                                                                class="feather icon-trash"></i></a> -->
+                                                data-target="#exampleModal2"><i style="color:red"
+                                                class="feather icon-trash"></i></a> -->
                                             </td>
+                                            <td>{{ $key->creator->name }}</td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>
