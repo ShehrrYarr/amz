@@ -379,6 +379,8 @@ class MobileController extends Controller
                 // Pending to walk-in customer
                 $data->customer_name = $request->input('customer_name');
                 $data->sold_vendor_id = null;
+                $data->pending_by = $user->id;
+
             }
 
             $data->save();
