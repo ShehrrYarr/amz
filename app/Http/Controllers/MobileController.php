@@ -198,100 +198,7 @@ class MobileController extends Controller
         return response()->json(['result' => $filterId]);
 
     }
-    // public function sellMobile(Request $request)
-    // {
-    //     if ($request->availability == 'Available') {
-    //         return redirect()->back()->with('danger', 'Please select a different availability option.');
-    //     }
-
-    //     if (!$request->filled('customer_name') && !$request->filled('vendor_id')) {
-    //         return redirect()->back()->with('danger', 'Enter customer name or select a vendor.');
-    //     }
-
-    //     $data = Mobile::findOrFail($request->id);
-    //     $user = auth()->user();
-
-
-    //     if ($request->filled('vendor_id') && $request->availability !== 'Pending') {
-    //         $vendorId = $request->vendor_id;
-    //         $data->sold_vendor_id = $vendorId;
-
-    //         $vendor = Vendor::find($vendorId);
-    //         $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
-    //         $data->customer_name = $vendorName;
-
-    //         $sellingPrice = (float) $request->selling_price;
-    //         $paidAmount = (float) $request->pay_amount;
-    //         $mobileName = $data->mobile_name;
-
-    //         // Credit: Vendor owes you
-    //         if ($sellingPrice > 0) {
-    //             Accounts::create([
-    //                 'vendor_id' => $vendorId,
-    //                 'category' => 'DB',
-    //                 'amount' => $sellingPrice,
-    //                 'description' => "Vendor purchased mobile: {$mobileName}",
-    //                 'created_by' => $user->id,
-    //             ]);
-    //         }
-
-    //         // Debit: Vendor paid you (reducing their debt)
-    //         if ($paidAmount > 0) {
-    //             Accounts::create([
-    //                 'vendor_id' => $vendorId,
-    //                 'category' => 'CR',
-    //                 'amount' => $paidAmount,
-    //                 'description' => "Vendor paid for: {$mobileName}",
-    //                 'created_by' => $user->id,
-    //             ]);
-    //         }
-    //     } else {
-    //         // Sold to walk-in customer (no vendor accounting)
-    //         $data->customer_name = $request->input('customer_name');
-    //         $data->sold_vendor_id = null;
-    //     }
-
-    //     // Update mobile sale details
-    //     $data->selling_price = $request->input('selling_price');
-    //     $data->availability = $request->input('availability');
-    //     $data->sold_at = Carbon::now();
-    //     $data->is_approve = $request->input('is_approve');
-    //     $data->sold_by = $user->id;
-    //     $data->save();
-
-    //     // Record mobile history
-    //     $historyCustomerName = $data->sold_vendor_id
-    //         ? ($vendor ? $vendor->name : 'Unknown Vendor')
-    //         : $data->customer_name;
-
-    //     if ($data->availability == 'Sold') {
-    //         MobileHistory::create([
-    //             'mobile_id' => $data->id,
-    //             'mobile_name' => $data->mobile_name,
-    //             'customer_name' => $historyCustomerName,
-    //             'battery_health' => $data->battery_health,
-    //             'cost_price' => $data->cost_price,
-    //             'selling_price' => $data->selling_price,
-    //             'availability_status' => 'Sold',
-    //             'created_by' => $user->name,
-    //         ]);
-    //     } elseif ($data->availability == 'Pending') {
-    //         MobileHistory::create([
-    //             'mobile_id' => $data->id,
-    //             'mobile_name' => $data->mobile_name,
-    //             'customer_name' => $historyCustomerName,
-    //             'battery_health' => $data->battery_health,
-    //             'cost_price' => $data->cost_price,
-    //             'selling_price' => $data->selling_price,
-    //             'availability_status' => 'Pending',
-    //             'created_by' => $user->name,
-    //         ]);
-    //     }
-
-
-
-    //     return redirect()->back()->with('success', 'Mobile status changed and account updated successfully.');
-    // }
+    
 
 
     public function sellMobile(Request $request)
@@ -333,7 +240,7 @@ class MobileController extends Controller
                         'vendor_id' => $vendorId,
                         'category' => 'DB',
                         'amount' => $sellingPrice,
-                        'description' => "Vendor purchased mobile: {$mobileName}",
+                        'description' => "We sold : {$mobileName}",
                         'created_by' => $user->id,
                     ]);
                 }
