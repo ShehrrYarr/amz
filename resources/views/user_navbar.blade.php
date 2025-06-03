@@ -247,6 +247,10 @@
                                                                 class="menu-item" href="/showpassword"
                                                                 data-i18n="1 columns">Password</a>
                                                 </li>
+                                                 <li class="@if (\Request::is('showlogin')) active @endif"><a
+                                                                class="menu-item" href="/showlogin"
+                                                                data-i18n="1 columns">Set login Time</a>
+                                                </li>
                                         </ul>
                                 </li>
 

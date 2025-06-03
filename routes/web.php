@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\LoginRestrictionController;
 use App\Http\Controllers\MasterPasswordController;
 use App\Http\Controllers\MobileController;
 use App\Http\Controllers\MobileHistoryController;
@@ -97,7 +98,11 @@ Route::put('/receivedpendingrestore', [App\Http\Controllers\MobileController::cl
 //     return view('mobileinventory', compact('mobile', 'users','totalCostPrice'));
 // })->middleware('auth');
 
-Route::get('/index', [App\Http\Controllers\UserController::class, 'index'])->name('user.index')->middleware('auth');
+// Route::get('/index', [App\Http\Controllers\UserController::class, 'index'])->name('user.index')->middleware('auth');
+
+Route::get('/index', [App\Http\Controllers\UserController::class, 'index'])
+    ->name('user.index')
+    ->middleware(['auth', 'login.time.restrict']);
 
 
 Route::get('/manageinventory', function () {
@@ -113,14 +118,14 @@ Route::get('/manageinventory', function () {
         ->sum('cost_price');
 
     $mobile = Mobile::where('availability', 'Available')
-        ->where('is_transfer', false)->with(['group', 'company', 'vendor','creator'])
+        ->where('is_transfer', false)->with(['group', 'company', 'vendor', 'creator'])
         ->get();
     // dd($mobile);
 
 
 
     return view('mobileinventory', compact('mobile', 'users', 'totalCostPrice', 'companies', 'groups', 'vendors'));
-})->middleware('auth')->name('homeRoute');
+})->middleware('auth', 'login.time.restrict')->name('homeRoute');
 
 
 
@@ -148,7 +153,7 @@ Route::get('/managerecentinventory', function () {
         ->get();
 
     return view('managerecentinventory', compact('mobile', 'users', 'totalCostPrice', 'transferMobiles'));
-})->middleware('auth');
+})->middleware('auth', 'login.time.restrict');
 
 
 
@@ -158,7 +163,7 @@ Route::get('/soldinventory', function () {
         ->where('is_approve', 'Not_Approved')->with('soldBy')
         ->get();
 
-        // dd($mobile);
+    // dd($mobile);
 
     // Calculate the sum of the profit for the $mobile collection
     $totalProfitMobile = $mobile->sum(function ($mobile) {
@@ -203,7 +208,7 @@ Route::get('/soldinventory', function () {
     $overAllProfit = $totalProfitMobile + $totalProfitTransfer;
 
     return view('soldinventory', compact('mobile', 'transferMobiles', 'totalProfitMobile', 'totalProfitTransfer', 'sumCostPriceMobile', 'sumSellingPriceTransfer', 'sumCostPriceTransfer', 'overAllProfit', 'sumSellingPriceMobile'));
-})->middleware('auth');
+})->middleware('auth', 'login.time.restrict');
 
 Route::get('/soldapprovedinventory', function () {
 
@@ -214,19 +219,17 @@ Route::get('/soldapprovedinventory', function () {
     $startOfWeek = Carbon::now()->startOfWeek(Carbon::FRIDAY);
     $endOfWeek = Carbon::now()->endOfWeek(Carbon::FRIDAY);
 
-    $profit = Mobile::where('user_id', auth()->user()->id)
-        ->where('availability', 'Sold')
+    $profit = Mobile::where('availability', 'Sold')
         ->where('is_transfer', false)
         ->where('is_approve', 'Approved')
         ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
-        ->sum('selling_price') - Mobile::where('user_id', auth()->user()->id)
-            ->where('availability', 'Sold')
+        ->sum('selling_price') - Mobile::where('availability', 'Sold')
             ->where('is_transfer', false)
             ->where('is_approve', 'Approved')
             ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
             ->sum('cost_price');
     return view('soldapprovedinventory', compact('mobile', 'profit'));
-})->middleware('auth');
+})->middleware('auth', 'login.time.restrict');
 
 
 Route::get('/pendinginventory', function () {
@@ -234,9 +237,9 @@ Route::get('/pendinginventory', function () {
     $mobile = Mobile::where('availability', 'Pending')->where('is_transfer', false)
         ->where('is_approve', 'Not_Approved')->with('pendingBy')
         ->get();
-        // dd($mobile);
+    // dd($mobile);
     return view('pendinginventory', compact('mobile'));
-})->middleware('auth');
+})->middleware('auth', 'login.time.restrict');
 
 Route::get('/receivedpendinginventory', function () {
 
@@ -244,7 +247,7 @@ Route::get('/receivedpendinginventory', function () {
         ->where('is_approve', 'Not_Approved')
         ->get();
     return view('receivedpendinginventory', compact('mobile'));
-})->middleware('auth');
+})->middleware('auth', 'login.time.restrict');
 
 Route::post('/storemobile', [App\Http\Controllers\MobileController::class, 'storeMobile'])->name('storeMobile');
 Route::get('/multipleentries', [App\Http\Controllers\MobileController::class, 'multipleEntries'])->name('multipleEntries');
@@ -289,7 +292,7 @@ Route::get('/transferedinventory', function () {
         ->get();
 
     return view('transferedinventory', compact('transferMobiles', 'users'));
-})->middleware('auth');
+})->middleware('auth', 'login.time.restrict');
 
 
 
@@ -317,7 +320,7 @@ Route::get('/recenttransferedinventory', function () {
     $recentReceivedClicked = session('recentReceivedClicked', false);
 
     return view('recenttransferedinventory', compact('transferMobiles', 'users', 'recentReceivedClicked'));
-})->middleware('auth')->name('recentTransferInventory');
+})->middleware('auth', 'login.time.restrict')->name('recentTransferInventory');
 
 
 
@@ -345,7 +348,7 @@ Route::get('/receivedtoday', function () {
     $recentReceivedClicked = session('recentReceivedClicked', false);
 
     return view('receivedtoday', compact('transferMobiles', 'users', 'recentReceivedClicked'));
-})->middleware('auth')->name('receivedtoday');
+})->middleware('auth', 'login.time.restrict')->name('receivedtoday');
 
 
 
@@ -355,7 +358,7 @@ Route::get('/transferinventory', function () {
         ->where('from_user_id', Auth::id())->get();
     // dd($transferMobiles);
     return view('transferinventory', compact('transferMobiles', 'users'));
-})->middleware('auth');
+})->middleware('auth', 'login.time.restrict');
 
 
 
@@ -391,7 +394,7 @@ Route::get('/soldtransferinventory', function () {
     });
 
     return view('soldtransferinventory', compact('transferMobiles', 'users', 'totalProfit', 'totalCostPrice'));
-})->middleware('auth');
+})->middleware('auth', 'login.time.restrict');
 
 
 // Sold Approve
@@ -415,7 +418,7 @@ Route::get('/soldapprovetransferinventory', function () {
         })
         ->get();
     return view('soldapprovetransferinventory', compact('transferMobiles', 'users'));
-})->middleware('auth');
+})->middleware('auth', 'login.time.restrict');
 
 
 
@@ -430,14 +433,13 @@ Route::get('/totalinventory', function () {
 
 
     return view('totalinventory', compact('result', 'users'));
-})->middleware('auth');
+})->middleware('auth', 'login.time.restrict');
 
 
 
 Route::get('/allinventory', function () {
     $users = User::all();
-    $mobile = Mobile::where('user_id', auth()->user()->id)
-        ->where('is_transfer', false)
+    $mobile = Mobile::where('is_transfer', false)
         ->get();
 
     $transferMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
@@ -458,7 +460,7 @@ Route::get('/allinventory', function () {
 
     $result = $mobile->concat($transferMobiles);
     return view('allinventory', compact('result', 'users'));
-})->middleware('auth');
+})->middleware('auth', 'login.time.restrict');
 
 
 Route::get('/otherinventory/{id}', [App\Http\Controllers\MobileController::class, 'otherInventory'])->name('otherInventory');
@@ -529,11 +531,16 @@ Route::post('/mobiles/bulk-store', [MobileController::class, 'bulkStoreMobile'])
 //Report Routes
 Route::get('/report/fetch', [MobileController::class, 'fetch'])->name('report.fetch');
 Route::get('/report', function () {
-    $company = company::all ();
-    $group = group::all ();
-    return view('report',compact('company','group')); })->middleware('auth');
+    $company = company::all();
+    $group = group::all();
+    return view('report', compact('company', 'group'));
+})->middleware('auth', 'login.time.restrict');
 
 
 
+//Custom Login Restriction Routes
+Route::get('/showlogin', [LoginRestrictionController::class, 'showLogin'])->name('showlogin');
 
-    //Sold inventory sy approvre nhi horha mobile
+Route::post('/admin/login-window', [LoginRestrictionController::class, 'updateLoginWindow'])
+    ->name('admin.updateLoginWindow');
+
