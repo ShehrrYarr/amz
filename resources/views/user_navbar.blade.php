@@ -148,6 +148,10 @@
                                                                 class="menu-item" href="/showvendors"
                                                                 data-i18n="1 columns">Manage Vendors</a>
                                                 </li>
+                                                <li class="@if(\Request::is('receivablevendors')) active @endif"><a
+                                                                class="menu-item" href="/receivablevendors"
+                                                                data-i18n="1 columns">Receivable Vendors</a>
+                                                </li>
 
                                         </ul>
                                 </li>

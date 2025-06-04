@@ -494,6 +494,8 @@ Route::get('/showvrHistory/{id}', [VendorController::class, 'showVRHistory'])->n
 Route::get('/showvsHistory/{id}', [VendorController::class, 'showVSHistory'])->name('showVSHistory');
 Route::get('/vendor-balance/{id}', [VendorController::class, 'getBalance'])->name('vendor.balance');
 Route::get('/vendor-balance', [VendorController::class, 'getBalance'])->name('getVendorBalance');
+Route::get('/receivablevendors', [VendorController::class, 'listReceivables'])->name('receivablevendors');
+
 
 
 

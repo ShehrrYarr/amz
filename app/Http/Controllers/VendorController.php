@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Accounts;
 use App\Models\Mobile;
 use App\Models\vendor;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
@@ -158,6 +159,72 @@ class VendorController extends Controller
             'status' => $balance < 0 ? 'Debit' : ($balance > 0 ? 'Credit' : 'Settled')
         ]);
     }
+
+
+    // public function listReceivables()
+    // {
+    //     // Get all vendors with their total debit and credit
+    //     $vendorReceivables = DB::table('accounts')
+    //         ->select(
+    //             'vendor_id',
+    //             DB::raw("
+    //             SUM(CASE WHEN category = 'DB' THEN amount ELSE 0 END) AS total_debit,
+    //             SUM(CASE WHEN category = 'CR' THEN amount ELSE 0 END) AS total_credit
+    //         ")
+    //         )
+    //         ->whereNotNull('vendor_id')
+    //         ->groupBy('vendor_id')
+    //         ->get();
+
+    //     // Filter out the vendors who owe you (total_debit > total_credit)
+    //     $vendorsOwing = $vendorReceivables->filter(function ($vendor) {
+    //         return ($vendor->total_debit - $vendor->total_credit) > 0;
+    //     });
+
+    //     // Get the actual vendor details from the 'vendors' table
+    //     $vendorsOwingDetails = Vendor::whereIn('id', $vendorsOwing->pluck('vendor_id'))
+    //         ->get();
+
+    //     return view('receivableVendors', compact('vendorsOwingDetails'));
+    // }
+
+    public function listReceivables()
+{
+    // Get all vendors with their total debit and credit
+    $vendorReceivables = DB::table('accounts')
+        ->select(
+            'vendor_id',
+            DB::raw("
+                SUM(CASE WHEN category = 'DB' THEN amount ELSE 0 END) AS total_debit,
+                SUM(CASE WHEN category = 'CR' THEN amount ELSE 0 END) AS total_credit
+            ")
+        )
+        ->whereNotNull('vendor_id')
+        ->groupBy('vendor_id')
+        ->get();
+
+    // Filter out the vendors who owe you (total_debit > total_credit)
+    $vendorsOwing = $vendorReceivables->filter(function ($vendor) {
+        return ($vendor->total_debit - $vendor->total_credit) > 0;
+    });
+
+    // Get the actual vendor details from the 'vendors' table
+    $vendorsOwingDetails = Vendor::whereIn('id', $vendorsOwing->pluck('vendor_id'))
+        ->get();
+
+    // Attach the owed amount to each vendor
+    $vendorsOwingDetails = $vendorsOwingDetails->map(function ($vendor) use ($vendorReceivables) {
+        // Find the corresponding vendor receivable
+        $vendorReceivable = $vendorReceivables->firstWhere('vendor_id', $vendor->id);
+        // Calculate the amount owed
+        $vendor->amount_owed = $vendorReceivable->total_debit - $vendorReceivable->total_credit;
+        return $vendor;
+    });
+
+    return view('receivableVendors', compact('vendorsOwingDetails'));
+}
+
+
 
 
 
