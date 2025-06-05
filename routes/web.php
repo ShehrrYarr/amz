@@ -168,6 +168,8 @@ Route::get('/soldinventory', function () {
         ->where('is_approve', 'Not_Approved')->with('soldBy')
         ->get();
 
+    $groups = group::all();
+
     // dd($mobile);
 
     // Calculate the sum of the profit for the $mobile collection
@@ -212,7 +214,9 @@ Route::get('/soldinventory', function () {
     // Calculate the overall profit
     $overAllProfit = $totalProfitMobile + $totalProfitTransfer;
 
-    return view('soldinventory', compact('mobile', 'transferMobiles', 'totalProfitMobile', 'totalProfitTransfer', 'sumCostPriceMobile', 'sumSellingPriceTransfer', 'sumCostPriceTransfer', 'overAllProfit', 'sumSellingPriceMobile'));
+    return view('soldinventory', compact('mobile', 'transferMobiles',
+     'totalProfitMobile', 'totalProfitTransfer', 'sumCostPriceMobile', 'sumSellingPriceTransfer', 'sumCostPriceTransfer', 
+     'overAllProfit', 'sumSellingPriceMobile','groups'));
 })->middleware('auth', 'login.time.restrict');
 
 Route::get('/soldapprovedinventory', function () {
@@ -559,4 +563,4 @@ Route::put('/update-user', [UserController::class, 'update'])->name('updateUser'
 
 
 //Sold logic change 
-//Receivable Vendor bnana h new 
+

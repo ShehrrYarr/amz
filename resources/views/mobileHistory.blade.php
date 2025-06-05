@@ -43,6 +43,7 @@
 
                                         <th>Added By</th>
                                         <th>Mobile Name</th>
+                                        <th>Group</th>
                                         <th>Customer Name</th>
                                         <th>Availability Status</th>
                                         <th>Battery Health</th>
@@ -56,6 +57,7 @@
                                             <td>{{ $key->created_at }}</td>
                                             <td>{{ $key->created_by }}</td>
                                             <td>{{ $key->mobile_name }}</td>
+                                            <td>{{ $key->group }}</td>
                                             <td>{{ $key->customer_name }}</td>
                                             <td>{{ $key->availability_status }}</td>
                                             <td>{{ $key->battery_health }}</td>

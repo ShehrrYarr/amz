@@ -24,6 +24,9 @@ class CreateMobileHistoriesTable extends Migration
             $table->decimal('cost_price', 10, 2)->nullable();
             $table->decimal('selling_price', 10, 2)->nullable();
             $table->string('availability_status'); // New column to track status
+            $table->string('group'); 
+
+            
             $table->timestamps();
         });
     }

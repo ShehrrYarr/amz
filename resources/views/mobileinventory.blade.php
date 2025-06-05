@@ -222,6 +222,14 @@
                                     <option value="Pending">Pending</option>
                                 </select>
                             </div>
+                            <div class="mb-1" style="display: none;">
+                                <label for="group_id" class="form-label">Group</label>
+                                <select class="form-control" id="sgroup_id" name="group_id" required>
+                                    @foreach($groups as $group)
+                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
                             <div class="mb-1">
                                 <label for="vendor_id" class="form-label">Vendor</label>
@@ -938,6 +946,7 @@
                     $('#sbattery_health').val(data.result.battery_health);
                     $('#scost_price').val(data.result.cost_price);
                     $('#savailability').val(data.result.availability);
+                    $('#sgroup_id').val(data.result.group_id);
                     $('#sselling_price').val(data.result.selling_price);
 
 

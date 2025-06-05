@@ -154,6 +154,8 @@ class MobileController extends Controller
         $mobile->added_by = $userId;
         $mobile->save();
 
+        $group = group::find($request->group_id);
+
         // Create vendor credit entry if vendor is present
         if ($request->filled('vendor_id')) {
             $vendor = Vendor::find($request->vendor_id);
@@ -177,6 +179,8 @@ class MobileController extends Controller
                 'selling_price' => $mobile->selling_price,
                 'availability_status' => 'Purchased',
                 'created_by' => $user->name, // Storing username here
+                'group' => $group->name,
+
             ]);
 
         return redirect()->back()->with('success', 'Mobile created and account updated successfully.');
@@ -203,6 +207,9 @@ class MobileController extends Controller
 
     public function sellMobile(Request $request)
     {
+            $group = group::find($request->group_id);
+            // dd($group);
+
         if ($request->availability == 'Available') {
             return redirect()->back()->with('danger', 'Please select a different availability option.');
         }
@@ -262,6 +269,7 @@ class MobileController extends Controller
 
             $data->save();
 
+
             MobileHistory::create([
                 'mobile_id' => $data->id,
                 'mobile_name' => $data->mobile_name,
@@ -271,6 +279,7 @@ class MobileController extends Controller
                 'selling_price' => $data->selling_price,
                 'availability_status' => 'Sold',
                 'created_by' => $user->name,
+                'group' => $group->name,
             ]);
         } elseif ($request->availability === 'Pending') {
             if ($request->filled('vendor_id')) {
@@ -347,6 +356,8 @@ class MobileController extends Controller
 
     public function restoreMobile(Request $request)
     {
+        $group = group::find($request->group_id);
+        // dd($group);
         $data = Mobile::findOrFail($request->id);
         $user = auth()->user();
 
@@ -359,6 +370,7 @@ class MobileController extends Controller
         $restoreMobile->old_selling_price = $data->selling_price;
         $restoreMobile->new_cost_price = $request->input('cost_price');
         $restoreMobile->new_selling_price = $request->input('selling_price');
+        // $restoreMobile->new_selling_price = $request->input('selling_price');
         $restoreMobile->restore_by = $user->name;
         $restoreMobile->save();
 
@@ -368,12 +380,14 @@ class MobileController extends Controller
         $data->availability = $request->input('availability');
         $data->customer_name = $request->input('customer_name');
         $data->battery_health = $request->input('battery_health');
+        $data->group_id = $request->input('group_id');
         $data->sold_vendor_id = null;
         $data->sold_by = null;
         $data->pending_by = null;
         $data->customer_name = null;
         $data->sold_at = null;
         $data->is_approve = 'Not_Approved';
+        $data->group_id = $request->input('group_id');
         $data->save();
 
         // Add mobile history
@@ -386,6 +400,7 @@ class MobileController extends Controller
             'selling_price' => $data->selling_price,
             'availability_status' => 'Restored',
             'created_by' => $user->name,
+            'group' => $group->name,
         ]);
 
         return redirect()->back()->with('success', 'Mobile Restored successfully.');
@@ -904,6 +919,8 @@ class MobileController extends Controller
             $mobile->added_by = $user->id;
             $mobile->save();
 
+            $group = group::find($entry['group_id']);
+
             // Create mobile history
             MobileHistory::create([
                 'mobile_id' => $mobile->id,
@@ -914,6 +931,7 @@ class MobileController extends Controller
                 'selling_price' => $mobile->selling_price,
                 'availability_status' => 'Purchased',
                 'created_by' => $user->name, // Storing username here
+                'group' => $group->name,
             ]);
         }
 

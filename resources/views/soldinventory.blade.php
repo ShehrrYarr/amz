@@ -139,11 +139,19 @@
                                     <option value="Sold">Sold</option>
                                 </select>
                             </div>
+                            <div class="mb-1">
+                                <label for="group_id" class="form-label">Group</label>
+                                <select class="form-control" id="rgroup_id" name="group_id" required>
+                                    @foreach($groups as $group)
+                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                              <div class="mb-1">
+                            <div class="mb-1">
                                 <label for="customer_name" class="form-label">Customer Name</label>
 
-                                <input type="text" class="form-control" id="customer_name" name="customer_name" required >
+                                <input type="text" class="form-control" id="customer_name" name="customer_name" required>
                             </div>
 
                             <div class="mb-1">
@@ -330,6 +338,7 @@
                                         <th>Sold By</th>
                                         <th>Mobile Name</th>
                                         <th>IMEI#</th>
+                                        <th>Group</th>
                                         <th>SIM Lock</th>
                                         <th>Approve</th>
                                         <th>Color</th>
@@ -357,6 +366,7 @@
                                             <td>{{ $key->soldBy->name }}</td>
                                             <td>{{ $key->mobile_name }}</td>
                                             <td>{{ $key->imei_number }}</td>
+                                            <td>{{ $key->group->name }}</td>
                                             <td>{{ $key->sim_lock }}</td>
                                             <td><a href="" onclick="approve({{ $key->id }})" data-toggle="modal"
                                                     data-target="#exampleModal1">
@@ -373,9 +383,9 @@
                                             <td>{{ $key->selling_price }}</td>
                                             <td>{{ $key->customer_name }}</td>
                                             <td>{{ $key->availability }}</td>
-                                              <td>
-                                                <a href="{{ route('showHistory', $key->id) }}" class="btn btn-sm btn-warning" >
-                                                     <i class="fa fa-eye"></i>
+                                            <td>
+                                                <a href="{{ route('showHistory', $key->id) }}" class="btn btn-sm btn-warning">
+                                                    <i class="fa fa-eye"></i>
 
                                                 </a>
 
@@ -398,64 +408,64 @@
 
 
 
-             
-
-                <!-- <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
-                    <div class="card">
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Sold Profit</h4>
-                            <h4>Rs {{$totalProfitMobile}}</h4>
-                        </div>
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Received Sold Profit</h4>
-                            <h4>Rs {{$totalProfitTransfer}}</h4>
-                        </div>
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Over All Proftt</h4>
-                            <h4>Rs {{$overAllProfit}}</h4>
-                        </div>
-                    </div>
-
-                </div> -->
-
-                <!-- <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
-                    <div class="card">
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Total Cost price of Mobiles</h4>
-                            <h4>Rs {{$sumCostPriceMobile}}</h4>
-                        </div>
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Total Sold price of Mobiles</h4>
-                            <h4>Rs {{$sumSellingPriceMobile}}</h4>
-                        </div>
-                    </div>
-
-                </div> -->
-                <!-- <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
-                    <div class="card">
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Total Cost Price of Received Mobiles</h4>
-                            <h4>Rs {{$sumCostPriceTransfer}}</h4>
-                        </div>
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Total Sold Price of Received Mobiles</h4>
-                            <h4>Rs {{$sumSellingPriceTransfer}}</h4>
-                        </div>
-                    </div>
-
-                </div> -->
 
 
                 <!-- <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
-                    <div class="card">
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Download The Sold Mobiles</h4>
-                            <a style="font-size: 25px" href="" data-toggle="modal" data-target="#exampleModal5"><i
-                                    style="color:red;" class="fa fa-download"></i></a>
+                        <div class="card">
+                            <div class="card-header latest-update-heading d-flex justify-content-between">
+                                <h4 class="latest-update-heading-title text-bold-500">Sold Profit</h4>
+                                <h4>Rs {{$totalProfitMobile}}</h4>
+                            </div>
+                            <div class="card-header latest-update-heading d-flex justify-content-between">
+                                <h4 class="latest-update-heading-title text-bold-500">Received Sold Profit</h4>
+                                <h4>Rs {{$totalProfitTransfer}}</h4>
+                            </div>
+                            <div class="card-header latest-update-heading d-flex justify-content-between">
+                                <h4 class="latest-update-heading-title text-bold-500">Over All Proftt</h4>
+                                <h4>Rs {{$overAllProfit}}</h4>
+                            </div>
                         </div>
-                    </div>
 
-                </div> -->
+                    </div> -->
+
+                <!-- <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
+                        <div class="card">
+                            <div class="card-header latest-update-heading d-flex justify-content-between">
+                                <h4 class="latest-update-heading-title text-bold-500">Total Cost price of Mobiles</h4>
+                                <h4>Rs {{$sumCostPriceMobile}}</h4>
+                            </div>
+                            <div class="card-header latest-update-heading d-flex justify-content-between">
+                                <h4 class="latest-update-heading-title text-bold-500">Total Sold price of Mobiles</h4>
+                                <h4>Rs {{$sumSellingPriceMobile}}</h4>
+                            </div>
+                        </div>
+
+                    </div> -->
+                <!-- <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
+                        <div class="card">
+                            <div class="card-header latest-update-heading d-flex justify-content-between">
+                                <h4 class="latest-update-heading-title text-bold-500">Total Cost Price of Received Mobiles</h4>
+                                <h4>Rs {{$sumCostPriceTransfer}}</h4>
+                            </div>
+                            <div class="card-header latest-update-heading d-flex justify-content-between">
+                                <h4 class="latest-update-heading-title text-bold-500">Total Sold Price of Received Mobiles</h4>
+                                <h4>Rs {{$sumSellingPriceTransfer}}</h4>
+                            </div>
+                        </div>
+
+                    </div> -->
+
+
+                <!-- <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
+                        <div class="card">
+                            <div class="card-header latest-update-heading d-flex justify-content-between">
+                                <h4 class="latest-update-heading-title text-bold-500">Download The Sold Mobiles</h4>
+                                <a style="font-size: 25px" href="" data-toggle="modal" data-target="#exampleModal5"><i
+                                        style="color:red;" class="fa fa-download"></i></a>
+                            </div>
+                        </div>
+
+                    </div> -->
 
             </div>
         </div>
@@ -551,6 +561,7 @@
                     $('#rcost_price').val(data.result.cost_price);
                     $('#rselling_price').val(data.result.selling_price);
                     $('#ravailability').val(Available);
+                    $('#rsold_id').val(data.result.sold_id);
                 },
                 error: function (error) {
                     console.log('Error:', error);
