@@ -33,6 +33,8 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 Auth::routes();
+Route::post('/logout-user/{user}', [UserController::class, 'logoutUser'])->name('logoutUser');
+
 
 Route::get('/', function () {
     $totalPublications = Publication::get()->count();

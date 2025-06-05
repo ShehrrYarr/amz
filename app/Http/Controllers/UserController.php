@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
 {
@@ -171,7 +172,8 @@ class UserController extends Controller
             'id' => 'required|exists:users,id',
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $request->id,
-            'password' => 'required|string|min:6',
+            'password' => 'nullable|string|min:6', // Make password optional for update
+            'is_active' => 'nullable|boolean', // Validate the active status
         ]);
 
         $user = User::findOrFail($request->id);
@@ -179,10 +181,32 @@ class UserController extends Controller
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password ? Hash::make($request->password) : $user->password, // Update password only if provided
             'password_text' => $request->password,
+            'is_active' => $request->is_active, // Update the active status
         ]);
 
         return redirect()->back()->with('success', 'User updated successfully.');
     }
+
+
+    public function logoutUser($id)
+    {
+        // Find the user by ID
+        $user = User::findOrFail($id);
+
+        // Manually logging out the specified user by clearing their session
+        // We can store the user's session ID or other identifier to be able to clear the correct session later.
+
+        $sessionKey = 'user_session_' . $user->id;
+
+        // Clear the specific user's session
+        Session::forget($sessionKey);  // Remove session data related to the user
+
+        // Optionally, if you're storing the user session manually (e.g., in a cache), you would invalidate it here.
+
+        return redirect()->route('home')->with('success', 'User has been logged out successfully.');
+    }
+
+
 }

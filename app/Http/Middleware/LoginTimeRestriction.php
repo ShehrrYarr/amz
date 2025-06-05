@@ -14,6 +14,14 @@ class LoginTimeRestriction
         $user = Auth::user();
 
         if ($user && !in_array($user->id, [1, 2])) {
+
+             if ($user->is_active == 0) {
+            Auth::logout(); // Log the user out immediately if they're inactive
+            return redirect()->route('login')->withErrors([
+                'email' => 'Your account is inactive. Please contact support.',
+            ]);
+        }
+        
             $restriction = LoginRestriction::latest()->first();
 
             if ($restriction) {

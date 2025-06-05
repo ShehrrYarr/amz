@@ -23,11 +23,11 @@
                                 <label for="name" class="form-label">Name</label>
                                 <input type="text" class="form-control" name="name" required>
                             </div>
-                              <div class="mb-1">
+                            <div class="mb-1">
                                 <label for="name" class="form-label">Email</label>
                                 <input type="text" class="form-control" name="email" required>
                             </div>
-                             <div class="mb-1">
+                            <div class="mb-1">
                                 <label for="name" class="form-label">Password</label>
                                 <input type="text" class="form-control" name="password" required>
                             </div>
@@ -50,7 +50,7 @@
     {{-- End Modal --}}
 
 
-     {{-- Edit Modal --}}
+    {{-- Edit Modal --}}
 
     <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -75,7 +75,7 @@
                                 <input class="form-control" type="hidden" name="id" id="id" value="Update">
                                 <input type="text" class="form-control" id="vname" name="name" required>
                             </div>
-                             <div class="mb-1">
+                            <div class="mb-1">
                                 <label for="name" class="form-label">Email</label>
                                 <input type="text" class="form-control" id="vemail" name="email" required>
                             </div>
@@ -83,7 +83,15 @@
                                 <label for="name" class="form-label">Password</label>
                                 <input type="text" class="form-control" id="vpassword" name="password" required>
                             </div>
-                           
+
+                            <div class="mb-1">
+                                <label for="is_active" class="form-label">Active Status</label>
+                                <select name="is_active" id="is_active" class="form-control">
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+
                         </div>
                         <div class="form-actions">
                             <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
@@ -103,7 +111,7 @@
     {{-- End Edit Modal --}}
 
 
-      {{-- Delete Modal --}}
+    {{-- Delete Modal --}}
 
     <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -124,9 +132,9 @@
                             <div class="mb-1">
                                 <label for="name" class="form-label">Are you sure you want to delete this Company?</label>
                                 <input class="form-control" hidden name="id" id="did" value="Update">
-                                <input type="text" class="form-control" id="dname" name="name" readonly  required>
+                                <input type="text" class="form-control" id="dname" name="name" readonly required>
                             </div>
-                           
+
                         </div>
                         <div class="form-actions">
                             <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
@@ -145,12 +153,11 @@
 
     {{-- End Delete Modal --}}
     <style>
-    .card {
-        border-radius: 12px;
-      
-    }
-  
-</style>
+        .card {
+            border-radius: 12px;
+
+        }
+    </style>
 
     <div class="app-content content">
         <div class="content-overlay"></div>
@@ -189,9 +196,9 @@
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Password</th>
-
-                                        
+                                        <th>Active Status</th>
                                         <th>Action</th>
+                                        <!-- <th>Logout User</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -201,11 +208,18 @@
                                             <td>{{ $user->name }}</td>
                                             <td>{{ $user->email }}</td>
                                             <td>{{ $user->password_text }}</td>
+                                            <td>{{ $user->is_active }}</td>
                                             <td>
                                                 <a href="" onclick="edit({{ $user->id }})" data-toggle="modal"
                                                     data-target="#exampleModal1">
-                                                    <i class="feather icon-edit"></i></a> 
+                                                    <i class="feather icon-edit"></i></a>
                                             </td>
+                                            <!-- <td>
+                                                <form action="{{ route('logoutUser', $user->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-danger btn-sm">Logout</button>
+                                                </form>
+                                            </td> -->
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -221,23 +235,25 @@
 
 
     <script>
-          //  Edit Function
+        //  Edit Function
         function edit(value) {
             console.log(value);
             var id = value;
             $.ajax({
                 type: "GET",
                 url: '/edituser/' + id,
-                success: function(data) {
+                success: function (data) {
                     $("#editmobile").trigger("reset");
 
                     $('#id').val(data.result.id);
                     $('#vname').val(data.result.name);
                     $('#vemail').val(data.result.email);
                     $('#vpassword').val(data.result.password_text);
-                  
+                    $('#is_active').val(data.result.is_active);
+
+
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log('Error:', error);
                 }
             });
@@ -245,21 +261,21 @@
 
         // End Edit Function
 
-           //  Delete Function
+        //  Delete Function
         function remove(value) {
             console.log(value);
             var id = value;
             $.ajax({
                 type: "GET",
                 url: '/editgroup/' + id,
-                success: function(data) {
+                success: function (data) {
                     $("#deleteMobile").trigger("reset");
 
                     $('#did').val(data.result.id);
                     $('#dname').val(data.result.name);
-                   
+
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log('Error:', error);
                 }
             });
