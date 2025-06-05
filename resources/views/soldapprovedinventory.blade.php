@@ -39,6 +39,7 @@
                                 </select>
                             </div>
 
+
                             <div class="mb-1" style="display: none;">
                                 <label for="sim_lock" class="form-label">SIM Lock</label>
                                 <select class="form-control" id="sim_lock" name="sim_lock" required>
@@ -132,6 +133,14 @@
                                 <select class="form-control" id="ravailability" name="availability" required>
                                     <option value="Available">Available</option>
                                     <option value="Sold">Sold</option>
+                                </select>
+                            </div>
+                              <div class="mb-1">
+                                <label for="group_id" class="form-label">Group</label>
+                                <select class="form-control" id="rgroup_id" name="group_id" required>
+                                    @foreach($groups as $group)
+                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="mb-1">
@@ -317,6 +326,7 @@
                     $('#rbattery_health').val(data.result.battery_health);
                     $('#rcost_price').val(data.result.cost_price);
                     $('#rselling_price').val(data.result.selling_price);
+                    $('#rgroup_id').val(data.result.group_id);
                     $('#ravailability').val(Available);
 
 

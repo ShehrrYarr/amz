@@ -221,6 +221,7 @@ Route::get('/soldinventory', function () {
 
 Route::get('/soldapprovedinventory', function () {
 
+    $groups = group::all();
     $mobile = Mobile::where('availability', 'Sold')->where('is_transfer', false)
         ->where('is_approve', 'Approved')
         ->get();
@@ -237,17 +238,18 @@ Route::get('/soldapprovedinventory', function () {
             ->where('is_approve', 'Approved')
             ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
             ->sum('cost_price');
-    return view('soldapprovedinventory', compact('mobile', 'profit'));
+    return view('soldapprovedinventory', compact('mobile', 'profit','groups'));
 })->middleware('auth', 'login.time.restrict');
 
 
 Route::get('/pendinginventory', function () {
+    $groups =  group::all();
 
     $mobile = Mobile::where('availability', 'Pending')->where('is_transfer', false)
         ->where('is_approve', 'Not_Approved')->with('pendingBy')
         ->get();
     // dd($mobile);
-    return view('pendinginventory', compact('mobile'));
+    return view('pendinginventory', compact('mobile','groups'));
 })->middleware('auth', 'login.time.restrict');
 
 Route::get('/receivedpendinginventory', function () {

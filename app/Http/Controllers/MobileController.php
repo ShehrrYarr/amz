@@ -310,6 +310,7 @@ class MobileController extends Controller
                 'selling_price' => $data->selling_price,
                 'availability_status' => 'Pending',
                 'created_by' => $user->name,
+                'group' => $group->name,
             ]);
         }
 
@@ -408,6 +409,7 @@ class MobileController extends Controller
 
     public function pendingRestore(Request $request)
     {
+        $group = group::find($request->group_id);
         $data = Mobile::findOrFail($request->id);
         // dd($request->id);
         $user = auth()->user();
@@ -420,6 +422,7 @@ class MobileController extends Controller
         $data->selling_price = $request->input('selling_price');
         $data->availability = $request->input('availability');
         $data->battery_health = $request->input('battery_health');
+        $data->group_id = $request->input('group_id');
         $data->save();
 
         MobileHistory::create([
@@ -431,6 +434,7 @@ class MobileController extends Controller
             'selling_price' => $data->selling_price,
             'availability_status' => 'Got back the mobile',
             'created_by' => $user->name,
+            'group' =>$group->name,
         ]);
         return redirect()->back()->with('success', 'Mobile Restored successfully.');
     }
