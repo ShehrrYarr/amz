@@ -59,7 +59,7 @@
 
 <!-- BEGIN: Body-->
 
- 
+
 
 <body class="vertical-layout vertical-menu 2-columns content-left-sidebar chat-application  fixed-navbar"
         data-open="click" data-menu="vertical-menu" data-col="2-columns">
@@ -181,6 +181,10 @@
                                                                 class="menu-item" href="/soldinventory"
                                                                 data-i18n="5 columns">Sold Inventory</a>
                                                 </li>
+                                                <li class="@if(\Request::is('soldtransactions')) active @endif"><a
+                                                                class="menu-item" href="/soldtransactions"
+                                                                data-i18n="5 columns">Sold Transactions</a>
+                                                </li>
                                                 <li class="@if (\Request::is('pendinginventory')) active @endif"><a
                                                                 class="menu-item" href="/pendinginventory"
                                                                 data-i18n="5 columns">Pending Inventory</a>
@@ -253,30 +257,30 @@
                                         </ul>
                                 </li>
                                 @php
-                                                                        $userId = auth()->id();
-                                                                @endphp
+                                $userId = auth()->id();
+                                @endphp
 
                                 @if (in_array($userId, [1, 2]))
-                                                                        <li class="nav-item">
-                                                                                        <a href="#"><i class="feather icon-tv"></i>
-                                                                                                        <span class="menu-title" data-i18n="Templates">Settings</span>
-                                                                                        </a>
-                                                                                        <ul class="menu-content">
-                                                                                                        <li class="@if (\Request::is('showpassword')) active @endif">
-                                                                                                                        <a class="menu-item" href="/showpassword"
-                                                                                                                                        data-i18n="1 columns">Password</a>
-                                                                                                        </li>
-                                                                                                        <li class="@if (\Request::is('showlogin')) active @endif">
-                                                                                                                        <a class="menu-item" href="/showlogin" data-i18n="1 columns">Set
-                                                                                                                                        login Time</a>
-                                                                                                        </li>
-                                                                                                        <li class="@if (\Request::is('showusers')) active @endif">
-                                                                                                                        <a class="menu-item" href="/showusers"
-                                                                                                                                        data-i18n="1 columns">Manage Users</a>
-                                                                                                        </li>
-                                                                                        </ul>
-                                                                        </li>
-                                                                @endif
+                                <li class="nav-item">
+                                        <a href="#"><i class="feather icon-tv"></i>
+                                                <span class="menu-title" data-i18n="Templates">Settings</span>
+                                        </a>
+                                        <ul class="menu-content">
+                                                <li class="@if (\Request::is('showpassword')) active @endif">
+                                                        <a class="menu-item" href="/showpassword"
+                                                                data-i18n="1 columns">Password</a>
+                                                </li>
+                                                <li class="@if (\Request::is('showlogin')) active @endif">
+                                                        <a class="menu-item" href="/showlogin" data-i18n="1 columns">Set
+                                                                login Time</a>
+                                                </li>
+                                                <li class="@if (\Request::is('showusers')) active @endif">
+                                                        <a class="menu-item" href="/showusers"
+                                                                data-i18n="1 columns">Manage Users</a>
+                                                </li>
+                                        </ul>
+                                </li>
+                                @endif
 
 
 

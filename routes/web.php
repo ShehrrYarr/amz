@@ -331,6 +331,8 @@ Route::get('/restoremobiles', [App\Http\Controllers\RestoreController::class, 'r
 
 Route::post('/check-imei', [MobileController::class, 'checkIMEI'])->name('checkIMEI');
 Route::post('/store-multiple-mobiles', [MobileController::class, 'storeMultipleMobiles'])->name('storeMultipleMobiles');
+Route::get('/soldtransactions', [App\Http\Controllers\MobileController::class, 'soldTransactions'])->name('soldtransactions');
+
 
 
 

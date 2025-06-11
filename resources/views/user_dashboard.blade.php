@@ -102,7 +102,7 @@
                                                 class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
 
                                                 <div class="stats-amount mr-3">
-                                                    <h3 class="heading-text text-bold-600">Rs.{{$totalCostPrice}}</h3>
+                                                    <h3 class="heading-text text-bold-600">Rs.{{number_format($totalCostPrice)}}</h3>
                                                     <p class="sub-heading">Total Mobiles Cost</p>
                                                 </div>
                                                 <!-- <span class="inc-dec-percentage">
@@ -115,7 +115,7 @@
                                                 class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
 
                                                 <div class="stats-amount mr-3">
-                                                    <h3 class="heading-text text-bold-600"> Rs.{{$totalSellingPrice}}</h3>
+                                                    <h3 class="heading-text text-bold-600"> Rs.{{number_format($totalSellingPrice)}}</h3>
                                                     <p class="sub-heading">Total Sold Mobile Sellings</p>
                                                 </div>
                                                 <!-- <span class="inc-dec-percentage">
@@ -128,7 +128,7 @@
                                                 class="d-flex align-items-start mb-sm-1 mb-xl-0 border-right-blue-grey border-right-lighten-5">
 
                                                 <div class="stats-amount mr-3">
-                                                    <h3 class="heading-text text-bold-600"> Rs.{{$pendingMobilesCost}}</h3>
+                                                    <h3 class="heading-text text-bold-600"> Rs.{{number_format($pendingMobilesCost)}}</h3>
                                                     <p class="sub-heading">Total Pending Mobile Cost</p>
                                                 </div>
                                                 <!-- <span class="inc-dec-percentage">

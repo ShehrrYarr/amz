@@ -537,6 +537,7 @@ public function storeMobile(Request $request)
             'mobile_id' => $data->id,
             'category' => 'Sale',
             'selling_price' => $sellingPrice,
+            'cost_price' => $data->cost_price,
             'vendor_id' => $vendorId,
             'customer_name' => $vendorId ? null : $customerName,
             'transaction_date' => now(),
@@ -722,6 +723,8 @@ public function storeMobile(Request $request)
     $data->battery_health = $request->input('battery_health');
     $data->group_id = $request->input('group_id');
     $data->sold_by = null;
+    $data->cost_price = $request->input('cost_price');
+    $data->selling_price = $request->input('selling_price');
     $data->pending_by = null;
     $data->sold_at = null;
     $data->is_approve = 'Not_Approved';
@@ -1496,6 +1499,15 @@ public function storeMultipleMobiles(Request $request)
     return response()->json(['html' => $html]);
 }
 
+public function soldTransactions()
+{
+    $transactions = MobileTransaction::with(['mobile.company', 'mobile.group', 'vendor', 'user'])
+                    ->where('category', 'Sale')
+                    ->latest()
+                    ->get();
+
+    return view('soldTransactions', compact('transactions'));
+}
 
 
 
