@@ -46,24 +46,13 @@ Route::get('/', function () {
 
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/publication', [App\Http\Controllers\PublicationController::class, 'index'])->name('publication');
-Route::post('/storepublication', [App\Http\Controllers\PublicationController::class, 'store'])->name('storepublication');
-Route::get('/editpublication/{id}', [App\Http\Controllers\PublicationController::class, 'edit'])->name('editpublication');
-Route::get('/managepublication', [App\Http\Controllers\PublicationController::class, 'show'])->name('managepublication');
-Route::post('/updatepublication', [App\Http\Controllers\PublicationController::class, 'update'])->name('updatepublication');
 
-Route::get('/downloadpublication/{publication}', [App\Http\Controllers\PublicationController::class, 'downloadPublication'])->name('downloadpublication');
 Route::get('/adminthread', [App\Http\Controllers\AdminThreadController::class, 'index'])->name('adminthread');
 Route::get('/fetchthread/{user_id}', [App\Http\Controllers\AdminThreadController::class, 'fetchThread'])->name('fetchthread');
-Route::get('/publicationallocation', [App\Http\Controllers\PublicationController::class, 'publicationAllocation'])->name('publicationallocation');
-Route::get('/unlinkpublication/{pivot_id}', [App\Http\Controllers\PublicationController::class, 'unlinkPublication'])->name('unlinkpublication');
-Route::get('/verifyallocation/{pubid}/{userid}', [App\Http\Controllers\PublicationController::class, 'verifyAllocation'])->name('verifyallocation');
-Route::post('/storeallocation', [App\Http\Controllers\PublicationController::class, 'storeAllocation'])->name('storeallocation');
-//user access
-Route::get('/publicationdetails/{pub_id}', [App\Http\Controllers\PublicationController::class, 'publicationDetails'])->name('publicationdetails');
+
 Route::get('/userthread', [App\Http\Controllers\UserThreadController::class, 'index'])->name('userthread');
 Route::get('/sendmessage/{message}/{chat_id}', [App\Http\Controllers\UserThreadController::class, 'store'])->name('sendmessage');
-Route::get('/userpublications', [App\Http\Controllers\PublicationController::class, 'index'])->name('userpublications');
+
 Route::post('/logout', [App\Http\Controllers\HomeController::class, 'logout'])->name('logout');
 //media routes
 Route::get('/createmedia', [App\Http\Controllers\MediaController::class, 'index'])->name('createmedia');
@@ -121,7 +110,7 @@ Route::get('/manageinventory', function () {
         ->sum('cost_price');
 
     $mobile = Mobile::where('availability', 'Available')
-        ->where('is_transfer', false)->with(['group', 'company', 'vendor', 'creator'])
+        ->where('is_transfer', false)->with(['group', 'company', 'vendor', 'creator','latestVendorTransaction.vendor'])
         ->get();
     // dd($mobile);
 
@@ -164,62 +153,126 @@ Route::get('/managerecentinventory', function () {
 
 
 
+// Route::get('/soldinventory', function () {
+//     $mobile = Mobile::where('availability', 'Sold')
+//         ->where('is_transfer', false)
+//         ->where('is_approve', 'Not_Approved')->with('soldBy')
+//         ->get();
+
+//     $groups = group::all();
+
+//     // dd($mobile);
+
+//     // Calculate the sum of the profit for the $mobile collection
+//     $totalProfitMobile = $mobile->sum(function ($mobile) {
+//         return $mobile->selling_price - $mobile->cost_price;
+//     });
+
+//     // Calculate the sum of the cost_price for the $mobile collection
+//     $sumCostPriceMobile = $mobile->sum('cost_price');
+
+//     // Calculate the sum of the selling_price for the $mobile collection
+//     $sumSellingPriceMobile = $mobile->sum('selling_price');
+
+//     $transferMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
+//         ->whereIn('id', function ($query) {
+//             $query->select(DB::raw('MAX(id)'))
+//                 ->from('transfer_records')
+//                 ->groupBy('mobile_id');
+//         })
+//         ->where('to_user_id', Auth::id())
+//         ->whereHas('mobile', function ($query) {
+//             $query->where('user_id', Auth::id())
+//                 ->where('availability', 'Sold')
+//                 ->where('is_approve', 'Not_Approved');
+//         })
+//         ->whereHas('mobile', function ($query) {
+//             $query->where('is_transfer', true);
+//         })
+//         ->get();
+
+//     // Calculate the sum of the profit for the $transferMobiles collection
+//     $totalProfitTransfer = $transferMobiles->sum(function ($transferMobile) {
+//         return $transferMobile->mobile->selling_price - $transferMobile->mobile->cost_price;
+//     });
+
+//     // Calculate the sum of the selling_price for the $transferMobiles collection
+//     $sumSellingPriceTransfer = $transferMobiles->sum('mobile.selling_price');
+
+//     // Calculate the sum of the cost_price for the $transferMobiles collection
+//     $sumCostPriceTransfer = $transferMobiles->sum('mobile.cost_price');
+
+//     // Calculate the overall profit
+//     $overAllProfit = $totalProfitMobile + $totalProfitTransfer;
+
+//     return view('soldinventory', compact('mobile', 'transferMobiles',
+//      'totalProfitMobile', 'totalProfitTransfer', 'sumCostPriceMobile', 'sumSellingPriceTransfer', 'sumCostPriceTransfer', 
+//      'overAllProfit', 'sumSellingPriceMobile','groups'));
+// })->middleware('auth', 'login.time.restrict');
+
 Route::get('/soldinventory', function () {
-    $mobile = Mobile::where('availability', 'Sold')
+    $mobiles = Mobile::where('availability', 'Sold')
         ->where('is_transfer', false)
-        ->where('is_approve', 'Not_Approved')->with('soldBy')
+        ->where('is_approve', 'Not_Approved')
+        ->with(['soldBy', 'latestSaleTransaction']) // add transaction here
         ->get();
 
-    $groups = group::all();
+    $groups = Group::all();
+    $vendors = Vendor::all();
 
-    // dd($mobile);
-
-    // Calculate the sum of the profit for the $mobile collection
-    $totalProfitMobile = $mobile->sum(function ($mobile) {
-        return $mobile->selling_price - $mobile->cost_price;
+    // Profit, Cost, and Selling Price Calculations from Transactions
+    $totalProfitMobile = $mobiles->sum(function ($mobile) {
+        return optional($mobile->latestSaleTransaction)->selling_price
+            - optional($mobile->latestSaleTransaction)->cost_price;
     });
 
-    // Calculate the sum of the cost_price for the $mobile collection
-    $sumCostPriceMobile = $mobile->sum('cost_price');
+    $sumCostPriceMobile = $mobiles->sum(fn($mobile) => optional($mobile->latestSaleTransaction)->cost_price);
+    $sumSellingPriceMobile = $mobiles->sum(fn($mobile) => optional($mobile->latestSaleTransaction)->selling_price);
 
-    // Calculate the sum of the selling_price for the $mobile collection
-    $sumSellingPriceMobile = $mobile->sum('selling_price');
-
-    $transferMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
+    $transferMobiles = TransferRecord::with([
+            'fromUser',
+            'toUser',
+            'mobile.latestSaleTransaction'
+        ])
         ->whereIn('id', function ($query) {
-            $query->select(\DB::raw('MAX(id)'))
+            $query->select(DB::raw('MAX(id)'))
                 ->from('transfer_records')
                 ->groupBy('mobile_id');
         })
         ->where('to_user_id', Auth::id())
         ->whereHas('mobile', function ($query) {
             $query->where('user_id', Auth::id())
-                ->where('availability', 'Sold')
-                ->where('is_approve', 'Not_Approved');
-        })
-        ->whereHas('mobile', function ($query) {
-            $query->where('is_transfer', true);
+                  ->where('availability', 'Sold')
+                  ->where('is_approve', 'Not_Approved')
+                  ->where('is_transfer', true);
         })
         ->get();
 
-    // Calculate the sum of the profit for the $transferMobiles collection
-    $totalProfitTransfer = $transferMobiles->sum(function ($transferMobile) {
-        return $transferMobile->mobile->selling_price - $transferMobile->mobile->cost_price;
+    $totalProfitTransfer = $transferMobiles->sum(function ($record) {
+        return optional($record->mobile->latestSaleTransaction)->selling_price
+             - optional($record->mobile->latestSaleTransaction)->cost_price;
     });
 
-    // Calculate the sum of the selling_price for the $transferMobiles collection
-    $sumSellingPriceTransfer = $transferMobiles->sum('mobile.selling_price');
+    $sumSellingPriceTransfer = $transferMobiles->sum(fn($record) => optional($record->mobile->latestSaleTransaction)->selling_price);
+    $sumCostPriceTransfer = $transferMobiles->sum(fn($record) => optional($record->mobile->latestSaleTransaction)->cost_price);
 
-    // Calculate the sum of the cost_price for the $transferMobiles collection
-    $sumCostPriceTransfer = $transferMobiles->sum('mobile.cost_price');
-
-    // Calculate the overall profit
     $overAllProfit = $totalProfitMobile + $totalProfitTransfer;
 
-    return view('soldinventory', compact('mobile', 'transferMobiles',
-     'totalProfitMobile', 'totalProfitTransfer', 'sumCostPriceMobile', 'sumSellingPriceTransfer', 'sumCostPriceTransfer', 
-     'overAllProfit', 'sumSellingPriceMobile','groups'));
+    return view('soldinventory', compact(
+        'mobiles',
+        'transferMobiles',
+        'totalProfitMobile',
+        'totalProfitTransfer',
+        'sumCostPriceMobile',
+        'sumSellingPriceTransfer',
+        'sumCostPriceTransfer',
+        'overAllProfit',
+        'sumSellingPriceMobile',
+        'groups',
+        'vendors'
+    ));
 })->middleware('auth', 'login.time.restrict');
+
 
 Route::get('/soldapprovedinventory', function () {
 
@@ -290,7 +343,7 @@ Route::get('/transferedinventory', function () {
 
     $transferMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
         ->whereIn('id', function ($query) {
-            $query->select(\DB::raw('MAX(id)'))
+            $query->select(DB::raw('MAX(id)'))
                 ->from('transfer_records')
                 ->groupBy('mobile_id');
         })
@@ -315,7 +368,7 @@ Route::get('/recenttransferedinventory', function () {
 
     $transferMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
         ->whereIn('id', function ($query) {
-            $query->select(\DB::raw('MAX(id)'))
+            $query->select(DB::raw('MAX(id)'))
                 ->from('transfer_records')
                 ->groupBy('mobile_id');
         })
@@ -343,7 +396,7 @@ Route::get('/receivedtoday', function () {
 
     $transferMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
         ->whereIn('id', function ($query) {
-            $query->select(\DB::raw('MAX(id)'))
+            $query->select(DB::raw('MAX(id)'))
                 ->from('transfer_records')
                 ->groupBy('mobile_id');
         })
@@ -382,7 +435,7 @@ Route::get('/soldtransferinventory', function () {
 
     $transferMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
         ->whereIn('id', function ($query) {
-            $query->select(\DB::raw('MAX(id)'))
+            $query->select(DB::raw('MAX(id)'))
                 ->from('transfer_records')
                 ->groupBy('mobile_id');
         })
@@ -416,7 +469,7 @@ Route::get('/soldapprovetransferinventory', function () {
     $users = User::all();
     $transferMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
         ->whereIn('id', function ($query) {
-            $query->select(\DB::raw('MAX(id)'))
+            $query->select(DB::raw('MAX(id)'))
                 ->from('transfer_records')
                 ->groupBy('mobile_id');
         })
@@ -457,7 +510,7 @@ Route::get('/allinventory', function () {
 
     $transferMobiles = TransferRecord::with('fromUser', 'toUser', 'mobile')
         ->whereIn('id', function ($query) {
-            $query->select(\DB::raw('MAX(id)'))
+            $query->select(DB::raw('MAX(id)'))
                 ->from('transfer_records')
                 ->groupBy('mobile_id');
         })

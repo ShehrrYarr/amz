@@ -149,9 +149,20 @@
                             </div>
 
                             <div class="mb-1">
+    <label for="vendor_id" class="form-label">Vendor (Optional)</label>
+    <select class="form-control select2" id="rvendor_id" name="vendor_id" style="width: 100%;">
+        <option value="">-- Select Vendor --</option>
+        @foreach ($vendors as $vendor)
+            <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
+        @endforeach
+    </select>
+</div>
+
+
+                            <div class="mb-1" id="customerNameWrapper">
                                 <label for="customer_name" class="form-label">Customer Name</label>
 
-                                <input type="text" class="form-control" id="customer_name" name="customer_name" required>
+                                <input type="text" class="form-control" id="customer_name" name="customer_name" >
                             </div>
 
                             <div class="mb-1">
@@ -359,7 +370,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($mobile as $key)
+                                    @foreach ($mobiles as $key)
                                         <tr>
                                             <!--<td>{{ $key->sold_at }}</td>-->
                                             <td>{{ \Carbon\Carbon::parse($key->sold_at)->format(' Y-m-d / h:i ') }}</td>
@@ -379,9 +390,11 @@
                                             <td>{{ $key->color }}</td>
                                             <td>{{ $key->storage }}</td>
                                             <td>{{ $key->battery_health}}</td>
-                                            <td>{{ $key->cost_price }}</td>
-                                            <td>{{ $key->selling_price }}</td>
-                                            <td>{{ $key->customer_name }}</td>
+                                            <td>{{ optional($key->latestSaleTransaction)->cost_price ?? 'N/A' }}</td>
+                                            <td>{{ optional($key->latestSaleTransaction)->selling_price ?? 'N/A' }}</td>
+                                            <td>{{ optional($key->latestSaleTransaction)->customer_name 
+                                            ?? optional($key->latestSaleTransaction->vendor)->name 
+                                            ?? 'N/A' }}</td>
                                             <td>{{ $key->availability }}</td>
                                             <td>
                                                 <a href="{{ route('showHistory', $key->id) }}" class="btn btn-sm btn-warning">
@@ -608,5 +621,32 @@
             document.getElementById('dangerMessage').style.display = 'none';
         }, 5000); // 15 seconds in milliseconds
         //End Message Time Out
+
+        $(document).ready(function () {
+        // Initialize Select2
+        $('#rvendor_id').select2({
+            placeholder: "-- Select Vendor --",
+            allowClear: true,
+            width: 'resolve'
+        });
+
+        // Initial check on load
+        toggleCustomerName();
+
+        // Trigger change event listener
+        $('#rvendor_id').on('change', function () {
+            toggleCustomerName();
+        });
+
+        function toggleCustomerName() {
+            const vendorSelected = $('#rvendor_id').val();
+            if (vendorSelected) {
+                $('#customerNameWrapper').hide();
+                $('#customer_name').val('');
+            } else {
+                $('#customerNameWrapper').show();
+            }
+        }
+    });
     </script>
 @endsection

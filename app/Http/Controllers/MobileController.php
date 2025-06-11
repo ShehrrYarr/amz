@@ -18,6 +18,9 @@ use App\Models\Restore;
 use App\Models\MobileHistory;
 use App\Models\vendor;
 use App\Models\Accounts;
+use App\Models\MobileTransaction;
+use Illuminate\Support\Facades\DB; // <-- Add this line
+
 
 
 
@@ -118,73 +121,257 @@ class MobileController extends Controller
     }
 
 
-    public function storeMobile(Request $request)
-    {
-        $validatedData = $request->validate([
-            'mobile_name' => 'required',
-            'imei_number' => 'required',
-            'sim_lock' => 'required|in:J.V,PTA,Non-PTA',
-            'color' => 'required',
-            'storage' => 'required',
-            'cost_price' => 'required|numeric',
-            'selling_price' => 'required|numeric',
-            'company_id' => 'required|exists:companies,id',
-            'group_id' => 'required|exists:groups,id',
-            'vendor_id' => 'nullable|exists:vendors,id',
+    // public function storeMobile(Request $request)
+    // {
+    //     $validatedData = $request->validate([
+    //         'mobile_name' => 'required',
+    //         'imei_number' => 'required',
+    //         'sim_lock' => 'required|in:J.V,PTA,Non-PTA',
+    //         'color' => 'required',
+    //         'storage' => 'required',
+    //         'cost_price' => 'required|numeric',
+    //         'selling_price' => 'required|numeric',
+    //         'company_id' => 'required|exists:companies,id',
+    //         'group_id' => 'required|exists:groups,id',
+    //         'vendor_id' => 'nullable|exists:vendors,id',
+    //     ]);
+
+    //     $userId = auth()->user()->id;
+    //     $user = auth()->user();
+
+
+    //     // Check if IMEI already exists
+    //     $existingMobile = Mobile::where('imei_number', $validatedData['imei_number'])->first();
+    //     if ($existingMobile) {
+    //         return redirect()->back()->with('danger', 'A mobile with this IMEI number already exists.');
+    //     }
+
+    //     // Create new Mobile record
+    //     $mobile = new Mobile($validatedData);
+    //     $mobile->user_id = auth()->id();
+    //     $mobile->original_owner_id = auth()->id();
+    //     $mobile->added_by = auth()->id(); // 👈 Track who added the mobile
+    //     $mobile->battery_health = $request->battery_health;
+    //     $mobile->availability = 'Available';
+    //     $mobile->is_approve = 'Not_Approved';
+    //     $mobile->added_by = $userId;
+    //     $mobile->save();
+
+    //     $group = group::find($request->group_id);
+
+    //     // Create vendor credit entry if vendor is present
+    //     if ($request->filled('vendor_id')) {
+    //         $vendor = Vendor::find($request->vendor_id);
+    //         $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
+
+    //         Accounts::create([
+    //             'vendor_id' => $request->vendor_id,
+    //             'category' => 'CR',
+    //             'amount' => $request->cost_price,
+    //             'description' => "Purchased mobile: {$mobile->mobile_name}",
+    //             'created_by' => $userId,
+    //         ]);
+    //     }
+
+    //       MobileHistory::create([
+    //             'mobile_id' => $mobile->id,
+    //             'mobile_name' => $mobile->mobile_name,
+    //             'customer_name' => $vendorName,
+    //             'battery_health' => $mobile->battery_health,
+    //             'cost_price' => $mobile->cost_price,
+    //             'selling_price' => $mobile->selling_price,
+    //             'availability_status' => 'Purchased',
+    //             'created_by' => $user->name, // Storing username here
+    //             'group' => $group->name,
+
+    //         ]);
+
+    //     return redirect()->back()->with('success', 'Mobile created and account updated successfully.');
+    // }
+
+//     public function storeMobile(Request $request)
+// {
+//     // dd($request->all());
+//     $validatedData = $request->validate([
+//         'mobile_name' => 'required',
+//         'imei_number' => 'required',
+//         'sim_lock' => 'required|in:J.V,PTA,Non-PTA',
+//         'color' => 'required',
+//         'storage' => 'required',
+//         'cost_price' => 'required|numeric',
+//         'selling_price' => 'required|numeric',
+//         'company_id' => 'required|exists:companies,id',
+//         'group_id' => 'required|exists:groups,id',
+//         'vendor_id' => 'nullable|exists:vendors,id',
+//         'battery_health' => 'nullable|string'
+//     ]);
+
+//     $user = auth()->user();
+//     $userId = $user->id;
+
+//     // Check if IMEI already exists
+//     if (Mobile::where('imei_number', $validatedData['imei_number'])->exists()) {
+//         return redirect()->back()->with('danger', 'A mobile with this IMEI number already exists.');
+//     }
+
+//     // Create new Mobile record
+//     $mobile = new Mobile([
+//         'mobile_name' => $validatedData['mobile_name'],
+//         'imei_number' => $validatedData['imei_number'],
+//         'sim_lock' => $validatedData['sim_lock'],
+//         'color' => $validatedData['color'],
+//         'storage' => $validatedData['storage'],
+//         'company_id' => $validatedData['company_id'],
+//         'group_id' => $validatedData['group_id'],
+//         'battery_health' => $validatedData['battery_health'],
+//         'user_id' => $userId,
+//         'original_owner_id' => $userId,
+//         'added_by' => $userId,
+//         'cost_price' => $validatedData['cost_price'],
+//         'selling_price' => $validatedData['selling_price'],
+//         'availability' => 'Available',
+//         'is_approve' => 'Not_Approved'
+//     ]);
+//     $mobile->save();
+
+//     // Create mobile transaction (purchase record)
+//     MobileTransaction::create([
+//         'mobile_id' => $mobile->id,
+//         'category' => 'Purchase',
+//         'cost_price' => $validatedData['cost_price'],
+//         'vendor_id' => $request->vendor_id,
+//         'transaction_date' => now(),
+//         'user_id' => $userId,
+//         'note' => 'Initial purchase entry',
+//     ]);
+
+//     // Vendor accounting (if vendor provided)
+//     if ($request->filled('vendor_id')) {
+//         Accounts::create([
+//             'vendor_id' => $request->vendor_id,
+//             'category' => 'CR',
+//             'amount' => $validatedData['cost_price'],
+//             'description' => "Purchased mobile: {$mobile->mobile_name}",
+//             'created_by' => $userId,
+//         ]);
+//     }
+
+//     // Add MobileHistory for tracking
+//     $group = Group::find($request->group_id);
+//     $vendor = $request->vendor_id ? Vendor::find($request->vendor_id) : null;
+
+//     MobileHistory::create([
+//         'mobile_id' => $mobile->id,
+//         'mobile_name' => $mobile->mobile_name,
+//         'customer_name' => $vendor ? $vendor->name : null,
+//         'battery_health' => $mobile->battery_health,
+//         'cost_price' => $validatedData['cost_price'], // kept for backward compatibility
+//         'selling_price' => $validatedData['selling_price'],
+//         'availability_status' => 'Purchased',
+//         'created_by' => $user->name,
+//         'group' => $group->name,
+//     ]);
+
+//     return redirect()->back()->with('success', 'Mobile created and purchase recorded successfully.');
+// }
+
+public function storeMobile(Request $request)
+{
+    $validatedData = $request->validate([
+        'mobile_name'     => 'required',
+        'imei_number'     => 'required',
+        'sim_lock'        => 'required|in:J.V,PTA,Non-PTA',
+        'color'           => 'required',
+        'storage'         => 'required',
+        'cost_price'      => 'required|numeric',
+        'selling_price'   => 'required|numeric',
+        'company_id'      => 'required|exists:companies,id',
+        'group_id'        => 'required|exists:groups,id',
+        'vendor_id'       => 'nullable|exists:vendors,id',
+        'battery_health'  => 'nullable|string',
+        'pay_amount'      => 'nullable|numeric|min:0',
+    ]);
+
+    $user = auth()->user();
+    $userId = $user->id;
+
+    // Check if IMEI already exists
+    if (Mobile::where('imei_number', $validatedData['imei_number'])->exists()) {
+        return redirect()->back()->with('danger', 'A mobile with this IMEI number already exists.');
+    }
+
+    // Create Mobile
+    $mobile = new Mobile([
+        'mobile_name'       => $validatedData['mobile_name'],
+        'imei_number'       => $validatedData['imei_number'],
+        'sim_lock'          => $validatedData['sim_lock'],
+        'color'             => $validatedData['color'],
+        'storage'           => $validatedData['storage'],
+        'company_id'        => $validatedData['company_id'],
+        'group_id'          => $validatedData['group_id'],
+        'battery_health'    => $validatedData['battery_health'],
+        'user_id'           => $userId,
+        'original_owner_id' => $userId,
+        'added_by'          => $userId,
+        'cost_price'        => $validatedData['cost_price'],
+        'selling_price'     => $validatedData['selling_price'],
+        'availability'      => 'Available',
+        'is_approve'        => 'Not_Approved'
+    ]);
+    $mobile->save();
+
+    // Create Mobile Transaction
+    MobileTransaction::create([
+        'mobile_id'       => $mobile->id,
+        'category'        => 'Purchase',
+        'cost_price'      => $validatedData['cost_price'],
+        'vendor_id'       => $request->vendor_id,
+        'transaction_date'=> now(),
+        'user_id'         => $userId,
+        'note'            => 'Initial purchase entry',
+    ]);
+
+    // Vendor Accounting (Credit for full cost)
+    if ($request->filled('vendor_id')) {
+        Accounts::create([
+            'vendor_id'   => $request->vendor_id,
+            'category'    => 'CR',
+            'amount'      => $validatedData['cost_price'],
+            'description' => "Purchased mobile: {$mobile->mobile_name}",
+            'created_by'  => $userId,
         ]);
 
-        $userId = auth()->user()->id;
-        $user = auth()->user();
-
-
-        // Check if IMEI already exists
-        $existingMobile = Mobile::where('imei_number', $validatedData['imei_number'])->first();
-        if ($existingMobile) {
-            return redirect()->back()->with('danger', 'A mobile with this IMEI number already exists.');
-        }
-
-        // Create new Mobile record
-        $mobile = new Mobile($validatedData);
-        $mobile->user_id = auth()->id();
-        $mobile->original_owner_id = auth()->id();
-        $mobile->added_by = auth()->id(); // 👈 Track who added the mobile
-        $mobile->battery_health = $request->battery_health;
-        $mobile->availability = 'Available';
-        $mobile->is_approve = 'Not_Approved';
-        $mobile->added_by = $userId;
-        $mobile->save();
-
-        $group = group::find($request->group_id);
-
-        // Create vendor credit entry if vendor is present
-        if ($request->filled('vendor_id')) {
-            $vendor = Vendor::find($request->vendor_id);
-            $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
-
+        // Debit if payment was made
+        if ($request->filled('pay_amount') && $request->pay_amount > 0) {
             Accounts::create([
-                'vendor_id' => $request->vendor_id,
-                'category' => 'CR',
-                'amount' => $request->cost_price,
-                'description' => "Purchased mobile: {$mobile->mobile_name}",
-                'created_by' => $userId,
+                'vendor_id'   => $request->vendor_id,
+                'category'    => 'DB',
+                'amount'      => $request->pay_amount,
+                'description' => "Partial payment for: {$mobile->mobile_name}",
+                'created_by'  => $userId,
             ]);
         }
-
-          MobileHistory::create([
-                'mobile_id' => $mobile->id,
-                'mobile_name' => $mobile->mobile_name,
-                'customer_name' => $vendorName,
-                'battery_health' => $mobile->battery_health,
-                'cost_price' => $mobile->cost_price,
-                'selling_price' => $mobile->selling_price,
-                'availability_status' => 'Purchased',
-                'created_by' => $user->name, // Storing username here
-                'group' => $group->name,
-
-            ]);
-
-        return redirect()->back()->with('success', 'Mobile created and account updated successfully.');
     }
+
+    // Create Mobile History
+    $group  = Group::find($validatedData['group_id']);
+    $vendor = $request->vendor_id ? Vendor::find($request->vendor_id) : null;
+
+    MobileHistory::create([
+        'mobile_id'          => $mobile->id,
+        'mobile_name'        => $mobile->mobile_name,
+        'customer_name'      => $vendor ? $vendor->name : null,
+        'battery_health'     => $mobile->battery_health,
+        'cost_price'         => $validatedData['cost_price'],
+        'selling_price'      => $validatedData['selling_price'],
+        'availability_status'=> 'Purchased',
+        'created_by'         => $user->name,
+        'group'              => $group->name,
+    ]);
+
+    return redirect()->back()->with('success', 'Mobile created and purchase recorded successfully.');
+}
+
 
 
 
@@ -205,117 +392,217 @@ class MobileController extends Controller
     
 
 
+    // public function sellMobile(Request $request)
+    // {
+    //         $group = group::find($request->group_id);
+    //         // dd($group);
+
+    //     if ($request->availability == 'Available') {
+    //         return redirect()->back()->with('danger', 'Please select a different availability option.');
+    //     }
+
+    //     if (!$request->filled('customer_name') && !$request->filled('vendor_id')) {
+    //         return redirect()->back()->with('danger', 'Enter customer name or select a vendor.');
+    //     }
+
+    //     $data = Mobile::findOrFail($request->id);
+    //     $user = auth()->user();
+
+    //     $data->selling_price = $request->input('selling_price');
+    //     $data->availability = $request->input('availability');
+    //     $data->sold_at = Carbon::now();
+    //     $data->is_approve = $request->input('is_approve');
+    //     $data->sold_by = $user->id;
+
+    //     if ($request->availability === 'Sold') {
+    //         if ($request->filled('vendor_id')) {
+    //             // Sold to Vendor
+    //             $vendorId = $request->vendor_id;
+    //             $data->sold_vendor_id = $vendorId;
+
+    //             $vendor = Vendor::find($vendorId);
+    //             $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
+    //             $data->customer_name = $vendorName;
+
+    //             $sellingPrice = (float) $request->selling_price;
+    //             $paidAmount = (float) $request->pay_amount;
+    //             $mobileName = $data->mobile_name;
+
+    //             // Accounts entries
+    //             if ($sellingPrice > 0) {
+    //                 Accounts::create([
+    //                     'vendor_id' => $vendorId,
+    //                     'category' => 'DB',
+    //                     'amount' => $sellingPrice,
+    //                     'description' => "We sold : {$mobileName}",
+    //                     'created_by' => $user->id,
+    //                 ]);
+    //             }
+
+    //             if ($paidAmount > 0) {
+    //                 Accounts::create([
+    //                     'vendor_id' => $vendorId,
+    //                     'category' => 'CR',
+    //                     'amount' => $paidAmount,
+    //                     'description' => "Vendor paid for: {$mobileName}",
+    //                     'created_by' => $user->id,
+    //                 ]);
+    //             }
+    //         } else {
+    //             // Sold to walk-in customer
+    //             $data->customer_name = $request->input('customer_name');
+    //             $data->sold_vendor_id = null;
+    //         }
+
+    //         $data->save();
+
+
+    //         MobileHistory::create([
+    //             'mobile_id' => $data->id,
+    //             'mobile_name' => $data->mobile_name,
+    //             'customer_name' => $data->customer_name,
+    //             'battery_health' => $data->battery_health,
+    //             'cost_price' => $data->cost_price,
+    //             'selling_price' => $data->selling_price,
+    //             'availability_status' => 'Sold',
+    //             'created_by' => $user->name,
+    //             'group' => $group->name,
+    //         ]);
+    //     } elseif ($request->availability === 'Pending') {
+    //         if ($request->filled('vendor_id')) {
+    //             // Pending to Vendor
+    //             $vendorId = $request->vendor_id;
+    //             $data->sold_vendor_id = $vendorId;
+    //             $data->pending_by = $user->id;
+
+    //             $vendor = Vendor::find($vendorId);
+    //             $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
+    //             $data->customer_name = $vendorName;
+    //         } else {
+    //             // Pending to walk-in customer
+    //             $data->customer_name = $request->input('customer_name');
+    //             $data->sold_vendor_id = null;
+    //             $data->pending_by = $user->id;
+
+    //         }
+
+    //         $data->save();
+
+    //         MobileHistory::create([
+    //             'mobile_id' => $data->id,
+    //             'mobile_name' => $data->mobile_name,
+    //             'customer_name' => $data->customer_name,
+    //             'battery_health' => $data->battery_health,
+    //             'cost_price' => $data->cost_price,
+    //             'selling_price' => $data->selling_price,
+    //             'availability_status' => 'Pending',
+    //             'created_by' => $user->name,
+    //             'group' => $group->name,
+    //         ]);
+    //     }
+
+    //     return redirect()->back()->with('success', 'Mobile sale processed successfully.');
+    // }
+
     public function sellMobile(Request $request)
-    {
-            $group = group::find($request->group_id);
-            // dd($group);
+{
+    $group = Group::find($request->group_id);
 
-        if ($request->availability == 'Available') {
-            return redirect()->back()->with('danger', 'Please select a different availability option.');
-        }
-
-        if (!$request->filled('customer_name') && !$request->filled('vendor_id')) {
-            return redirect()->back()->with('danger', 'Enter customer name or select a vendor.');
-        }
-
-        $data = Mobile::findOrFail($request->id);
-        $user = auth()->user();
-
-        $data->selling_price = $request->input('selling_price');
-        $data->availability = $request->input('availability');
-        $data->sold_at = Carbon::now();
-        $data->is_approve = $request->input('is_approve');
-        $data->sold_by = $user->id;
-
-        if ($request->availability === 'Sold') {
-            if ($request->filled('vendor_id')) {
-                // Sold to Vendor
-                $vendorId = $request->vendor_id;
-                $data->sold_vendor_id = $vendorId;
-
-                $vendor = Vendor::find($vendorId);
-                $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
-                $data->customer_name = $vendorName;
-
-                $sellingPrice = (float) $request->selling_price;
-                $paidAmount = (float) $request->pay_amount;
-                $mobileName = $data->mobile_name;
-
-                // Accounts entries
-                if ($sellingPrice > 0) {
-                    Accounts::create([
-                        'vendor_id' => $vendorId,
-                        'category' => 'DB',
-                        'amount' => $sellingPrice,
-                        'description' => "We sold : {$mobileName}",
-                        'created_by' => $user->id,
-                    ]);
-                }
-
-                if ($paidAmount > 0) {
-                    Accounts::create([
-                        'vendor_id' => $vendorId,
-                        'category' => 'CR',
-                        'amount' => $paidAmount,
-                        'description' => "Vendor paid for: {$mobileName}",
-                        'created_by' => $user->id,
-                    ]);
-                }
-            } else {
-                // Sold to walk-in customer
-                $data->customer_name = $request->input('customer_name');
-                $data->sold_vendor_id = null;
-            }
-
-            $data->save();
-
-
-            MobileHistory::create([
-                'mobile_id' => $data->id,
-                'mobile_name' => $data->mobile_name,
-                'customer_name' => $data->customer_name,
-                'battery_health' => $data->battery_health,
-                'cost_price' => $data->cost_price,
-                'selling_price' => $data->selling_price,
-                'availability_status' => 'Sold',
-                'created_by' => $user->name,
-                'group' => $group->name,
-            ]);
-        } elseif ($request->availability === 'Pending') {
-            if ($request->filled('vendor_id')) {
-                // Pending to Vendor
-                $vendorId = $request->vendor_id;
-                $data->sold_vendor_id = $vendorId;
-                $data->pending_by = $user->id;
-
-                $vendor = Vendor::find($vendorId);
-                $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
-                $data->customer_name = $vendorName;
-            } else {
-                // Pending to walk-in customer
-                $data->customer_name = $request->input('customer_name');
-                $data->sold_vendor_id = null;
-                $data->pending_by = $user->id;
-
-            }
-
-            $data->save();
-
-            MobileHistory::create([
-                'mobile_id' => $data->id,
-                'mobile_name' => $data->mobile_name,
-                'customer_name' => $data->customer_name,
-                'battery_health' => $data->battery_health,
-                'cost_price' => $data->cost_price,
-                'selling_price' => $data->selling_price,
-                'availability_status' => 'Pending',
-                'created_by' => $user->name,
-                'group' => $group->name,
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Mobile sale processed successfully.');
+    if ($request->availability == 'Available') {
+        return redirect()->back()->with('danger', 'Please select a different availability option.');
     }
+
+    if (!$request->filled('customer_name') && !$request->filled('vendor_id')) {
+        return redirect()->back()->with('danger', 'Enter customer name or select a vendor.');
+    }
+
+    $data = Mobile::findOrFail($request->id);
+    $user = auth()->user();
+
+    $data->availability = $request->input('availability');
+    $data->sold_at = Carbon::now();
+    $data->is_approve = $request->input('is_approve');
+    $data->sold_by = $user->id;
+    $data->save(); // Save availability, status, etc.
+
+    // Prepare common transaction data
+    $sellingPrice = (float) $request->selling_price;
+    $paidAmount = (float) $request->pay_amount;
+    $vendorId = $request->vendor_id;
+    $customerName = $request->customer_name;
+
+    // Record Sale Transaction
+    if ($request->availability === 'Sold') {
+        MobileTransaction::create([
+            'mobile_id' => $data->id,
+            'category' => 'Sale',
+            'selling_price' => $sellingPrice,
+            'vendor_id' => $vendorId,
+            'customer_name' => $vendorId ? null : $customerName,
+            'transaction_date' => now(),
+            'user_id' => $user->id,
+            'note' => 'Sale recorded',
+        ]);
+
+        if ($vendorId) {
+            $vendor = Vendor::find($vendorId);
+            $mobileName = $data->mobile_name;
+
+            // Vendor Account Entries
+            if ($sellingPrice > 0) {
+                Accounts::create([
+                    'vendor_id' => $vendorId,
+                    'category' => 'DB',
+                    'amount' => $sellingPrice,
+                    'description' => "We sold: {$mobileName}",
+                    'created_by' => $user->id,
+                ]);
+            }
+
+            if ($paidAmount > 0) {
+                Accounts::create([
+                    'vendor_id' => $vendorId,
+                    'category' => 'CR',
+                    'amount' => $paidAmount,
+                    'description' => "Vendor paid for: {$mobileName}",
+                    'created_by' => $user->id,
+                ]);
+            }
+        }
+
+        // Mobile history
+        MobileHistory::create([
+            'mobile_id' => $data->id,
+            'mobile_name' => $data->mobile_name,
+            'customer_name' => $vendorId ? ($vendor->name ?? 'Unknown Vendor') : $customerName,
+            'battery_health' => $data->battery_health,
+            'cost_price' => $data->cost_price,
+            'selling_price' => $sellingPrice,
+            'availability_status' => 'Sold',
+            'created_by' => $user->name,
+            'group' => $group->name,
+        ]);
+    } elseif ($request->availability === 'Pending') {
+        // Pending logic, not a confirmed sale yet
+        $data->pending_by = $user->id;
+        $data->save();
+
+        MobileHistory::create([
+            'mobile_id' => $data->id,
+            'mobile_name' => $data->mobile_name,
+            'customer_name' => $vendorId ? (Vendor::find($vendorId)->name ?? 'Unknown Vendor') : $customerName,
+            'battery_health' => $data->battery_health,
+            'cost_price' => $data->cost_price,
+            'selling_price' => $sellingPrice,
+            'availability_status' => 'Pending',
+            'created_by' => $user->name,
+            'group' => $group->name,
+        ]);
+    }
+
+    return redirect()->back()->with('success', 'Mobile sale processed successfully.');
+}
+
 
 
 
@@ -355,57 +642,135 @@ class MobileController extends Controller
 
    
 
+    // public function restoreMobile(Request $request)
+    // {
+    //     $group = group::find($request->group_id);
+    //     dd($group);
+    //     $data = Mobile::findOrFail($request->id);
+    //     $user = auth()->user();
+
+    //     // Log the restore details
+    //     $restoreMobile = new Restore();
+    //     $restoreMobile->mobile_name = $request->input('mobile_name');
+    //     $restoreMobile->imei_number = $data->imei_number;
+    //     $restoreMobile->customer_name = $request->customer_name;
+    //     $restoreMobile->old_cost_price = $data->cost_price;
+    //     $restoreMobile->old_selling_price = $data->selling_price;
+    //     $restoreMobile->new_cost_price = $request->input('cost_price');
+    //     $restoreMobile->new_selling_price = $request->input('selling_price');
+    //     // $restoreMobile->new_selling_price = $request->input('selling_price');
+    //     $restoreMobile->restore_by = $user->name;
+    //     $restoreMobile->save();
+
+    //     // Update mobile table with new data
+    //     $data->cost_price = $request->input('cost_price');
+    //     $data->selling_price = $request->input('selling_price');
+    //     $data->availability = $request->input('availability');
+    //     $data->customer_name = $request->input('customer_name');
+    //     $data->battery_health = $request->input('battery_health');
+    //     $data->group_id = $request->input('group_id');
+    //     $data->sold_vendor_id = null;
+    //     $data->sold_by = null;
+    //     $data->pending_by = null;
+    //     $data->customer_name = null;
+    //     $data->sold_at = null;
+    //     $data->is_approve = 'Not_Approved';
+    //     $data->group_id = $request->input('group_id');
+    //     $data->save();
+
+    //     // Add mobile history
+    //     MobileHistory::create([
+    //         'mobile_id' => $data->id,
+    //         'mobile_name' => $data->mobile_name,
+    //         'customer_name' => $request->customer_name,
+    //         'battery_health' => $data->battery_health,
+    //         'cost_price' => $data->cost_price,
+    //         'selling_price' => $data->selling_price,
+    //         'availability_status' => 'Restored',
+    //         'created_by' => $user->name,
+    //         'group' => $group->name,
+    //     ]);
+
+    //     return redirect()->back()->with('success', 'Mobile Restored successfully.');
+    // }
+
     public function restoreMobile(Request $request)
-    {
-        $group = group::find($request->group_id);
-        // dd($group);
-        $data = Mobile::findOrFail($request->id);
-        $user = auth()->user();
+{
+    $group = Group::findOrFail($request->group_id);
+    $data = Mobile::findOrFail($request->id);
+    $user = auth()->user();
 
-        // Log the restore details
-        $restoreMobile = new Restore();
-        $restoreMobile->mobile_name = $request->input('mobile_name');
-        $restoreMobile->imei_number = $data->imei_number;
-        $restoreMobile->customer_name = $request->customer_name;
-        $restoreMobile->old_cost_price = $data->cost_price;
-        $restoreMobile->old_selling_price = $data->selling_price;
-        $restoreMobile->new_cost_price = $request->input('cost_price');
-        $restoreMobile->new_selling_price = $request->input('selling_price');
-        // $restoreMobile->new_selling_price = $request->input('selling_price');
-        $restoreMobile->restore_by = $user->name;
-        $restoreMobile->save();
+    $oldCostPrice = optional($data->latestSaleTransaction)->cost_price ?? 0;
+    $oldSellingPrice = optional($data->latestSaleTransaction)->selling_price ?? 0;
 
-        // Update mobile table with new data
-        $data->cost_price = $request->input('cost_price');
-        $data->selling_price = $request->input('selling_price');
-        $data->availability = $request->input('availability');
-        $data->customer_name = $request->input('customer_name');
-        $data->battery_health = $request->input('battery_health');
-        $data->group_id = $request->input('group_id');
-        $data->sold_vendor_id = null;
-        $data->sold_by = null;
-        $data->pending_by = null;
-        $data->customer_name = null;
-        $data->sold_at = null;
-        $data->is_approve = 'Not_Approved';
-        $data->group_id = $request->input('group_id');
-        $data->save();
 
-        // Add mobile history
-        MobileHistory::create([
-            'mobile_id' => $data->id,
-            'mobile_name' => $data->mobile_name,
-            'customer_name' => $request->customer_name,
-            'battery_health' => $data->battery_health,
-            'cost_price' => $data->cost_price,
-            'selling_price' => $data->selling_price,
-            'availability_status' => 'Restored',
-            'created_by' => $user->name,
-            'group' => $group->name,
+    // Log the restore details
+    $restoreMobile = new Restore();
+    $restoreMobile->mobile_name = $request->input('mobile_name');
+    $restoreMobile->imei_number = $data->imei_number;
+    $restoreMobile->customer_name = $request->input('customer_name');
+    $restoreMobile->old_cost_price = $data->cost_price;
+    $restoreMobile->old_selling_price = $data->selling_price;
+    $restoreMobile->new_cost_price = $request->input('cost_price');
+    $restoreMobile->new_selling_price = $request->input('selling_price');
+    $restoreMobile->restore_by = $user->name;
+    $restoreMobile->save();
+    
+
+    // Update mobile base data
+    $data->availability = $request->input('availability');
+    $data->battery_health = $request->input('battery_health');
+    $data->group_id = $request->input('group_id');
+    $data->sold_by = null;
+    $data->pending_by = null;
+    $data->sold_at = null;
+    $data->is_approve = 'Not_Approved';
+    $data->save();
+
+    // Mobile History log
+    MobileHistory::create([
+        'mobile_id' => $data->id,
+        'mobile_name' => $data->mobile_name,
+        'customer_name' => $request->filled('vendor_id')
+            ? optional(Vendor::find($request->vendor_id))->name
+            : $request->input('customer_name'),
+        'battery_health' => $data->battery_health,
+        'cost_price' => $request->cost_price,
+        'selling_price' => $request->selling_price,
+        'availability_status' => 'Restored',
+        'created_by' => $user->name,
+        'group' => $group->name,
+    ]);
+
+    // Handle vendor-based restore
+    if ($request->filled('vendor_id')) {
+        $vendorId = $request->input('vendor_id');
+        $vendor = Vendor::find($vendorId);
+
+        // 1. Create Accounts Credit Entry
+        Accounts::create([
+            'vendor_id' => $vendorId,
+            'category' => 'CR',
+            'amount' => $request->cost_price,
+            'description' => "Restored purchase of mobile: {$data->mobile_name}",
+            'created_by' => $user->id,
         ]);
 
-        return redirect()->back()->with('success', 'Mobile Restored successfully.');
+        // 2. Create a Purchase Transaction
+        MobileTransaction::create([
+            'mobile_id' => $data->id,
+            'category' => 'Purchase',
+            'cost_price' => $request->cost_price,
+            'vendor_id' => $vendorId,
+            'transaction_date' => now(),
+            'user_id' => $user->id,
+            'note' => 'Restored and repurchased from vendor',
+        ]);
     }
+
+    return redirect()->back()->with('success', 'Mobile restored successfully.');
+}
+
 
     public function pendingRestore(Request $request)
     {
@@ -647,7 +1012,7 @@ class MobileController extends Controller
     {
         $mobileData = TransferRecord::with('fromUser', 'toUser', 'mobile')
             ->whereIn('id', function ($query) use ($id) {
-                $query->select(\DB::raw('MAX(id)'))
+                $query->select(DB::raw('MAX(id)'))
                     ->from('transfer_records')
                     ->groupBy('mobile_id');
             })
@@ -667,7 +1032,7 @@ class MobileController extends Controller
     {
         $mobileData = TransferRecord::with('fromUser', 'toUser', 'mobile')
             ->whereIn('id', function ($query) {
-                $query->select(\DB::raw('MAX(id)'))
+                $query->select(DB::raw('MAX(id)'))
                     ->from('transfer_records')
                     ->groupBy('mobile_id');
             })
@@ -903,10 +1268,128 @@ class MobileController extends Controller
     // }
 
 
-    public function storeMultipleMobiles(Request $request)
-    {
+    // public function storeMultipleMobiles(Request $request)
+    // {
+    //     $vendorId = $request->vendor_id;
+    //     $mobiles = $request->mobiles;
+    //     $user = auth()->user();
+
+    //     $vendor = Vendor::find($vendorId);
+    //     $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
+
+    //     foreach ($mobiles as $entry) {
+    //         $mobile = new Mobile($entry);
+    //         $mobile->user_id = $user->id;
+    //         $mobile->original_owner_id = $user->id;
+    //         $mobile->battery_health = $entry['battery_health'] ?? null;
+    //         $mobile->availability = 'Available';
+    //         $mobile->is_approve = 'Not_Approved';
+    //         $mobile->vendor_id = $vendorId;
+    //         $mobile->added_by = $user->id;
+    //         $mobile->save();
+
+    //         $group = group::find($entry['group_id']);
+
+    //         // Create mobile history
+    //         MobileHistory::create([
+    //             'mobile_id' => $mobile->id,
+    //             'mobile_name' => $mobile->mobile_name,
+    //             'customer_name' => $vendorName,
+    //             'battery_health' => $mobile->battery_health,
+    //             'cost_price' => $mobile->cost_price,
+    //             'selling_price' => $mobile->selling_price,
+    //             'availability_status' => 'Purchased',
+    //             'created_by' => $user->name, // Storing username here
+    //             'group' => $group->name,
+    //         ]);
+    //     }
+
+    //     // Account entry for total cost
+    //     if ($vendorId && $vendor) {
+    //         $totalCost = collect($mobiles)->sum('cost_price');
+
+    //         Accounts::create([
+    //             'vendor_id' => $vendorId,
+    //             'category' => 'CR',
+    //             'amount' => $totalCost,
+    //             'created_by' => $user->id, // Storing user ID here
+    //             'description' => "Purchased " . count($mobiles) . " mobiles from {$vendorName} (Bulk Entry)"
+    //         ]);
+    //     }
+
+    //     return response()->json(['success' => true]);
+    // }
+
+//     public function storeMultipleMobiles(Request $request)
+// {
+//     $vendorId = $request->vendor_id;
+//     $mobiles = $request->mobiles;
+//     $user = auth()->user();
+
+//     $vendor = Vendor::find($vendorId);
+//     $vendorName = $vendor ? $vendor->name : 'Unknown Vendor';
+
+//     foreach ($mobiles as $entry) {
+//         // Create Mobile record
+//         $mobile = new Mobile($entry);
+//         $mobile->user_id = $user->id;
+//         $mobile->original_owner_id = $user->id;
+//         $mobile->battery_health = $entry['battery_health'] ?? null;
+//         $mobile->availability = 'Available';
+//         $mobile->is_approve = 'Not_Approved';
+//         $mobile->added_by = $user->id;
+//         $mobile->save();
+
+//         // Find Group
+//         $group = Group::find($entry['group_id']);
+
+//         // Create Purchase Transaction
+//         MobileTransaction::create([
+//             'mobile_id'     => $mobile->id,
+//             'category'      => 'Purchase',
+//             'cost_price'    => $entry['cost_price'],
+//             'selling_price' => $entry['selling_price'] ?? null,
+//             'vendor_id'     => $vendorId,
+//             'transaction_date' => now(),
+//             'user_id'       => $user->id,
+//             'note'          => 'Bulk purchase entry',
+//         ]);
+
+//         // Create Mobile History
+//         MobileHistory::create([
+//             'mobile_id'       => $mobile->id,
+//             'mobile_name'     => $mobile->mobile_name,
+//             'customer_name'   => $vendorName,
+//             'battery_health'  => $mobile->battery_health,
+//             'cost_price'      => $entry['cost_price'],
+//             'selling_price'   => $entry['selling_price'] ?? null,
+//             'availability_status' => 'Purchased',
+//             'created_by'      => $user->name,
+//             'group'           => $group->name ?? 'Unknown',
+//         ]);
+//     }
+
+//     // Account entry for total cost
+//     if ($vendorId && $vendor) {
+//         $totalCost = collect($mobiles)->sum('cost_price');
+
+//         Accounts::create([
+//             'vendor_id'  => $vendorId,
+//             'category'   => 'CR',
+//             'amount'     => $totalCost,
+//             'created_by' => $user->id,
+//             'description' => "Purchased " . count($mobiles) . " mobiles from {$vendorName} (Bulk Entry)"
+//         ]);
+//     }
+
+//     return response()->json(['success' => true]);
+// }
+public function storeMultipleMobiles(Request $request)
+{
+    try {
         $vendorId = $request->vendor_id;
         $mobiles = $request->mobiles;
+        $payAmount = $request->pay_amount;
         $user = auth()->user();
 
         $vendor = Vendor::find($vendorId);
@@ -919,41 +1402,77 @@ class MobileController extends Controller
             $mobile->battery_health = $entry['battery_health'] ?? null;
             $mobile->availability = 'Available';
             $mobile->is_approve = 'Not_Approved';
-            $mobile->vendor_id = $vendorId;
             $mobile->added_by = $user->id;
             $mobile->save();
 
-            $group = group::find($entry['group_id']);
+            $group = Group::find($entry['group_id']);
 
-            // Create mobile history
+            MobileTransaction::create([
+                'mobile_id'     => $mobile->id,
+                'category'      => 'Purchase',
+                'cost_price'    => $entry['cost_price'],
+                'selling_price' => $entry['selling_price'] ?? null,
+                'vendor_id'     => $vendorId,
+                'transaction_date' => now(),
+                'user_id'       => $user->id,
+                'note'          => 'Bulk purchase entry',
+            ]);
+
             MobileHistory::create([
-                'mobile_id' => $mobile->id,
-                'mobile_name' => $mobile->mobile_name,
-                'customer_name' => $vendorName,
-                'battery_health' => $mobile->battery_health,
-                'cost_price' => $mobile->cost_price,
-                'selling_price' => $mobile->selling_price,
+                'mobile_id'       => $mobile->id,
+                'mobile_name'     => $mobile->mobile_name,
+                'customer_name'   => $vendorName,
+                'battery_health'  => $mobile->battery_health,
+                'cost_price'      => $entry['cost_price'],
+                'selling_price'   => $entry['selling_price'] ?? null,
                 'availability_status' => 'Purchased',
-                'created_by' => $user->name, // Storing username here
-                'group' => $group->name,
+                'created_by'      => $user->name,
+                'group'           => $group->name ?? 'Unknown',
             ]);
         }
 
-        // Account entry for total cost
         if ($vendorId && $vendor) {
             $totalCost = collect($mobiles)->sum('cost_price');
 
             Accounts::create([
-                'vendor_id' => $vendorId,
-                'category' => 'CR',
-                'amount' => $totalCost,
-                'created_by' => $user->id, // Storing user ID here
+                'vendor_id'  => $vendorId,
+                'category'   => 'CR',
+                'amount'     => $totalCost,
+                'created_by' => $user->id,
                 'description' => "Purchased " . count($mobiles) . " mobiles from {$vendorName} (Bulk Entry)"
             ]);
+
+            if ($payAmount > 0) {
+                Accounts::create([
+                    'vendor_id'  => $vendorId,
+                    'category'   => 'DB',
+                    'amount'     => $payAmount,
+                    'created_by' => $user->id,
+                    'description' => "Partial payment of Rs. {$payAmount} made to {$vendorName} at time of purchase"
+                ]);
+            }
         }
 
         return response()->json(['success' => true]);
+
+    } catch (\Throwable $e) {
+        // Log the error for Laravel logs
+        \Log::error('storeMultipleMobiles error: ' . $e->getMessage(), [
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        // Return a readable error to frontend
+        return response()->json([
+            'success' => false,
+            'message' => 'Server Error: ' . $e->getMessage(),
+        ], 500);
     }
+}
+
+
+
 
 
     public function filterMobiles(Request $request)

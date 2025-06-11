@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Accounts;
 use App\Models\Mobile;
+use App\Models\MobileTransaction;
 use App\Models\TransferRecord;
 use Hash;
 use Illuminate\Http\Request;
@@ -27,10 +28,7 @@ class UserController extends Controller
             ->count();
 
         // 2. Sold Mobiles (Not Approved & not transferred)
-        $soldMobile = Mobile::where('availability', 'Sold')
-            ->where('is_approve', 'Not_Approved')
-            ->where('is_transfer', false)
-            ->count();
+        $soldMobile = MobileTransaction::where('category', 'Sale')->count();
 
         // 3. Pending Mobiles Count & Cost
         $pendingMobiles = Mobile::where('availability', 'Pending')
@@ -49,13 +47,9 @@ class UserController extends Controller
             ->sum('cost_price');
 
         // 5. Total Selling Price of Sold Mobiles (Not Approved)
-        $totals = Mobile::where('availability', 'Sold')
-            ->where('is_transfer', false)
-            ->where('is_approve', 'Not_Approved')
-            ->selectRaw('SUM(cost_price) as total_cost, SUM(selling_price) as total_selling_price')
-            ->first();
-
-        $totalSellingPrice = $totals->total_selling_price ?? 0;
+        $totalSellingPrice = MobileTransaction::where('category', 'Sale')
+        ->sum('selling_price');
+    
 
         // 6. Total Cost of Received Mobiles
         $sumCostPrice = Mobile::join('transfer_records', function ($join) {

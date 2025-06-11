@@ -36,10 +36,13 @@ class AccountsController extends Controller
 
     public function showAccounts($id)
     {
+        
         $accounts = Accounts::with('creator') // eager load the user who created each entry
             ->where('vendor_id', $id)
             ->orderBy('created_at')
             ->get();
+
+            // dd($accounts);
 
         $vendor = Vendor::findOrFail($id);
         $runningBalance = 0;
@@ -52,7 +55,7 @@ class AccountsController extends Controller
             }
 
             return [
-                'created_at' => $item->created_at->format('Y-m-d H:i'),
+                'created_at' => $item->created_at->format('Y-m-d H:i:s'),
                 'cr' => $item->category === 'CR' ? $item->amount : null,
                 'db' => $item->category === 'DB' ? $item->amount : null,
                 'balance' => $runningBalance,

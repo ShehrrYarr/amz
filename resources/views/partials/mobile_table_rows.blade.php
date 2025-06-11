@@ -1,7 +1,7 @@
 @foreach ($mobiles as $key)
 <tr>
     <td>{{ \Carbon\Carbon::parse($key->created_at)->format('Y-m-d / h:i') }}</td>
-    <td>{{ $key->creator->name }}</td>
+    <td>{{ $key->creator->name ?? 'N/A' }}</td>
     <td>{{ $key->mobile_name }}</td>
     <td>{{ $key->company->name ?? 'N/A' }}</td>
     <td>{{ $key->group->name ?? 'N/A' }}</td>

@@ -8,6 +8,8 @@ use App\Models\vendor;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use App\Models\MobileTransaction;
+
 
 class VendorController extends Controller
 {
@@ -135,15 +137,30 @@ class VendorController extends Controller
 
     public function showVRHistory($id)
     {
-        $mobile = Mobile::where('sold_vendor_id', $id)->get();
-        return view('showVRHistory', compact('mobile'));
+        // Get all transactions where mobiles were sold to this vendor
+        $transactions = MobileTransaction::with('mobile')
+            ->where('category', 'Sale')
+            ->where('vendor_id', $id)
+            ->latest('created_at')
+            ->get();
+            $vendor = Vendor::find($id);
+    
+        return view('showVRHistory', compact('transactions','vendor'));
     }
+    
 
     public function showVSHistory($id)
     {
-        $mobile = Mobile::where('vendor_id', $id)->get();
-        return view('showVSHistory', compact('mobile'));
+        // Fetch all purchase transactions from this vendor
+        $transactions = MobileTransaction::with('mobile')
+            ->where('category', 'Purchase')
+            ->where('vendor_id', $id)
+            ->latest('created_at')
+            ->get();
+            $vendor = Vendor::find($id);
+        return view('showVSHistory', compact('transactions','vendor'));
     }
+    
 
     public function getBalance(Request $request)
     {

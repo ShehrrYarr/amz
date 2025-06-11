@@ -406,6 +406,10 @@
                                 <label for="selling_price" class="form-label">Selling Price</label>
                                 <input type="number" class="form-control" name="selling_price" required>
                             </div>
+                            <div class="mb-1">
+                                <label for="pay_amount" class="form-label">Pay Amount (Optional)</label>
+                                <input type="number" class="form-control" name="pay_amount" placeholder="Enter amount paid to vendor">     
+                             </div>
                         </div>
                         <div class="form-actions">
                             <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
@@ -732,7 +736,7 @@
                                         <th>Selling Price</th>
                                         <th>Mobile History</th>
                                         <th>Availability</th>
-                                        <th>Transfer</th>
+                                        <!-- <th>Transfer</th> -->
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -750,12 +754,12 @@
 
 
 
-                                            <td>{{ $key->creator->name }}</td>
+                                            <td>{{ $key->creator->name ?? 'N/A'  }}</td>
 
                                             <td>{{ $key->mobile_name }}</td>
                                             <td>{{ $key->company->name ?? 'N/A' }}</td>
                                             <td>{{ $key->group->name ?? 'N/A' }}</td>
-                                            <td>{{ $key->vendor->name ?? 'N/A' }}</td>
+                                            <td>{{ $key->latestVendorTransaction->vendor->name ?? 'N/A' }}</td>
 
 
                                             <td>{{ $key->imei_number }}</td>
@@ -780,16 +784,16 @@
                                                 </a>
 
                                             </td>
-                                            <td><a href="" onclick="transfer({{ $key->id }})" data-toggle="modal"
+                                            <!-- <td><a href="" onclick="transfer({{ $key->id }})" data-toggle="modal"
                                                     data-target="#exampleModal2">
-                                                    <i class="fa fa-exchange" style="font-size: 20px"></i></a></td>
+                                                    <i class="fa fa-exchange" style="font-size: 20px"></i></a></td> -->
                                             <td>
                                                 <a href="" onclick="edit({{ $key->id }})" data-toggle="modal"
                                                     data-target="#exampleModal1">
-                                                    <i class="feather icon-edit"></i></a> |
-                                                <a href="" onclick="deletefn({{ $key->id }})" data-toggle="modal"
+                                                    <i class="feather icon-edit"></i></a> 
+                                                <!-- <a href="" onclick="deletefn({{ $key->id }})" data-toggle="modal"
                                                     data-target="#exampleModal4"><i style="color:red"
-                                                        class="feather icon-trash"></i></a>
+                                                        class="feather icon-trash"></i></a> -->
                                             </td>
                                         </tr>
                                     @endforeach

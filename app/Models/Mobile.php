@@ -16,10 +16,10 @@ class Mobile extends Model
         'storage',
         'cost_price',
         'selling_price',
-        'vendor_id',
         'company_id',
         'group_id',
-        ' battery_health'
+        'battery_health',
+        'added_by'
 
     ];
 
@@ -31,10 +31,10 @@ class Mobile extends Model
     {
         return $this->belongsTo(User::class);
     }
-    public function transfers()
-    {
-        return $this->hasMany(mobile_transfer::class);
-    }
+    // public function transfers()
+    // {
+    //     return $this->hasMany(mobile_transfer::class);
+    // }
 
     public function vendor()
     {
@@ -71,6 +71,45 @@ class Mobile extends Model
     {
         return $this->belongsTo(User::class, 'pending_by');
     }
+
+
+    public function transactions()
+{
+    return $this->hasMany(MobileTransaction::class);
+}
+
+public function latestTransaction()
+{
+    return $this->hasOne(MobileTransaction::class)->latestOfMany();
+}
+
+public function latestPurchase()
+{
+    return $this->hasOne(MobileTransaction::class)
+                ->where('category', 'Purchase')
+                ->latestOfMany();
+}
+
+public function latestSale()
+{
+    return $this->hasOne(MobileTransaction::class)
+                ->where('category', 'Sale')
+                ->latestOfMany();
+}
+public function latestVendorTransaction()
+{
+    return $this->hasOne(MobileTransaction::class)
+        ->where('category', 'Purchase')
+        ->latestOfMany('created_at');
+}
+
+public function latestSaleTransaction()
+{
+    return $this->hasOne(MobileTransaction::class)
+        ->where('category', 'Sale')
+        ->latestOfMany('created_at'); // or 'created_at' if you’re not using 'transaction_date'
+}
+
 
 
 }

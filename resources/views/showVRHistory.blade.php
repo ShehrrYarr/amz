@@ -32,7 +32,7 @@
                 <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
                     <div class="card">
                         <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Mobiles Sent to vendors</h4>
+                            <h4 class="latest-update-heading-title text-bold-500">Mobiles Sent to  <b>{{$vendor->name}}</b></h4>
 
                         </div>
                         <div class="table-responsive">
@@ -58,51 +58,40 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($mobile as $key)
-                                        <tr>
-                                            {{-- <td>{{ $key->id }}</td> --}}
-                                            {{-- <td>{{ $key->created_at }}</td> --}}
-                                            <!--<td>{{ \Carbon\Carbon::parse($key->created_at)->tz('Asia/Karachi')->format('d h:i A, M ,Y') }}</td>-->
-                                            <td>{{ \Carbon\Carbon::parse($key->created_at)->format(' Y-m-d / h:i ') }}</td>
-                                            <!--<td>{{ \Carbon\Carbon::parse($key->created_at)->diffForHumans() }}</td>-->
+    @foreach ($transactions as $key)
+        <tr>
+            <td>{{ \Carbon\Carbon::parse($key->transaction_date ?? $key->created_at)->format('Y-m-d / h:i') }}</td>
 
+            <td>{{ $key->mobile->mobile_name ?? 'N/A' }}</td>
+            <td>{{ $key->mobile->company->name ?? 'N/A' }}</td>
+            <td>{{ $key->mobile->group->name ?? 'N/A' }}</td>
 
+            <td>{{ optional($key->vendor)->name ?? 'N/A' }}</td>
 
+            <td>{{ $key->mobile->imei_number ?? 'N/A' }}</td>
+            <td>{{ $key->mobile->sim_lock ?? 'N/A' }}</td>
+            <td>{{ $key->mobile->color ?? 'N/A' }}</td>
+            <td>{{ $key->mobile->storage ?? 'N/A' }}</td>
+            <td>{{ $key->mobile->battery_health ?? 'N/A' }}</td>
 
+            <td>{{ $key->cost_price ?? 'N/A' }}</td>
+            <td>{{ $key->selling_price ?? 'N/A' }}</td>
 
+            <td>
+                <a href="{{ route('showHistory', $key->mobile_id) }}" class="btn btn-sm btn-warning">
+                    <i class="fa fa-eye"></i>
+                </a>
+            </td>
 
+            <td>
+                <span class="badge badge-success">
+                    {{ $key->mobile->availability ?? 'Sold' }}
+                </span>
+            </td>
+        </tr>
+    @endforeach
+</tbody>
 
-                                            <td>{{ $key->mobile_name }}</td>
-                                            <td>{{ $key->company->name ?? 'N/A' }}</td>
-                                            <td>{{ $key->group->name ?? 'N/A' }}</td>
-                                            <td>{{ $key->vendor->name ?? 'N/A' }}</td>
-
-
-                                            <td>{{ $key->imei_number }}</td>
-                                            <td>{{ $key->sim_lock }}</td>
-                                            <td>{{ $key->color }}</td>
-                                            <td>{{ $key->storage }}</td>
-                                            <td>{{ $key->battery_health }}</td>
-                                            <td>{{ $key->cost_price }}</td>
-                                            <td>{{ $key->selling_price }}</td>
-                                            
-                                              <td>
-                                                <a href="{{ route('showHistory', $key->id) }}" class="btn btn-sm btn-warning" >
-                                                     <i class="fa fa-eye"></i>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="" onclick="sold({{ $key->id }})" data-toggle="modal"
-                                                    data-target="#exampleModal3">
-                                                    <span class="badge badge-success">{{ $key->availability }}</span>
-
-                                                </a>
-
-                                            </td>
-                                            
-                                        </tr>
-                                    @endforeach
-                                </tbody>
                             </table>
                         </div>
                     </div>

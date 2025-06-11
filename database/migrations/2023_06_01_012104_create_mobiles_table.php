@@ -22,7 +22,7 @@ class CreateMobilesTable extends Migration
             $table->string('storage');
             $table->decimal('cost_price', 12, 2);
             $table->decimal('selling_price', 12, 2);
-            $table->string('customer_name')->nullable();
+            // $table->string('customer_name')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('original_owner_id')->nullable();
             $table->string('battery_health')->nullable();
@@ -38,10 +38,10 @@ class CreateMobilesTable extends Migration
             $table->foreign('original_owner_id')->references('id')->on('users')->onDelete('set null');
 
 
-            $table->unsignedBigInteger('vendor_id')->nullable();
-            $table->foreign('vendor_id')->references('id')->on('vendors')->onDelete('set null');
-            $table->unsignedBigInteger('sold_vendor_id')->nullable();
-            $table->foreign('sold_vendor_id')->references('id')->on('vendors')->onDelete('set null');
+            // $table->unsignedBigInteger('vendor_id')->nullable();
+            // $table->foreign('vendor_id')->references('id')->on('vendors')->onDelete('set null');
+            // $table->unsignedBigInteger('sold_vendor_id')->nullable();
+            // $table->foreign('sold_vendor_id')->references('id')->on('vendors')->onDelete('set null');
             $table->unsignedBigInteger('company_id')->nullable();
             $table->unsignedBigInteger('group_id')->nullable();
 
