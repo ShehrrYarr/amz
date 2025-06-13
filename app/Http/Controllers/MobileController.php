@@ -625,11 +625,10 @@ public function storeMobile(Request $request)
             $data->cost_price = $request->input('cost_price');
             $data->selling_price = $request->input('selling_price');
             $data->availability = $request->input('availability');
-            $data->customer_name = $request->input('customer_name');
             $data->battery_health = $request->input('battery_health');
             $data->is_approve = $request->input('is_approve');
             $data->company_id = $request->input('company_id');
-            $data->vendor_id = $request->input('vendor_id');
+            // $data->vendor_id = $request->input('vendor_id');
             $data->group_id = $request->input('group_id');
 
             $data->save();
@@ -639,6 +638,10 @@ public function storeMobile(Request $request)
             return redirect()->back()->with('danger', 'Incorrect update password.');
         }
     }
+
+
+   
+
 
 
    

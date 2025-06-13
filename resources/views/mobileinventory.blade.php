@@ -1,540 +1,541 @@
 @extends('user_navbar')
 @section('content')
-    {{-- Edit Modal --}}
+{{-- Edit Modal --}}
 
-    <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit Mobile</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form class="form" id="editmobile" action="{{ route('updateMobile') }}" method="post"
-                        enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-
-                        <div class="form-body">
-
-                            <div class="mb-1">
-                                <label for="mobile_name" class="form-label">Mobile Name</label>
-                                <input class="form-control" type="hidden" name="id" id="id" value="Update">
-                                <input type="text" class="form-control" id="mobile_name" name="mobile_name" required>
-                            </div>
-                            <div class="mb-1">
-                                <label for="company_id" class="form-label">Company</label>
-                                <select class="form-control" id="company_id" name="company_id" required>
-                                    @foreach($companies as $company)
-                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="vendor_id" class="form-label">Vendor</label>
-                                <select class="form-control" id="vendor_id" name="vendor_id" required>
-                                    @foreach($vendors as $vendor)
-                                        <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="group_id" class="form-label">Group</label>
-                                <select class="form-control" id="group_id" name="group_id" required>
-                                    @foreach($groups as $group)
-                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="imei_number" class="form-label">IMEI Number</label>
-                                <input type="text" class="form-control" id="imei_number" name="imei_number" required>
-                            </div>
-
-                            <div class="mb-1" style="display: none">
-                                <label for="availability" class="form-label">Availability</label>
-                                <select class="form-control" id="availability" name="availability" required>
-                                    <option value="Available">Available</option>
-                                    <option value="Sold">Sold</option>
-                                </select>
-                            </div>
-
-
-
-                            <div class="mb-1">
-                                <label for="sim_lock" class="form-label">SIM Lock</label>
-                                <select class="form-control" id="sim_lock" name="sim_lock" required>
-                                    <option value="J.V">J.V</option>
-                                    <option value="PTA">PTA</option>
-                                    <option value="Non-PTA">Non-PTA</option>
-                                </select>
-                            </div>
-                            <div class="mb-1" style="display: none">
-                                <label for="is_approve" class="form-label">SIM Lock</label>
-                                <select class="form-control" id="is_approve" name="is_approve">
-                                    <option value="Approved">Approved</option>
-                                    <option selected value="Not_Approved">Not_Approved</option>
-
-                                </select>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="color" class="form-label">Color</label>
-                                <input type="text" class="form-control" id="color" name="color" required>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="storage" class="form-label">Storage</label>
-                                <input type="text" class="form-control" id="storage" name="storage" required>
-                            </div>
-                            <div class="mb-1">
-                                <label for="battery_health" class="form-label">Battery Health</label>
-                                <input type="text" class="form-control" id="battery_health" name="battery_health" required>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="cost_price" class="form-label">Cost Price</label>
-                                <input type="number" class="form-control" id="cost_price" name="cost_price" required>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="selling_price" class="form-label">Selling Price</label>
-                                <input type="number" class="form-control" id="selling_price" name="selling_price" required>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="password" class="form-label">Edit Password</label>
-                                <input type="password" class="form-control" name="password" required>
-                            </div>
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
-                                <i class="feather icon-x"></i> Cancel
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-check-square-o"></i> Save
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
+<div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Mobile</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <div class="modal-body">
+                <form class="form" id="editmobile" action="{{ route('updateMobile') }}" method="post"
+                    enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="form-body">
+
+                        <div class="mb-1">
+                            <label for="mobile_name" class="form-label">Mobile Name</label>
+                            <input class="form-control" type="hidden" name="id" id="id" value="Update">
+                            <input type="text" class="form-control" id="mobile_name" name="mobile_name" required>
+                        </div>
+                        <div class="mb-1">
+                            <label for="company_id" class="form-label">Company</label>
+                            <select class="form-control" id="company_id" name="company_id" required>
+                                @foreach($companies as $company)
+                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- <div class="mb-1">
+                            <label for="vendor_id" class="form-label">Vendor</label>
+                            <select class="form-control" id="vendor_id" name="vendor_id" required>
+                                @foreach($vendors as $vendor)
+                                <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
+                                @endforeach
+                            </select>
+                        </div> --}}
+
+                        <div class="mb-1">
+                            <label for="group_id" class="form-label">Group</label>
+                            <select class="form-control" id="group_id" name="group_id" required>
+                                @foreach($groups as $group)
+                                <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="imei_number" class="form-label">IMEI Number</label>
+                            <input type="text" class="form-control" id="imei_number" name="imei_number" required>
+                        </div>
+
+                        <div class="mb-1" style="display: none">
+                            <label for="availability" class="form-label">Availability</label>
+                            <select class="form-control" id="availability" name="availability" required>
+                                <option value="Available">Available</option>
+                                <option value="Sold">Sold</option>
+                            </select>
+                        </div>
+
+
+
+                        <div class="mb-1">
+                            <label for="sim_lock" class="form-label">SIM Lock</label>
+                            <select class="form-control" id="sim_lock" name="sim_lock" required>
+                                <option value="J.V">J.V</option>
+                                <option value="PTA">PTA</option>
+                                <option value="Non-PTA">Non-PTA</option>
+                            </select>
+                        </div>
+                        <div class="mb-1" style="display: none">
+                            <label for="is_approve" class="form-label">SIM Lock</label>
+                            <select class="form-control" id="is_approve" name="is_approve">
+                                <option value="Approved">Approved</option>
+                                <option selected value="Not_Approved">Not_Approved</option>
+
+                            </select>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="color" class="form-label">Color</label>
+                            <input type="text" class="form-control" id="color" name="color" required>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="storage" class="form-label">Storage</label>
+                            <input type="text" class="form-control" id="storage" name="storage" required>
+                        </div>
+                        <div class="mb-1">
+                            <label for="battery_health" class="form-label">Battery Health</label>
+                            <input type="text" class="form-control" id="battery_health" name="battery_health" required>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="cost_price" class="form-label">Cost Price</label>
+                            <input type="number" class="form-control" id="cost_price" name="cost_price" required>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="selling_price" class="form-label">Selling Price</label>
+                            <input type="number" class="form-control" id="selling_price" name="selling_price" required>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="password" class="form-label">Edit Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
+                            <i class="feather icon-x"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-check-square-o"></i> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
+</div>
 
-    {{-- End Edit Modal --}}
-
-
-    {{-- Delete Modal --}}
-
-    <div class="modal fade" id="exampleModal4" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Delete this mobile?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form class="form" id="deletemobile" action="{{ route('deleteMobile') }}" method="get"
-                        enctype="multipart/form-data">
-                        @csrf
+{{-- End Edit Modal --}}
 
 
-                        <div class="form-body">
+{{-- Delete Modal --}}
 
-                            <div class="mb-1">
-                                <label for="mobile_name" class="form-label">Mobile Name</label>
-                                <input class="form-control" type="hidden" name="id" id="did" value="Update">
-                                <input type="text" class="form-control" id="dmobile_name" name="mobile_name" readonly>
-                            </div>
-                            <div class="mb-1">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" name="password" required>
-                            </div>
-
-
-
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
-                                <i class="feather icon-x"></i> Cancel
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-check-square-o"></i> Yes
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
+<div class="modal fade" id="exampleModal4" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete this mobile?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <div class="modal-body">
+                <form class="form" id="deletemobile" action="{{ route('deleteMobile') }}" method="get"
+                    enctype="multipart/form-data">
+                    @csrf
+
+
+                    <div class="form-body">
+
+                        <div class="mb-1">
+                            <label for="mobile_name" class="form-label">Mobile Name</label>
+                            <input class="form-control" type="hidden" name="id" id="did" value="Update">
+                            <input type="text" class="form-control" id="dmobile_name" name="mobile_name" readonly>
+                        </div>
+                        <div class="mb-1">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+
+
+
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
+                            <i class="feather icon-x"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-check-square-o"></i> Yes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
+</div>
 
-    {{-- End Delete Modal --}}
-
-
-    {{-- Edit For Sold Modal --}}
-
-    <div class="modal fade" id="exampleModal3" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Sold Mobile</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form class="form" id="soldmobile" action="{{ route('sellMobile') }}" method="post"
-                        enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-
-                        <div class="form-body">
-
-                            <div class="mb-1">
-                                <label for="mobile_name" class="form-label">Mobile Name</label>
-                                <input class="form-control" type="hidden" name="id" id="sid" value="Update">
-                                <input type="text" class="form-control" id="smobile_name" name="mobile_name" required
-                                    readonly>
-                            </div>
-
-                            <div class="mb-1" style="display: none">
-                                <label for="imei_number" class="form-label">IMEI Number</label>
-                                <input type="text" class="form-control" id="simei_number" name="imei_number" required>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="availability" class="form-label">Availability</label>
-                                <select class="form-control" id="savailability" name="availability" required>
-                                    <option value="Available">Available</option>
-                                    <option value="Sold">Sold</option>
-                                    <option value="Pending">Pending</option>
-                                </select>
-                            </div>
-                            <div class="mb-1" style="display: none;">
-                                <label for="group_id" class="form-label">Group</label>
-                                <select class="form-control" id="sgroup_id" name="group_id" required>
-                                    @foreach($groups as $group)
-                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="vendor_id" class="form-label">Vendor</label>
-                                <select class="form-control" name="vendor_id" id="vendorSelect">
-                                    <option value="">Select Vendor</option>
-                                    @foreach ($vendors as $vendor)
-                                        <option value="{{ $vendor->id }}">{{ $vendor->name }} ({{ $vendor->mobile_no }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+{{-- End Delete Modal --}}
 
 
-                            <div class="mb-1" id="payAmountContainer" style="display: none;">
-                                <label for="pay_amount" class="form-label">Pay Amount</label>
-                                <input type="number" class="form-control" name="pay_amount" id="pay_amount">
-                            </div>
+{{-- Edit For Sold Modal --}}
 
-
-                            <div class="mb-1">
-                                <label for="customer_name" class="form-label">Customer Name</label>
-
-                                <input type="text" class="form-control" id="customer_name" name="customer_name">
-                            </div>
-
-                            <div class="mb-1" style="display: none">
-                                <label for="sim_lock" class="form-label">SIM Lock</label>
-                                <select class="form-control" id="ssim_lock" name="sim_lock" required>
-                                    <option value="J.V">J.V</option>
-                                    <option value="PTA">PTA</option>
-                                    <option value="Non-PTA">Non-PTA</option>
-                                </select>
-                            </div>
-                            <div class="mb-1" style="display: none">
-                                <label for="is_approve" class="form-label">SIM Lock</label>
-                                <select class="form-control" id="sis_approve" name="is_approve">
-                                    <option value="Approved">Approved</option>
-                                    <option selected value="Not_Approved">Not_Approved</option>
-
-                                </select>
-                            </div>
-
-                            <div class="mb-1" style="display: none">
-                                <label for="color" class="form-label">Color</label>
-                                <input type="text" class="form-control" id="scolor" name="color" required>
-                            </div>
-
-                            <div class="mb-1" style="display: none">
-                                <label for="storage" class="form-label">Storage</label>
-                                <input type="text" class="form-control" id="sstorage" name="storage" required>
-                            </div>
-                            <div class="mb-1" style="display: none">
-                                <label for="battery_health" class="form-label">Battery Health</label>
-                                <input type="text" class="form-control" id="sbattery_health" name="battery_health">
-                            </div>
-
-                            <div class="mb-1" style="display: none">
-                                <label for="cost_price" class="form-label">Cost Price</label>
-                                <input type="number" class="form-control" id="scost_price" name="cost_price" required>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="selling_price" class="form-label">Selling Price</label>
-                                <input type="number" class="form-control" id="sselling_price" name="selling_price" required>
-                            </div>
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
-                                <i class="feather icon-x"></i> Cancel
-                            </button>
-                            <button type="submit" class="btn btn-primary" id="soldButton">
-                                <i class="fa fa-check-square-o"></i> Save
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
+<div class="modal fade" id="exampleModal3" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sold Mobile</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <div class="modal-body">
+                <form class="form" id="soldmobile" action="{{ route('sellMobile') }}" method="post"
+                    enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="form-body">
+
+                        <div class="mb-1">
+                            <label for="mobile_name" class="form-label">Mobile Name</label>
+                            <input class="form-control" type="hidden" name="id" id="sid" value="Update">
+                            <input type="text" class="form-control" id="smobile_name" name="mobile_name" required
+                                readonly>
+                        </div>
+
+                        <div class="mb-1" style="display: none">
+                            <label for="imei_number" class="form-label">IMEI Number</label>
+                            <input type="text" class="form-control" id="simei_number" name="imei_number" required>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="availability" class="form-label">Availability</label>
+                            <select class="form-control" id="savailability" name="availability" required>
+                                <option value="Available">Available</option>
+                                <option value="Sold">Sold</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                        <div class="mb-1" style="display: none;">
+                            <label for="group_id" class="form-label">Group</label>
+                            <select class="form-control" id="sgroup_id" name="group_id" required>
+                                @foreach($groups as $group)
+                                <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="vendor_id" class="form-label">Vendor</label>
+                            <select class="form-control" name="vendor_id" id="vendorSelect">
+                                <option value="">Select Vendor</option>
+                                @foreach ($vendors as $vendor)
+                                <option value="{{ $vendor->id }}">{{ $vendor->name }} ({{ $vendor->mobile_no }})
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+
+                        <div class="mb-1" id="payAmountContainer" style="display: none;">
+                            <label for="pay_amount" class="form-label">Pay Amount</label>
+                            <input type="number" class="form-control" name="pay_amount" id="pay_amount">
+                        </div>
+
+
+                        <div class="mb-1">
+                            <label for="customer_name" class="form-label">Customer Name</label>
+
+                            <input type="text" class="form-control" id="customer_name" name="customer_name">
+                        </div>
+
+                        <div class="mb-1" style="display: none">
+                            <label for="sim_lock" class="form-label">SIM Lock</label>
+                            <select class="form-control" id="ssim_lock" name="sim_lock" required>
+                                <option value="J.V">J.V</option>
+                                <option value="PTA">PTA</option>
+                                <option value="Non-PTA">Non-PTA</option>
+                            </select>
+                        </div>
+                        <div class="mb-1" style="display: none">
+                            <label for="is_approve" class="form-label">SIM Lock</label>
+                            <select class="form-control" id="sis_approve" name="is_approve">
+                                <option value="Approved">Approved</option>
+                                <option selected value="Not_Approved">Not_Approved</option>
+
+                            </select>
+                        </div>
+
+                        <div class="mb-1" style="display: none">
+                            <label for="color" class="form-label">Color</label>
+                            <input type="text" class="form-control" id="scolor" name="color" required>
+                        </div>
+
+                        <div class="mb-1" style="display: none">
+                            <label for="storage" class="form-label">Storage</label>
+                            <input type="text" class="form-control" id="sstorage" name="storage" required>
+                        </div>
+                        <div class="mb-1" style="display: none">
+                            <label for="battery_health" class="form-label">Battery Health</label>
+                            <input type="text" class="form-control" id="sbattery_health" name="battery_health">
+                        </div>
+
+                        <div class="mb-1" style="display: none">
+                            <label for="cost_price" class="form-label">Cost Price</label>
+                            <input type="number" class="form-control" id="scost_price" name="cost_price" required>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="selling_price" class="form-label">Selling Price</label>
+                            <input type="number" class="form-control" id="sselling_price" name="selling_price" required>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
+                            <i class="feather icon-x"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="soldButton">
+                            <i class="fa fa-check-square-o"></i> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
+</div>
 
-    {{-- End Edit For Sold Modal --}}
-
-
-    {{-- Modal --}}
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Add Mobile</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form class="form" id="storeMobile" action="{{ route('storeMobile') }}" method="post"
-                        enctype="multipart/form-data">
-                        @csrf
-
-                        <div class="form-body">
-
-                            <div class="mb-1">
-                                <label for="mobile_name" class="form-label">Mobile Name</label>
-                                <input type="text" class="form-control" name="mobile_name" required>
-                            </div>
-                            <div class="mb-1">
-                                <label for="company_id" class="form-label">Company</label>
-                                <select class="form-control" name="company_id" required>
-                                    <option value="">Select Company</option>
-                                    @foreach ($companies as $company)
-                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="mb-1">
-                                <label for="group_id" class="form-label">Group</label>
-                                <select class="form-control" name="group_id" required>
-                                    <option value="">Select Group</option>
-                                    @foreach ($groups as $group)
-                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="mb-1">
-                                <label for="vendor_id" class="form-label">Vendor</label>
-                                <select class="form-control" name="vendor_id" id="vendorSelect1">
-                                    <option value="">Select Vendor</option>
-                                    @foreach ($vendors as $vendor)
-                                        <option value="{{ $vendor->id }}">{{ $vendor->name }} ({{ $vendor->mobile_no }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+{{-- End Edit For Sold Modal --}}
 
 
-                            <div class="mb-1">
-                                <label for="imei_number" class="form-label">IMEI Number</label>
-                                <input type="text" class="form-control" name="imei_number" required pattern="\d{15}"
-                                    maxlength="15" minlength="15" title="IMEI number must be exactly 15 digits">
-                            </div>
-
-
-                            <div class="mb-1">
-                                <label for="sim_lock" class="form-label">SIM Lock</label>
-                                <select class="form-control" name="sim_lock" required>
-                                    <option value="J.V">J.V</option>
-                                    <option value="PTA">PTA</option>
-                                    <option value="Non-PTA">Non-PTA</option>
-                                </select>
-                            </div>
-
-
-                            <div class="mb-1">
-                                <label for="color" class="form-label">Color</label>
-                                <input type="text" class="form-control" name="color" required>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="storage" class="form-label">Storage</label>
-                                <input type="text" class="form-control" name="storage" required>
-                            </div>
-                            <div class="mb-1">
-                                <label for="battery_health" class="form-label">Battery Health</label>
-                                <input type="text" class="form-control" name="battery_health">
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="cost_price" class="form-label">Cost Price</label>
-                                <input type="number" class="form-control" name="cost_price" required>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="selling_price" class="form-label">Selling Price</label>
-                                <input type="number" class="form-control" name="selling_price" required>
-                            </div>
-                            <div class="mb-1">
-                                <label for="pay_amount" class="form-label">Pay Amount (Optional)</label>
-                                <input type="number" class="form-control" name="pay_amount" placeholder="Enter amount paid to vendor">     
-                             </div>
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
-                                <i class="feather icon-x"></i> Cancel
-                            </button>
-                            <button type="submit" class="btn btn-primary" id="storeButton">
-                                <i class="fa fa-check-square-o"></i> Save
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
+{{-- Modal --}}
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Mobile</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <div class="modal-body">
+                <form class="form" id="storeMobile" action="{{ route('storeMobile') }}" method="post"
+                    enctype="multipart/form-data">
+                    @csrf
+
+                    <div class="form-body">
+
+                        <div class="mb-1">
+                            <label for="mobile_name" class="form-label">Mobile Name</label>
+                            <input type="text" class="form-control" name="mobile_name" required>
+                        </div>
+                        <div class="mb-1">
+                            <label for="company_id" class="form-label">Company</label>
+                            <select class="form-control" name="company_id" required>
+                                <option value="">Select Company</option>
+                                @foreach ($companies as $company)
+                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-1">
+                            <label for="group_id" class="form-label">Group</label>
+                            <select class="form-control" name="group_id" required>
+                                <option value="">Select Group</option>
+                                @foreach ($groups as $group)
+                                <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-1">
+                            <label for="vendor_id" class="form-label">Vendor</label>
+                            <select class="form-control" name="vendor_id" id="vendorSelect1">
+                                <option value="">Select Vendor</option>
+                                @foreach ($vendors as $vendor)
+                                <option value="{{ $vendor->id }}">{{ $vendor->name }} ({{ $vendor->mobile_no }})
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+
+                        <div class="mb-1">
+                            <label for="imei_number" class="form-label">IMEI Number</label>
+                            <input type="text" class="form-control" name="imei_number" required pattern="\d{15}"
+                                maxlength="15" minlength="15" title="IMEI number must be exactly 15 digits">
+                        </div>
+
+
+                        <div class="mb-1">
+                            <label for="sim_lock" class="form-label">SIM Lock</label>
+                            <select class="form-control" name="sim_lock" required>
+                                <option value="J.V">J.V</option>
+                                <option value="PTA">PTA</option>
+                                <option value="Non-PTA">Non-PTA</option>
+                            </select>
+                        </div>
+
+
+                        <div class="mb-1">
+                            <label for="color" class="form-label">Color</label>
+                            <input type="text" class="form-control" name="color" required>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="storage" class="form-label">Storage</label>
+                            <input type="text" class="form-control" name="storage" required>
+                        </div>
+                        <div class="mb-1">
+                            <label for="battery_health" class="form-label">Battery Health</label>
+                            <input type="text" class="form-control" name="battery_health">
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="cost_price" class="form-label">Cost Price</label>
+                            <input type="number" class="form-control" name="cost_price" required>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="selling_price" class="form-label">Selling Price</label>
+                            <input type="number" class="form-control" name="selling_price" required>
+                        </div>
+                        <div class="mb-1">
+                            <label for="pay_amount" class="form-label">Pay Amount (Optional)</label>
+                            <input type="number" class="form-control" name="pay_amount"
+                                placeholder="Enter amount paid to vendor">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
+                            <i class="feather icon-x"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="storeButton">
+                            <i class="fa fa-check-square-o"></i> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
-    {{-- End Modal --}}
+</div>
+{{-- End Modal --}}
 
-    {{-- Transfer Modal --}}
-    <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel2">Transfer Mobile</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form class="form" id="transferMobile" action="{{ route('transferMobile') }}" method="post"
-                        enctype="multipart/form-data">
-                        @csrf
-
-                        <div class="form-body">
-
-                            <div class="mb-1">
-                                <label for="mobile_name" class="form-label">Mobile Name</label>
-                                <input class="form-control" type="hidden" name="mobile_id" id="tid">
-
-                                <input type="text" class="form-control" id="tmobile_name" name="mobile_name" disabled>
-                            </div>
-
-
-
-                            <div class="mb-1">
-                                <label for="sim_lock" class="form-label">Transfer To</label>
-                                <select class="form-control" id="to_user_id" name="to_user_id" required>
-                                    @foreach ($users as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
-                                <i class="feather icon-x"></i> Cancel
-                            </button>
-                            <button type="submit" class="btn btn-primary" id="transferButton">
-                                <i class="fa fa-check-square-o"></i> Save
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
+{{-- Transfer Modal --}}
+<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel2">Transfer Mobile</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <div class="modal-body">
+                <form class="form" id="transferMobile" action="{{ route('transferMobile') }}" method="post"
+                    enctype="multipart/form-data">
+                    @csrf
+
+                    <div class="form-body">
+
+                        <div class="mb-1">
+                            <label for="mobile_name" class="form-label">Mobile Name</label>
+                            <input class="form-control" type="hidden" name="mobile_id" id="tid">
+
+                            <input type="text" class="form-control" id="tmobile_name" name="mobile_name" disabled>
+                        </div>
+
+
+
+                        <div class="mb-1">
+                            <label for="sim_lock" class="form-label">Transfer To</label>
+                            <select class="form-control" id="to_user_id" name="to_user_id" required>
+                                @foreach ($users as $user)
+                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
+                            <i class="feather icon-x"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="transferButton">
+                            <i class="fa fa-check-square-o"></i> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
-    {{-- End Transfer Modal --}}
+</div>
+{{-- End Transfer Modal --}}
 
-    {{-- Download Modal --}}
-    <div class="modal fade" id="exampleModal5" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel2">Select Dates</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form class="form" action="{{ route('mobiles.export') }}" method="post" enctype="multipart/form-data">
-                        @csrf
-
-                        <div class="form-body">
-
-                            <div class="mb-1">
-                                <label for="start_date" class="form-label">Start Date</label>
-
-
-                                <input type="date" class="form-control" id="start_date" name="start_date">
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="end_date" class="form-label">End Date</label>
-
-
-                                <input type="date" class="form-control" id="end_date" name="end_date">
-                            </div>
-
-
-
-
-
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
-                                <i class="feather icon-x"></i> Cancel
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-check-square-o"></i> Download
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
+{{-- Download Modal --}}
+<div class="modal fade" id="exampleModal5" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel2">Select Dates</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <div class="modal-body">
+                <form class="form" action="{{ route('mobiles.export') }}" method="post" enctype="multipart/form-data">
+                    @csrf
+
+                    <div class="form-body">
+
+                        <div class="mb-1">
+                            <label for="start_date" class="form-label">Start Date</label>
+
+
+                            <input type="date" class="form-control" id="start_date" name="start_date">
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="end_date" class="form-label">End Date</label>
+
+
+                            <input type="date" class="form-control" id="end_date" name="end_date">
+                        </div>
+
+
+
+
+
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
+                            <i class="feather icon-x"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-check-square-o"></i> Download
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
-    {{-- End Download Modal --}}
+</div>
+{{-- End Download Modal --}}
 
-    <!-- Multiple entries Modal -->
+<!-- Multiple entries Modal -->
 
-    <!-- <div class="modal fade" id="bulkMobileModal" tabindex="-1" role="dialog" aria-labelledby="bulkMobileLabel"
+<!-- <div class="modal fade" id="bulkMobileModal" tabindex="-1" role="dialog" aria-labelledby="bulkMobileLabel"
                     aria-hidden="true">
                     <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
@@ -632,203 +633,203 @@
                 </div> -->
 
 
-    <style>
-        .gradient-button3 {
-            background: linear-gradient(to right, #74a8e0, #1779e2);
-            border-color: #007bff;
-            color: white;
-        }
+<style>
+    .gradient-button3 {
+        background: linear-gradient(to right, #74a8e0, #1779e2);
+        border-color: #007bff;
+        color: white;
+    }
 
-        .gradient-button4 {
-            background: linear-gradient(to right, rgb(224, 116, 116), rgb(226, 23, 23));
-            border-color: rgb(255, 0, 0);
-            color: white;
-        }
+    .gradient-button4 {
+        background: linear-gradient(to right, rgb(224, 116, 116), rgb(226, 23, 23));
+        border-color: rgb(255, 0, 0);
+        color: white;
+    }
 
-        ,
-        .select2-container .select2-selection--single {
-            height: 38px !important;
-            padding: 5px 10px;
-        }
-    </style>
+    ,
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        padding: 5px 10px;
+    }
+</style>
 
 
-    <div class="app-content content">
-        <div class="content-overlay"></div>
-        <div class="content-wrapper">
-            <div class="content-header row">
+<div class="app-content content">
+    <div class="content-overlay"></div>
+    <div class="content-wrapper">
+        <div class="content-header row">
+        </div>
+        <div class="content-body">
+            @if (session('success'))
+            <div class="alert alert-success" id="successMessage">
+                {{ session('success') }}
             </div>
-            <div class="content-body">
-                @if (session('success'))
-                    <div class="alert alert-success" id="successMessage">
-                        {{ session('success') }}
-                    </div>
-                @endif
+            @endif
 
-                @if (session('danger'))
-                    <div class="alert alert-danger" id="dangerMessage" style="color: red;">
-                        {{ session('danger') }}
-                    </div>
-                @endif
+            @if (session('danger'))
+            <div class="alert alert-danger" id="dangerMessage" style="color: red;">
+                {{ session('danger') }}
+            </div>
+            @endif
 
-                <button type="button" class="btn btn-primary gradient-button3 ml-1" data-toggle="modal"
-                    data-target="#exampleModal">
-                    <i class="feather icon-smartphone" style="font-size: 20px;"></i>
-                </button>
+            <button type="button" class="btn btn-primary gradient-button3 ml-1" data-toggle="modal"
+                data-target="#exampleModal">
+                <i class="feather icon-smartphone" style="font-size: 20px;"></i>
+            </button>
 
-                <a href="/multipleentries" type="button" class="btn btn-primary gradient-button4 ml-1">
-                    <i class="feather icon-copy" style="font-size: 20px;"></i>
-                </a>
-                <div class="row mb-2 mt-2" >
-                    <div class="col-lg-3 col-md-6 col-sm-12 mb-1">
-                        <select id="companyFilter" class="form-control">
-                            <option value="">All Companies</option>
-                            @foreach ($companies as $company)
-                                <option value="{{ $company->id }}">{{ $company->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 col-sm-12 mb-1">
-                        <select id="groupFilter" class="form-control">
-                            <option value="">All Groups</option>
-                            @foreach ($groups as $group)
-                                <option value="{{ $group->id }}">{{ $group->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 col-sm-6 mb-1">
-                        <button id="filterBtn" class="btn btn-primary w-100">Filter</button>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 col-sm-6 mb-1">
-                        <button type="button" id="resetFilterBtn" class="btn btn-secondary w-100">Reset</button>
-                    </div>
+            <a href="/multipleentries" type="button" class="btn btn-primary gradient-button4 ml-1">
+                <i class="feather icon-copy" style="font-size: 20px;"></i>
+            </a>
+            <div class="row mb-2 mt-2">
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-1">
+                    <select id="companyFilter" class="form-control">
+                        <option value="">All Companies</option>
+                        @foreach ($companies as $company)
+                        <option value="{{ $company->id }}">{{ $company->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-1">
+                    <select id="groupFilter" class="form-control">
+                        <option value="">All Groups</option>
+                        @foreach ($groups as $group)
+                        <option value="{{ $group->id }}">{{ $group->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
+                <div class="col-lg-3 col-md-6 col-sm-6 mb-1">
+                    <button id="filterBtn" class="btn btn-primary w-100">Filter</button>
+                </div>
 
-
-                <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
-                    <div class="card">
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Available Mobiles</h4>
-
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered zero-configuration" id="mobileTable">
-                                <thead>
-                                    <tr>
-                                        {{-- <th>ID</th> --}}
-                                        <th>Added at</th>
-                                        <th>Added By</th>
-                                        <th>Mobile Name</th>
-                                        <th>Company</th>
-                                        <th>Group</th>
-                                        <th>Vendor</th>
-                                        <th>IMEI#</th>
-                                        <th>SIM Lock</th>
-                                        <th>Color</th>
-                                        <th>Storage</th>
-                                        <th>Battery Health</th>
-                                        <th>Cost Price</th>
-                                        <th>Selling Price</th>
-                                        <th>Mobile History</th>
-                                        <th>Availability</th>
-                                        <!-- <th>Transfer</th> -->
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($mobile as $key)
-                                        <tr>
-                                            {{-- <td>{{ $key->id }}</td> --}}
-                                            {{-- <td>{{ $key->created_at }}</td> --}}
-                                            <!--<td>{{ \Carbon\Carbon::parse($key->created_at)->tz('Asia/Karachi')->format('d h:i A, M ,Y') }}</td>-->
-                                            <td>{{ \Carbon\Carbon::parse($key->created_at)->format(' Y-m-d / h:i ') }}</td>
-                                            <!--<td>{{ \Carbon\Carbon::parse($key->created_at)->diffForHumans() }}</td>-->
+                <div class="col-lg-3 col-md-6 col-sm-6 mb-1">
+                    <button type="button" id="resetFilterBtn" class="btn btn-secondary w-100">Reset</button>
+                </div>
+            </div>
 
 
 
 
+            <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
+                <div class="card">
+                    <div class="card-header latest-update-heading d-flex justify-content-between">
+                        <h4 class="latest-update-heading-title text-bold-500">Available Mobiles</h4>
+
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered zero-configuration" id="mobileTable">
+                            <thead>
+                                <tr>
+                                    {{-- <th>ID</th> --}}
+                                    <th>Added at</th>
+                                    <th>Added By</th>
+                                    <th>Mobile Name</th>
+                                    <th>Company</th>
+                                    <th>Group</th>
+                                    <th>Vendor</th>
+                                    <th>IMEI#</th>
+                                    <th>SIM Lock</th>
+                                    <th>Color</th>
+                                    <th>Storage</th>
+                                    <th>Battery Health</th>
+                                    <th>Cost Price</th>
+                                    <th>Selling Price</th>
+                                    <th>Mobile History</th>
+                                    <th>Availability</th>
+                                    <!-- <th>Transfer</th> -->
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($mobile as $key)
+                                <tr>
+                                    {{-- <td>{{ $key->id }}</td> --}}
+                                    {{-- <td>{{ $key->created_at }}</td> --}}
+                                    <!--<td>{{ \Carbon\Carbon::parse($key->created_at)->tz('Asia/Karachi')->format('d h:i A, M ,Y') }}</td>-->
+                                    <td>{{ \Carbon\Carbon::parse($key->created_at)->format(' Y-m-d / h:i ') }}</td>
+                                    <!--<td>{{ \Carbon\Carbon::parse($key->created_at)->diffForHumans() }}</td>-->
 
 
-                                            <td>{{ $key->creator->name ?? 'N/A'  }}</td>
-
-                                            <td>{{ $key->mobile_name }}</td>
-                                            <td>{{ $key->company->name ?? 'N/A' }}</td>
-                                            <td>{{ $key->group->name ?? 'N/A' }}</td>
-                                            <td>{{ $key->latestVendorTransaction->vendor->name ?? 'N/A' }}</td>
 
 
-                                            <td>{{ $key->imei_number }}</td>
-                                            <td>{{ $key->sim_lock }}</td>
-                                            <td>{{ $key->color }}</td>
-                                            <td>{{ $key->storage }}</td>
-                                            <td>{{ $key->battery_health }}</td>
-                                            <td>{{ $key->cost_price }}</td>
-                                            <td>{{ $key->selling_price }}</td>
-                                            <td>
-                                                <a href="{{ route('showHistory', $key->id) }}" class="btn btn-sm btn-warning">
-                                                    <i class="fa fa-eye"></i>
 
-                                                </a>
 
-                                            </td>
-                                            <td>
-                                                <a href="" onclick="sold({{ $key->id }})" data-toggle="modal"
-                                                    data-target="#exampleModal3">
-                                                    <span class="badge badge-success">{{ $key->availability }}</span>
+                                    <td>{{ $key->creator->name ?? 'N/A' }}</td>
 
-                                                </a>
+                                    <td>{{ $key->mobile_name }}</td>
+                                    <td>{{ $key->company->name ?? 'N/A' }}</td>
+                                    <td>{{ $key->group->name ?? 'N/A' }}</td>
+                                    <td>{{ $key->latestVendorTransaction->vendor->name ?? 'N/A' }}</td>
 
-                                            </td>
-                                            <!-- <td><a href="" onclick="transfer({{ $key->id }})" data-toggle="modal"
+
+                                    <td>{{ $key->imei_number }}</td>
+                                    <td>{{ $key->sim_lock }}</td>
+                                    <td>{{ $key->color }}</td>
+                                    <td>{{ $key->storage }}</td>
+                                    <td>{{ $key->battery_health }}</td>
+                                    <td>{{ $key->cost_price }}</td>
+                                    <td>{{ $key->selling_price }}</td>
+                                    <td>
+                                        <a href="{{ route('showHistory', $key->id) }}" class="btn btn-sm btn-warning">
+                                            <i class="fa fa-eye"></i>
+
+                                        </a>
+
+                                    </td>
+                                    <td>
+                                        <a href="" onclick="sold({{ $key->id }})" data-toggle="modal"
+                                            data-target="#exampleModal3">
+                                            <span class="badge badge-success">{{ $key->availability }}</span>
+
+                                        </a>
+
+                                    </td>
+                                    <!-- <td><a href="" onclick="transfer({{ $key->id }})" data-toggle="modal"
                                                     data-target="#exampleModal2">
                                                     <i class="fa fa-exchange" style="font-size: 20px"></i></a></td> -->
-                                            <td>
-                                                <a href="" onclick="edit({{ $key->id }})" data-toggle="modal"
-                                                    data-target="#exampleModal1">
-                                                    <i class="feather icon-edit"></i></a> 
-                                                <!-- <a href="" onclick="deletefn({{ $key->id }})" data-toggle="modal"
+                                    <td>
+                                        <a href="" onclick="edit({{ $key->id }})" data-toggle="modal"
+                                            data-target="#exampleModal1">
+                                            <i class="feather icon-edit"></i></a>
+                                        <!-- <a href="" onclick="deletefn({{ $key->id }})" data-toggle="modal"
                                                     data-target="#exampleModal4"><i style="color:red"
                                                         class="feather icon-trash"></i></a> -->
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
-                    <div class="card">
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Download The Inventory</h4>
-                            <a style="font-size: 25px" href="" data-toggle="modal" data-target="#exampleModal5"><i
-                                    style="color:red;" class="fa fa-download"></i></a>
-                        </div>
+            <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
+                <div class="card">
+                    <div class="card-header latest-update-heading d-flex justify-content-between">
+                        <h4 class="latest-update-heading-title text-bold-500">Download The Inventory</h4>
+                        <a style="font-size: 25px" href="" data-toggle="modal" data-target="#exampleModal5"><i
+                                style="color:red;" class="fa fa-download"></i></a>
                     </div>
-
-                </div>
-
-                <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
-                    <div class="card">
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Total Credit Cost</h4>
-                            <h3>Rs <strong>{{ $totalCostPrice }}</strong></h3>
-                        </div>
-                    </div>
-
                 </div>
 
             </div>
+
+            <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
+                <div class="card">
+                    <div class="card-header latest-update-heading d-flex justify-content-between">
+                        <h4 class="latest-update-heading-title text-bold-500">Total Credit Cost</h4>
+                        <h3>Rs <strong>{{ $totalCostPrice }}</strong></h3>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
     </div>
-    <script>
-        //Start dataTable
+</div>
+<script>
+    //Start dataTable
 
         $(document).ready(function () {
             $('#mobileTable').DataTable({
@@ -1189,5 +1190,5 @@
         });
 
 
-    </script>
+</script>
 @endsection
