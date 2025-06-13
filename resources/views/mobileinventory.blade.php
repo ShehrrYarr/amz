@@ -376,9 +376,9 @@
                         <div class="mb-1">
                             <label for="sim_lock" class="form-label">SIM Lock</label>
                             <select class="form-control" name="sim_lock" required>
-                                <option value="J.V">J.V</option>
                                 <option value="PTA">PTA</option>
                                 <option value="Non-PTA">Non-PTA</option>
+                                <option value="J.V">J.V</option>
                             </select>
                         </div>
 
