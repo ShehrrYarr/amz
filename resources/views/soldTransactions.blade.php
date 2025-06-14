@@ -24,7 +24,7 @@
                 <div class="card">
                     <div class="card-header latest-update-heading d-flex justify-content-between">
                         <h4 class="latest-update-heading-title text-bold-500">Sold Transactions</h4>
-                        
+
 
                     </div>
                     <div class="table-responsive">
@@ -42,7 +42,7 @@
                                     <th>Battery Health</th>
                                     <th>Cost Price</th>
                                     <th>Selling Price</th>
-                                    <th>Customer Name</th>
+                                    {{-- <th>Customer Name</th> --}}
 
                                     <th>Mobile History</th>
 
@@ -52,10 +52,11 @@
 
                                 </tr>
                             </thead>
-                           <tbody>
+                            <tbody>
                                 @foreach ($transactions as $txn)
                                 <tr>
-                                    <td>{{ \Carbon\Carbon::parse($txn->transaction_date)->format('Y-m-d / h:i A') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($txn->transaction_date)->format('Y-m-d / h:i A') }}
+                                    </td>
                                     <td>{{ $txn->user->name ?? 'N/A' }}</td>
                                     <td>{{ $txn->mobile->mobile_name ?? 'N/A' }}</td>
                                     <td>{{ $txn->mobile->imei_number ?? 'N/A' }}</td>
@@ -66,18 +67,19 @@
                                     <td>{{ $txn->mobile->battery_health ?? 'N/A' }}</td>
                                     <td>{{ $txn->cost_price }}</td>
                                     <td>{{ $txn->selling_price }}</td>
-                                    <td>
+                                    {{-- <td>
                                         {{ $txn->customer_name
                                         ?? ($txn->vendor->name ?? 'N/A') }}
-                                    </td>
+                                    </td> --}}
                                     <td>
-                                        <a href="{{ route('showHistory', $txn->mobile_id) }}" class="btn btn-sm btn-warning">
+                                        <a href="{{ route('showHistory', $txn->mobile_id) }}"
+                                            class="btn btn-sm btn-warning">
                                             <i class="fa fa-eye"></i>
                                         </a>
                                     </td>
                                 </tr>
                                 @endforeach
-                            </tbody>                            
+                            </tbody>
                         </table>
                     </div>
                 </div>
