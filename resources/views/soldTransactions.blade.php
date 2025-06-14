@@ -24,7 +24,7 @@
                 <div class="card">
                     <div class="card-header latest-update-heading d-flex justify-content-between">
                         <h4 class="latest-update-heading-title text-bold-500">Sold Transactions</h4>
-                        
+
 
                     </div>
                     <div class="table-responsive">
@@ -52,10 +52,11 @@
 
                                 </tr>
                             </thead>
-                           <tbody>
+                            <tbody>
                                 @foreach ($transactions as $txn)
                                 <tr>
-                                    <td>{{ \Carbon\Carbon::parse($txn->transaction_date)->format('Y-m-d / h:i A') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($txn->transaction_date)->format('Y-m-d / h:i A') }}
+                                    </td>
                                     <td>{{ $txn->user->name ?? 'N/A' }}</td>
                                     <td>{{ $txn->mobile->mobile_name ?? 'N/A' }}</td>
                                     <td>{{ $txn->mobile->imei_number ?? 'N/A' }}</td>
@@ -71,13 +72,14 @@
                                         ?? ($txn->vendor->name ?? 'N/A') }}
                                     </td>
                                     <td>
-                                        <a href="{{ route('showHistory', $txn->mobile_id) }}" class="btn btn-sm btn-warning">
+                                        <a href="{{ route('showHistory', $txn->mobile_id) }}"
+                                            class="btn btn-sm btn-warning">
                                             <i class="fa fa-eye"></i>
                                         </a>
                                     </td>
                                 </tr>
                                 @endforeach
-                            </tbody>                            
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -188,88 +190,88 @@
         // End Disable Mobile Owner Button Function
 
         //  approve Function
-        function approve(value) {
-            console.log(value);
-            var id = value;
-            $.ajax({
-                type: "GET",
-                url: '/findapmobile/' + id,
-                success: function (data) {
-                    $("#approvemobile").trigger("reset");
+        // function approve(value) {
+        //     console.log(value);
+        //     var id = value;
+        //     $.ajax({
+        //         type: "GET",
+        //         url: '/findapmobile/' + id,
+        //         success: function (data) {
+        //             $("#approvemobile").trigger("reset");
 
-                    $('#id').val(data.result.id);
-                    $('#mobile_name').val(data.result.mobile_name);
-                    $('#imei_number').val(data.result.imei_number);
-                    $('#sim_lock').val(data.result.sim_lock);
-                    $('#color').val(data.result.color);
-                    $('#storage').val(data.result.storage);
-                    $('#battery_health').val(data.result.battery_health);
-                    $('#customer_name').val(data.result.customer_name);
-                    $('#cost_price').val(data.result.cost_price);
-                    $('#availability').val(data.result.availability);
-                    $('#selling_price').val(data.result.selling_price);
-                    $('#is_approve').val(data.result.is_approve);
-
-
+        //             $('#id').val(data.result.id);
+        //             $('#mobile_name').val(data.result.mobile_name);
+        //             $('#imei_number').val(data.result.imei_number);
+        //             $('#sim_lock').val(data.result.sim_lock);
+        //             $('#color').val(data.result.color);
+        //             $('#storage').val(data.result.storage);
+        //             $('#battery_health').val(data.result.battery_health);
+        //             $('#customer_name').val(data.result.customer_name);
+        //             $('#cost_price').val(data.result.cost_price);
+        //             $('#availability').val(data.result.availability);
+        //             $('#selling_price').val(data.result.selling_price);
+        //             $('#is_approve').val(data.result.is_approve);
 
 
-                },
-                error: function (error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
+
+
+        //         },
+        //         error: function (error) {
+        //             console.log('Error:', error);
+        //         }
+        //     });
+        // }
 
         // End Edit Function
         //  restore Function
-        function restore(value) {
-            console.log(value);
-            var id = value;
-            $.ajax({
-                type: "GET",
-                url: '/findapmobile/' + id,
-                success: function (data) {
-                    $("#restoremobile").trigger("reset");
+        // function restore(value) {
+        //     console.log(value);
+        //     var id = value;
+        //     $.ajax({
+        //         type: "GET",
+        //         url: '/findapmobile/' + id,
+        //         success: function (data) {
+        //             $("#restoremobile").trigger("reset");
 
-                    $('#rid').val(data.result.id);
-                    $('#rmobile_name').val(data.result.mobile_name);
-                    $('#rimei_number').val(data.result.imei_number);
-                    $('#rbattery_health').val(data.result.battery_health);
-                    $('#rcost_price').val(data.result.cost_price);
-                    $('#rselling_price').val(data.result.selling_price);
-                    $('#ravailability').val(Available);
-                    $('#rsold_id').val(data.result.sold_id);
-                },
-                error: function (error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
+        //             $('#rid').val(data.result.id);
+        //             $('#rmobile_name').val(data.result.mobile_name);
+        //             $('#rimei_number').val(data.result.imei_number);
+        //             $('#rbattery_health').val(data.result.battery_health);
+        //             $('#rcost_price').val(data.result.cost_price);
+        //             $('#rselling_price').val(data.result.selling_price);
+        //             $('#ravailability').val(Available);
+        //             $('#rsold_id').val(data.result.sold_id);
+        //         },
+        //         error: function (error) {
+        //             console.log('Error:', error);
+        //         }
+        //     });
+        // }
 
         // End Restore Function
 
         //Owner Transfer
-        function owner(value) {
-            console.log(value);
-            var id = value;
-            $.ajax({
-                type: "GET",
-                url: '/findapmobile/' + id,
-                success: function (data) {
-                    $("#restoremobile").trigger("reset");
+        // function owner(value) {
+        //     console.log(value);
+        //     var id = value;
+        //     $.ajax({
+        //         type: "GET",
+        //         url: '/findapmobile/' + id,
+        //         success: function (data) {
+        //             $("#restoremobile").trigger("reset");
 
-                    $('#oid').val(data.result.id);
-                    $('#omobile_name').val(data.result.mobile_name);
-                    $('#obattery_health').val(data.result.battery_health);
-                    $('#ocost_price').val(data.result.cost_price);
-                    $('#oselling_price').val(data.result.selling_price);
+        //             $('#oid').val(data.result.id);
+        //             $('#omobile_name').val(data.result.mobile_name);
+        //             $('#obattery_health').val(data.result.battery_health);
+        //             $('#ocost_price').val(data.result.cost_price);
+        //             $('#oselling_price').val(data.result.selling_price);
 
-                },
-                error: function (error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
+        //         },
+        //         error: function (error) {
+        //             console.log('Error:', error);
+        //         }
+        //     });
+        // }
         //Owner Transfer End
 
 
