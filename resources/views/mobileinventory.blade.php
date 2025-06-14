@@ -791,10 +791,10 @@
                                     <td>
                                         <a href="" onclick="edit({{ $key->id }})" data-toggle="modal"
                                             data-target="#exampleModal1">
-                                            <i class="feather icon-edit"></i></a>
-                                        <!-- <a href="" onclick="deletefn({{ $key->id }})" data-toggle="modal"
-                                                    data-target="#exampleModal4"><i style="color:red"
-                                                        class="feather icon-trash"></i></a> -->
+                                            <i class="feather icon-edit"></i></a> |
+                                        <a href="" onclick="deletefn({{ $key->id }})" data-toggle="modal"
+                                            data-target="#exampleModal4"><i style="color:red"
+                                                class="feather icon-trash"></i></a>
                                     </td>
                                 </tr>
                                 @endforeach
