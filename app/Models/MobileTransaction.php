@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\vendor;
 
 class MobileTransaction extends Model
 {
@@ -27,7 +28,7 @@ class MobileTransaction extends Model
 
     public function vendor()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(vendor::class);
     }
 
     public function user()
