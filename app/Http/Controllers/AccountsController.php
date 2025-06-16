@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Accounts;
 use App\Models\vendor;
 use Illuminate\Http\Request;
+use App\Models\MasterPassword;
+
 
 class AccountsController extends Controller
 {
@@ -55,6 +57,7 @@ class AccountsController extends Controller
             }
 
             return [
+                'id' => $item->id, 
                 'created_at' => $item->created_at->format('Y-m-d H:i:s'),
                 'cr' => $item->category === 'CR' ? $item->amount : null,
                 'db' => $item->category === 'DB' ? $item->amount : null,
@@ -126,6 +129,40 @@ class AccountsController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Debit amount recorded successfully.');
+    }
+
+    public function getaccount($id)
+    {
+        $filterId = Accounts::find($id);
+        // dd($filterId);
+        if (!$filterId) {
+
+            return response()->json(['message' => 'Id not found'], 404);
+        }
+
+        return response()->json(['result' => $filterId]);
+
+    }
+
+    public function destroyAccount(Request $request)
+    {
+        $account = Accounts::findOrFail($request->id);
+
+        $password = $request->input('password');
+        $masterPassword = MasterPassword::first();
+
+        // Check against delete_password
+        if ($password === $masterPassword->delete_password) {
+            $account->delete();
+
+            return redirect()->back()->with('success', 'Account deleted successfully.');
+        } else {
+            return redirect()->back()->with('danger', 'Incorrect delete password.');
+        }
+
+        // Delete the vendor record
+
+        return redirect()->back()->with('success', 'Vendor deleted successfully!');
     }
 
 
