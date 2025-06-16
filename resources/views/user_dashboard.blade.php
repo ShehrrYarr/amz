@@ -159,6 +159,53 @@
                     </div>
                 </div>
             </div>
+
+            <div class="container">
+                <h2>Installment Calculator</h2>
+                <form id="installmentForm">
+                    <!-- Total Amount -->
+                    <div class="mb-3">
+                        <label>Total Amount</label>
+                        <input type="number" class="form-control" id="totalAmount" required>
+                    </div>
+                    <!-- Down Payment -->
+                    <div class="mb-3">
+                        <label>Down Payment</label>
+                        <input type="number" class="form-control" id="downPayment" required>
+                    </div>
+                    <!-- Remaining Amount -->
+                    <div class="mb-3">
+                        <label>Remaining Amount</label>
+                        <input type="number" class="form-control" id="remainingAmount" readonly>
+                    </div>
+                    <!-- Profit Percentage -->
+                    <div class="mb-3">
+                        <label>Monthly Profit Percentage (%)</label>
+                        <input type="number" class="form-control" id="percentage" required>
+                    </div>
+                    <!-- Number of Installments -->
+                    <div class="mb-3">
+                        <label>Number of Installments</label>
+                        <input type="number" class="form-control" id="numInstallments" required min="1">
+                    </div>
+                    <!-- Installment Dates -->
+                    <div class="mb-3" id="datesDiv" style="display:none;">
+                        <label>Select Installment Dates</label>
+                        <div id="datesInputs"></div>
+                    </div>
+                    <!-- Pay Installment -->
+                    <div class="mb-3">
+                        <label>Pay Installment Amount</label>
+                        <input type="number" class="form-control" id="payAmount">
+                    </div>
+                    <!-- Updated Balance -->
+                    <div class="mb-3">
+                        <label>Updated Remaining Amount</label>
+                        <input type="number" class="form-control" id="updatedBalance" readonly>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="calcInstallment">Calculate Installment</button>
+                </form>
+            </div>
             <!-- <div class="row grouped-multiple-statistics-card">
                         <div class="col-12">
                             <div class="card">
@@ -225,6 +272,52 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    $(document).ready(function(){
+    
+    // Calculate Remaining Amount
+    $('#downPayment, #totalAmount').on('input', function(){
+    let total = parseFloat($('#totalAmount').val()) || 0;
+    let down = parseFloat($('#downPayment').val()) || 0;
+    let remaining = total - down;
+    $('#remainingAmount').val(remaining > 0 ? remaining : 0);
+    });
+    
+    // Show Date Pickers for Installments
+    $('#numInstallments').on('input', function(){
+    let n = parseInt($(this).val());
+    let $datesDiv = $('#datesDiv');
+    let $inputs = $('#datesInputs');
+    $inputs.empty();
+    if(n > 0){
+    $datesDiv.show();
+    for(let i=1; i<=n; i++){ $inputs.append(`<input type="date" class="form-control mb-2" name="installment_dates[]"
+        required>`);
+        }
+        } else {
+        $datesDiv.hide();
+        }
+        });
+    
+        // Calculate First Installment + Profit, Handle Pay
+        $('#calcInstallment').click(function(){
+        let rem = parseFloat($('#remainingAmount').val()) || 0;
+        let percent = parseFloat($('#percentage').val()) || 0;
+        let pay = parseFloat($('#payAmount').val()) || 0;
+    
+        // Calculate profit amount
+        let profit = (rem * percent) / 100;
+        let balanceWithProfit = rem + profit;
+    
+        // Deduct paid amount
+        let updatedBalance = balanceWithProfit - pay;
+    
+        $('#updatedBalance').val(updatedBalance >= 0 ? updatedBalance : 0);
+        });
+        });
+</script>
 {{--
 <script>
     function getPublicationDetails(pub_id) {
