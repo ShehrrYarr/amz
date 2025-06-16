@@ -328,6 +328,8 @@ Route::get('/findapmobile/{id}', [App\Http\Controllers\MobileController::class, 
 Route::get('/deletemobile', [App\Http\Controllers\MobileController::class, 'destroy'])->name('deleteMobile');
 
 Route::get('/restoremobiles', [App\Http\Controllers\RestoreController::class, 'restoreMobiles'])->name('restoremobiles');
+Route::get('/deleteinventory', [App\Http\Controllers\MobileController::class, 'deletedMobiles'])->name('deleteinventory');
+
 
 Route::post('/check-imei', [MobileController::class, 'checkIMEI'])->name('checkIMEI');
 Route::post('/store-multiple-mobiles', [MobileController::class, 'storeMultipleMobiles'])->name('storeMultipleMobiles');

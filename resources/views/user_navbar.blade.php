@@ -193,6 +193,10 @@
                                                                 class="menu-item" href="/soldapprovedinventory"
                                                                 data-i18n="5 columns">Sold Approve Inventory</a>
                                                 </li>
+                                                <li class="@if(\Request::is('deleteinventory')) active @endif"><a
+                                                                class="menu-item" href="/deleteinventory"
+                                                                data-i18n="5 columns">Deleted Mobiles</a>
+                                                </li>
                                                 <li class="@if (\Request::is('allinventory')) active @endif"><a
                                                                 class="menu-item" href="/allinventory"
                                                                 data-i18n="6 columns">All Inventory</a>

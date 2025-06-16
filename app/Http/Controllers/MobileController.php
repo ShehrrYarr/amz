@@ -1071,7 +1071,8 @@ public function storeMobile(Request $request)
 
         // Check against delete_password
         if ($password === $masterPassword->delete_password) {
-            $mobile->delete();
+            $mobile->availability= 'Deleted';
+            $mobile->save();
             return redirect()->back()->with('success', 'Mobile deleted successfully.');
         } else {
             return redirect()->back()->with('danger', 'Incorrect delete password.');
@@ -1510,6 +1511,19 @@ public function soldTransactions()
                     ->get();
 
     return view('soldTransactions', compact('transactions'));
+}
+
+public function deletedMobiles(){
+    $users = User::all();
+    $companies = Company::all();
+   
+   
+
+    $mobile = Mobile::where('availability', 'Deleted')
+        ->where('is_transfer', false)->with(['group', 'company', 'vendor', 'creator','latestVendorTransaction.vendor'])
+        ->get();
+    // dd($mobile);
+    return view('deleteinventory',compact('mobile'));
 }
 
 
