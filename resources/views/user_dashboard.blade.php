@@ -160,50 +160,53 @@
                 </div>
             </div>
 
-            <div class="container">
+            <div class="container mt-4">
                 <h2>Installment Calculator</h2>
-                <form id="installmentForm">
+                <form id="installmentForm" onsubmit="return false;">
                     <!-- Total Amount -->
                     <div class="mb-3">
-                        <label>Total Amount</label>
-                        <input type="number" class="form-control" id="totalAmount" required>
+                        <label for="totalAmount" class="form-label">Total Amount</label>
+                        <input type="number" class="form-control" id="totalAmount" min="0" required>
                     </div>
                     <!-- Down Payment -->
                     <div class="mb-3">
-                        <label>Down Payment</label>
-                        <input type="number" class="form-control" id="downPayment" required>
+                        <label for="downPayment" class="form-label">Down Payment</label>
+                        <input type="number" class="form-control" id="downPayment" min="0" required>
                     </div>
                     <!-- Remaining Amount -->
                     <div class="mb-3">
-                        <label>Remaining Amount</label>
+                        <label for="remainingAmount" class="form-label">Remaining Amount</label>
                         <input type="number" class="form-control" id="remainingAmount" readonly>
                     </div>
-                    <!-- Profit Percentage -->
+                    <!-- Monthly Profit Percentage -->
                     <div class="mb-3">
-                        <label>Monthly Profit Percentage (%)</label>
-                        <input type="number" class="form-control" id="percentage" required>
+                        <label for="percentage" class="form-label">Monthly Profit Percentage (%)</label>
+                        <input type="number" class="form-control" id="percentage" min="0" required>
                     </div>
                     <!-- Number of Installments -->
                     <div class="mb-3">
-                        <label>Number of Installments</label>
-                        <input type="number" class="form-control" id="numInstallments" required min="1">
+                        <label for="numInstallments" class="form-label">Number of Installments</label>
+                        <input type="number" class="form-control" id="numInstallments" min="1" required>
                     </div>
                     <!-- Installment Dates -->
                     <div class="mb-3" id="datesDiv" style="display:none;">
-                        <label>Select Installment Dates</label>
+                        <label class="form-label">Select Installment Dates</label>
                         <div id="datesInputs"></div>
                     </div>
                     <!-- Pay Installment -->
                     <div class="mb-3">
-                        <label>Pay Installment Amount</label>
-                        <input type="number" class="form-control" id="payAmount">
+                        <label for="payAmount" class="form-label">Pay Installment Amount</label>
+                        <input type="number" class="form-control" id="payAmount" min="0">
                     </div>
                     <!-- Updated Balance -->
                     <div class="mb-3">
-                        <label>Updated Remaining Amount</label>
+                        <label for="updatedBalance" class="form-label">Updated Remaining Amount</label>
                         <input type="number" class="form-control" id="updatedBalance" readonly>
                     </div>
-                    <button type="button" class="btn btn-primary" id="calcInstallment">Calculate Installment</button>
+                    <button type="button" class="btn btn-primary" id="calcInstallment">Calculate First
+                        Installment</button>
+                    <button type="button" class="btn btn-success mt-2" id="checkDates">Check Installments (Add
+                        Profit)</button>
                 </form>
             </div>
             <!-- <div class="row grouped-multiple-statistics-card">
@@ -276,55 +279,70 @@
 
 <script>
     $(document).ready(function(){
-    
-    // Calculate Remaining Amount
-    $('#downPayment, #totalAmount').on('input', function(){
-    let total = parseFloat($('#totalAmount').val()) || 0;
-    let down = parseFloat($('#downPayment').val()) || 0;
-    let remaining = total - down;
-    $('#remainingAmount').val(remaining > 0 ? remaining : 0);
+
+// Calculate Remaining Amount when total or down payment changes
+$('#totalAmount, #downPayment').on('input', function(){
+let total = parseFloat($('#totalAmount').val()) || 0;
+let down = parseFloat($('#downPayment').val()) || 0;
+let remaining = total - down;
+$('#remainingAmount').val(remaining > 0 ? remaining : 0);
+$('#updatedBalance').val(remaining > 0 ? remaining : 0);
+});
+
+// Show date inputs based on number of installments
+$('#numInstallments').on('input', function(){
+let n = parseInt($(this).val());
+let $datesDiv = $('#datesDiv');
+let $inputs = $('#datesInputs');
+$inputs.empty();
+if(n > 0){
+$datesDiv.show();
+for(let i=1; i<=n; i++){ $inputs.append(`<input type="date" class="form-control mb-2" name="installment_dates[]"
+    required>`);
+    }
+    } else {
+    $datesDiv.hide();
+    }
     });
-    
-    // Show Date Pickers for Installments
-    $('#numInstallments').on('input', function(){
-    let n = parseInt($(this).val());
-    let $datesDiv = $('#datesDiv');
-    let $inputs = $('#datesInputs');
-    $inputs.empty();
-    if(n > 0){
-    $datesDiv.show();
-    for(let i=1; i<=n; i++){ $inputs.append(`<input type="date" class="form-control mb-2" name="installment_dates[]"
-        required>`);
-        }
-        } else {
-        $datesDiv.hide();
+
+    // Calculate first installment (add profit, deduct pay)
+    $('#calcInstallment').click(function(){
+    let rem = parseFloat($('#remainingAmount').val()) || 0;
+    let percent = parseFloat($('#percentage').val()) || 0;
+    let pay = parseFloat($('#payAmount').val()) || 0;
+
+    // Profit calculation
+    let profit = (rem * percent) / 100;
+    let balanceWithProfit = rem + profit;
+
+    // Deduct user pay
+    let updatedBalance = balanceWithProfit - pay;
+
+    $('#updatedBalance').val(updatedBalance >= 0 ? updatedBalance.toFixed(2) : 0);
+    });
+
+    // Check all installment dates, add profit for each past date
+    $('#checkDates').click(function(){
+    let rem = parseFloat($('#remainingAmount').val()) || 0;
+    let percent = parseFloat($('#percentage').val()) || 0;
+    let today = new Date();
+    let count = 0;
+
+    $('#datesInputs input[type="date"]').each(function(){
+    let dateVal = $(this).val();
+    if(dateVal){
+    let dueDate = new Date(dateVal);
+    // Only if date is in the past (not today or future)
+    if(dueDate < today){ let profit=(rem * percent) / 100; rem +=profit; count++; } } }); $('#updatedBalance').val(rem>=
+        0 ? rem.toFixed(2) : 0);
+        if(count > 0){
+        alert(`${count} due date(s) passed. Profit added for each. New balance: ${rem.toFixed(2)}`);
+        }else{
+        alert('No past due dates yet.');
         }
         });
-    
-        // Calculate First Installment + Profit, Handle Pay
-        $('#calcInstallment').click(function(){
-        let rem = parseFloat($('#remainingAmount').val()) || 0;
-        let percent = parseFloat($('#percentage').val()) || 0;
-        let pay = parseFloat($('#payAmount').val()) || 0;
-    
-        // Calculate profit amount
-        let profit = (rem * percent) / 100;
-        let balanceWithProfit = rem + profit;
-    
-        // Deduct paid amount
-        let updatedBalance = balanceWithProfit - pay;
-    
-        $('#updatedBalance').val(updatedBalance >= 0 ? updatedBalance : 0);
-        });
+
         });
 </script>
-{{--
-<script>
-    function getPublicationDetails(pub_id) {
-            var request = XMLHttpRequest();
-            request.open("GET", "/publicationdetails/" + pub_id, false);
-            request.send();
-            console.log(request.response);
-        }
-</script> --}}
+
 @endsection
