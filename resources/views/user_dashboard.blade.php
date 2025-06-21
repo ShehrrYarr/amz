@@ -160,8 +160,20 @@
                 </div>
             </div>
 
+            <style>
+              label { display: block; margin-bottom: 5px; font-weight: bold; }
+            input[type="number"], input[type="text"], input[type="date"] { padding: 7px; width: 100%; border-radius: 5px; border:
+            1px solid #ccc; }
+            input[readonly] { background: #eee; }
+            button { padding: 10px 20px; background: #4CAF50; color: #fff; border: none; border-radius: 6px; font-size: 15px; }
+            .installments-section { margin-top: 25px; }
+            .installment-group { padding: 12px; background: #f8f8f8; margin-bottom: 15px; border-radius: 7px; }
+            .row { display: flex; gap: 12px;}
+            .row > div { flex: 1;}
+            </style>
+
             <div class="container mt-5">
-                <h3 class="mb-4">Installment Calculator</h3>
+                {{-- <h3 class="mb-4">Installment Calculator</h3>
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label class="form-label">Total Amount</label>
@@ -176,8 +188,8 @@
                         <input type="number" class="form-control" id="remainingAmount" placeholder="Auto-calculated"
                             readonly />
                     </div>
-                </div>
-                <div class="row mb-3">
+                </div> --}}
+                {{-- <div class="row mb-3">
                     <div class="col-md-4">
                         <label class="form-label">Percentage (%)</label>
                         <input type="number" class="form-control" id="percentage" placeholder="Interest %" />
@@ -193,77 +205,140 @@
                 </div>
                 <form id="installmentsForm">
                     <div id="installmentsContainer"></div>
+                </form> --}}
+
+             <h2>Custom Installment Calculator</h2>
+                <div class="field">
+                    <label>Total Payment</label>
+                    <input type="number" id="totalPayment" min="0" step="0.01" placeholder="Total payment" oninput="updateRemaining()">
+                </div>
+                <div class="field">
+                    <label>Down Payment</label>
+                    <input type="number" id="downPayment" min="0" step="0.01" placeholder="Down payment" oninput="updateRemaining()">
+                </div>
+                <div class="field">
+                    <label>Remaining Payment</label>
+                    <input type="number" id="remainingPayment" readonly>
+                </div>
+                <div class="field">
+                    <label>Percentage (%)</label>
+                    <input type="number" id="percentage" min="0" step="0.01" placeholder="Enter percentage">
+                </div>
+                <div class="field">
+                    <label>Number of Installments</label>
+                    <input type="number" id="numInstallments" min="1" max="12" oninput="showInstallmentFields()"
+                        placeholder="How many installments?">
+                </div>
+                <form id="installmentsForm">
+                    <div id="installmentsContainer" class="installments-section"></div>
                 </form>
+                <div id="calculationResults"></div>
+
             </div>
-            <!-- <div class="row grouped-multiple-statistics-card">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="row">
 
-
-
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
             @endif
-            <!-- Grouped multiple cards for statistics ends here -->
 
 
-            <!-- Grouped multiple cards for statistics ends here -->
-
-            <!-- Minimal modern charts for power consumption, region statistics and sales etc. starts here -->
-            <div class="row minimal-modern-charts">
 
 
-                <!-- latest update tracking chart-->
-                {{-- <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking">
-                    <div class="card">
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Available Publications</h4>
 
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered zero-configuration">
-                                <thead>
-                                    <tr>
-                                        <th>Publication Title</th>
-                                        <th>Publication Number</th>
-                                        <th>Description</th>
-                                        <th>File/Document</th>
-                                        <th>Start</th>
-                                        <th>End</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($publications as $key)
-                                    <tr>
-                                        <td>{{ $key->name }}</td>
-                                        <td>{{ $key->publication_number }}</td>
-                                        <td>{{ $key->description }}</td>
-                                        <td><a href="{{ route('downloadpublication', $key->id) }}">{{ $key->file_name
-                                                }}</a>
-                                        </td>
-                                        <td>{{ $key->start_date }}</td>
-                                        <td>{{ $key->end_date }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div> --}}
-
-            </div>
         </div>
     </div>
 </div>
-
+</div>
 
 <script>
+    function updateRemaining() {
+    const total = parseFloat(document.getElementById('totalPayment').value) || 0;
+    const down = parseFloat(document.getElementById('downPayment').value) || 0;
+    const remaining = Math.max(0, total - down);
+    document.getElementById('remainingPayment').value = remaining.toFixed(2);
+    }
+    
+    
+    function showInstallmentFields() {
+    const num = parseInt(document.getElementById('numInstallments').value) || 0;
+    const container = document.getElementById('installmentsContainer');
+    container.innerHTML = '';
+    for (let i = 1; i <= num; i++) { container.innerHTML +=` <div class="installment-group" id="installment${i}">
+        <h4>Installment #${i}</h4>
+        <div class="row">
+            <div>
+                <label>Calendar Date</label>
+                <input type="date" id="date${i}">
+            </div>
+            <div>
+                <label>Pay Amount</label>
+                <input type="number" min="0" step="0.01" id="payAmount${i}" placeholder="Enter amount">
+            </div>
+            <div>
+                <label>Remaining Amount</label>
+                <input type="number" id="remain${i}" readonly>
+            </div>
+        </div>
+        </div>`;
+        }
+    
+        if (num > 0) {
+        container.innerHTML += `<button type="button" onclick="calculateInstallments()">Calculate Installments</button>`;
+        }
+        }
+    
+        // Step 7–8: Custom Calculation Logic
+        function calculateInstallments() {
+        // Read main inputs
+        let principle = parseFloat(document.getElementById('remainingPayment').value) || 0;
+        let percentage = parseFloat(document.getElementById('percentage').value) || 0;
+        let num = parseInt(document.getElementById('numInstallments').value) || 0;
+        let perDayRate = percentage / 30; // As per your logic
+        let resultsHtml = '<h3>Calculation Results:</h3>';
+        let profit = 0;
+    
+        let lastDate = new Date();
+        let profitRemaining = 0;
+    
+        for (let i = 1; i <= num; i++) { const payAmount=parseFloat(document.getElementById(`payAmount${i}`).value) || 0;
+            const dateVal=document.getElementById(`date${i}`).value; let days=30;  if (dateVal) { const
+            currentDate=new Date(dateVal); if (i===1) { const today=new Date(); days=Math.round((currentDate - today) /
+            (1000 * 60 * 60 * 24)); lastDate=currentDate; } else { days=Math.round((currentDate - lastDate) / (1000 * 60 *
+            60 * 24)); lastDate=currentDate; } if (days < 1) days=30; }  let
+            percentForThis=perDayRate * days; let profitThis=principle * (percentForThis / 100); let totalThis=principle +
+            profitThis;  let payInfo='' ; if (payAmount> 0) {
+            if (payAmount >= profitThis) {
+            // Profit will be cleared, remaining will go to principle
+            let toPrinciple = payAmount - profitThis;
+            if (toPrinciple > 0) {
+            principle = Math.max(0, principle - toPrinciple);
+            profitRemaining = 0;
+            }
+            else {
+            profitRemaining = Math.abs(toPrinciple);
+            }
+            } else {
+            // Not enough to clear profit, keep principle same, reduce profit
+            profitRemaining = profitThis - payAmount;
+            }
+            }
+            // Next month: Always apply percentage on principle only (not on profit!)
+            document.getElementById(`remain${i}`).value = (principle + profitRemaining).toFixed(2);
+    
+            resultsHtml += `
+            <div>
+                <b>Installment #${i}:</b> Principle: ${principle.toFixed(2)},
+                Profit: ${profitThis.toFixed(2)},
+                Total Due: ${(principle + profitThis).toFixed(2)},
+                Paid: ${payAmount.toFixed(2)},
+                Remaining Principle: ${principle.toFixed(2)},
+                Remaining Profit: ${profitRemaining.toFixed(2)}
+            </div>
+            `;
+            }
+            document.getElementById('calculationResults').innerHTML = resultsHtml;
+            }
+</script>
+
+
+{{-- <script>
     document.getElementById('downPayment').addEventListener('input', updateRemaining);
     document.getElementById('totalAmount').addEventListener('input', updateRemaining);
     
@@ -342,6 +417,8 @@
             currentRemaining = newRemaining;
         }
     }
-</script>
+</script> --}}
+
+
 
 @endsection
