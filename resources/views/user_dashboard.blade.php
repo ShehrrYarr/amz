@@ -91,7 +91,11 @@
                                             </div>
                                         </div>
                                     </div> -->
-            @if($userId == 1 && 2)
+
+            @php
+            $userId = auth()->id();
+            @endphp
+            @if (in_array($userId, [1, 2]))
             <div class="row grouped-multiple-statistics-card">
                 <div class="col-12">
                     <div class="card">
@@ -161,60 +165,103 @@
             </div>
 
             <style>
-              label { display: block; margin-bottom: 5px; font-weight: bold; }
-            input[type="number"], input[type="text"], input[type="date"] { padding: 7px; width: 100%; border-radius: 5px; border:
-            1px solid #ccc; }
-            input[readonly] { background: #eee; }
-            button { padding: 10px 20px; background: #4CAF50; color: #fff; border: none; border-radius: 6px; font-size: 15px; }
-            .installments-section { margin-top: 25px; }
-            .installment-group { padding: 12px; background: #f8f8f8; margin-bottom: 15px; border-radius: 7px; }
-            .row { display: flex; gap: 12px;}
-            .row > div { flex: 1;}
+                label {
+                    display: block;
+                    margin-bottom: 5px;
+                    font-weight: bold;
+                }
+
+                input[type="number"],
+                input[type="text"],
+                input[type="date"] {
+                    padding: 7px;
+                    width: 100%;
+                    border-radius: 5px;
+                    border:
+                        1px solid #ccc;
+                }
+
+                input[readonly] {
+                    background: #eee;
+                }
+
+                button {
+                    padding: 10px 20px;
+                    background: #4CAF50;
+                    color: #fff;
+                    border: none;
+                    border-radius: 6px;
+                    font-size: 15px;
+                }
+
+                .installments-section {
+                    margin-top: 25px;
+                }
+
+                .installment-group {
+                    padding: 12px;
+                    background: #f8f8f8;
+                    margin-bottom: 15px;
+                    border-radius: 7px;
+                }
+
+                .row {
+                    display: flex;
+                    gap: 12px;
+                }
+
+                .row>div {
+                    flex: 1;
+                }
             </style>
 
-            <div class="container mt-5">
-                {{-- <h3 class="mb-4">Installment Calculator</h3>
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <label class="form-label">Total Amount</label>
-                        <input type="number" class="form-control" id="totalAmount" placeholder="Enter total amount" />
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Down Payment</label>
-                        <input type="number" class="form-control" id="downPayment" placeholder="Enter down payment" />
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Remaining Amount</label>
-                        <input type="number" class="form-control" id="remainingAmount" placeholder="Auto-calculated"
-                            readonly />
-                    </div>
-                </div> --}}
-                {{-- <div class="row mb-3">
-                    <div class="col-md-4">
-                        <label class="form-label">Percentage (%)</label>
-                        <input type="number" class="form-control" id="percentage" placeholder="Interest %" />
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Number of Installments</label>
-                        <input type="number" class="form-control" id="numInstallments" min="1" placeholder="e.g. 3" />
-                    </div>
-                    <div class="col-md-4 d-flex align-items-end">
-                        <button class="btn btn-info w-100" id="generateInstallments" type="button">Generate
-                            Installments</button>
-                    </div>
-                </div>
-                <form id="installmentsForm">
-                    <div id="installmentsContainer"></div>
-                </form> --}}
 
-             <h2>Custom Installment Calculator</h2>
+            {{-- <h3 class="mb-4">Installment Calculator</h3>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Total Amount</label>
+                    <input type="number" class="form-control" id="totalAmount" placeholder="Enter total amount" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Down Payment</label>
+                    <input type="number" class="form-control" id="downPayment" placeholder="Enter down payment" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Remaining Amount</label>
+                    <input type="number" class="form-control" id="remainingAmount" placeholder="Auto-calculated"
+                        readonly />
+                </div>
+            </div> --}}
+            {{-- <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Percentage (%)</label>
+                    <input type="number" class="form-control" id="percentage" placeholder="Interest %" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Number of Installments</label>
+                    <input type="number" class="form-control" id="numInstallments" min="1" placeholder="e.g. 3" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button class="btn btn-info w-100" id="generateInstallments" type="button">Generate
+                        Installments</button>
+                </div>
+            </div>
+            <form id="installmentsForm">
+                <div id="installmentsContainer"></div>
+            </form> --}}
+
+            {{-- <div class="container mt-5">
+
+                <h2>Custom Installment Calculator</h2>
                 <div class="field">
                     <label>Total Payment</label>
-                    <input type="number" id="totalPayment" min="0" step="0.01" placeholder="Total payment" oninput="updateRemaining()">
+                    <input type="number" id="totalPayment" min="0" step="0.01" placeholder="Total payment"
+                        oninput="updateRemaining()">
                 </div>
                 <div class="field">
                     <label>Down Payment</label>
-                    <input type="number" id="downPayment" min="0" step="0.01" placeholder="Down payment" oninput="updateRemaining()">
+                    <input type="number" id="downPayment" min="0" step="0.01" placeholder="Down payment"
+                        oninput="updateRemaining()">
                 </div>
                 <div class="field">
                     <label>Remaining Payment</label>
@@ -234,7 +281,7 @@
                 </form>
                 <div id="calculationResults"></div>
 
-            </div>
+            </div> --}}
 
             @endif
 
