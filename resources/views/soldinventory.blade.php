@@ -163,6 +163,11 @@
                         </div>
 
                         <div class="mb-1">
+                            <label for="pay_amount" class="form-label">Pay Amount</label>
+                            <input type="number" step="0.01" class="form-control" id="pay_amount" name="pay_amount" >
+                        </div>                        
+
+                        <div class="mb-1">
                             <label for="battery_health" class="form-label">Battery Health</label>
                             <input type="text" class="form-control" id="rbattery_health" name="battery_health" required>
                         </div>

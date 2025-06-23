@@ -774,6 +774,16 @@ public function storeMobile(Request $request)
         ]);
     }
 
+    if ($request->filled('pay_amount') && $request->pay_amount > 0) {
+        Accounts::create([
+            'vendor_id' => $request->input('vendor_id') ?? null,
+            'category' => 'DB',
+            'amount' => $request->input('pay_amount'),
+            'description' => "Payment made during restore for mobile: " . $request->input('mobile_name'),
+            'created_by' => auth()->id(),
+        ]);
+    }
+
     return redirect()->back()->with('success', 'Mobile restored successfully.');
 }
 
