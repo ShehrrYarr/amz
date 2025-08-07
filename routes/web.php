@@ -64,7 +64,7 @@ Route::get('/deletemedia/{id}', [App\Http\Controllers\MediaController::class, 'd
 Route::get('/mediacategory', [App\Http\Controllers\MediaCategoryController::class, 'index'])->name('mediacategory');
 Route::post('/storecategory', [App\Http\Controllers\MediaCategoryController::class, 'store'])->name('storecategory');
 Route::get('/editcategory/{id}', [App\Http\Controllers\MediaCategoryController::class, 'edit'])->name('editCategory');
-Route::post('/update', [App\Http\Controllers\MediaCategoryController::class, 'update'])->name('updatecategory');
+// Route::post('/update', [App\Http\Controllers\MediaCategoryController::class, 'update'])->name('updatecategory');
 Route::get('/deletecategory/{id}', [App\Http\Controllers\MediaCategoryController::class, 'destroy'])->name('deletecategory');
 Route::put('/approve', [App\Http\Controllers\MobileController::class, 'approve'])->name('approve');
 Route::put('/movetoowner', [App\Http\Controllers\MobileController::class, 'moveToOwner'])->name('moveToOwner');
