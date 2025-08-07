@@ -104,82 +104,101 @@
 
 
     {{-- Restore Modal --}}
-    <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Restore Mobile?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form class="form" id="restoremobile" action="{{ route('restoreMobile') }}" method="post"
-                        enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-
-                        <div class="form-body">
-
-                            <div class="mb-1">
-                                <label for="mobile_name" class="form-label">Mobile Name</label>
-                                <input class="form-control" type="hidden" name="id" id="rid">
-                                <input type="text" class="form-control" id="rmobile_name" name="mobile_name" readonly>
-                            </div>
-
-                            <div class="mb-1" style="display: none">
-                                <label for="availability" class="form-label">Availability</label>
-                                <select class="form-control" id="ravailability" name="availability" required>
-                                    <option value="Available">Available</option>
-                                    <option value="Sold">Sold</option>
-                                </select>
-                            </div>
-                              <div class="mb-1">
-                                <label for="group_id" class="form-label">Group</label>
-                                <select class="form-control" id="rgroup_id" name="group_id" required>
-                                    @foreach($groups as $group)
-                                        <option value="{{ $group->id }}">{{ $group->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="mb-1">
-                                <label for="customer_name" class="form-label">Customer Name</label>
-
-                                <input type="text" class="form-control" id="customer_name" name="customer_name" required>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="battery_health" class="form-label">Battery Health</label>
-                                <input type="text" class="form-control" id="rbattery_health" name="battery_health" required>
-                            </div>
-
-
-                            <div class="mb-1">
-                                <label for="cost_price" class="form-label">Cost Price</label>
-                                <input type="number" class="form-control" id="rcost_price" name="cost_price" required>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="selling_price" class="form-label">Selling Price</label>
-                                <input type="number" class="form-control" id="rselling_price" name="selling_price" required>
-                            </div>
-
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
-                                <i class="feather icon-x"></i> Cancel
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fa fa-check-square-o"></i> Restore
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
+   <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Restore Mobile</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <div class="modal-body">
+                <form class="form" id="restoremobile" action="{{ route('restoreMobile') }}" method="post"
+                    enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="form-body">
+
+                        <div class="mb-1">
+                            <label for="mobile_name" class="form-label">Mobile Name</label>
+                            <input class="form-control" type="hidden" name="id" id="rid">
+                            <input type="text" class="form-control" id="rmobile_name" name="mobile_name" readonly>
+                            <input type="text" class="form-control" id="rimei_number" name="imei_number" hidden>
+
+                        </div>
+
+                        <div class="mb-1" style="display: none">
+                            <label for="availability" class="form-label">Availability</label>
+                            <select class="form-control" id="ravailability" name="availability" required>
+                                <option value="Available">Available</option>
+                                <option value="Sold">Sold</option>
+                            </select>
+                        </div>
+                        <div class="mb-1">
+                            <label for="group_id" class="form-label">Group</label>
+                            <select class="form-control" id="rgroup_id" name="group_id" required>
+                                @foreach($groups as $group)
+                                <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="vendor_id" class="form-label">Vendor (Optional)</label>
+                            <select class="form-control select2" id="rvendor_id" name="vendor_id" style="width: 100%;">
+                                <option value="">-- Select Vendor --</option>
+                                @foreach ($vendors as $vendor)
+                                <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+
+                        <div class="mb-1" id="customerNameWrapper">
+                            <label for="customer_name" class="form-label">Customer Name</label>
+
+                            <input type="text" class="form-control" id="customer_name" name="customer_name">
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="pay_amount" class="form-label">Pay Amount</label>
+                            <input type="number" step="0.01" class="form-control" id="pay_amount" name="pay_amount">
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="battery_health" class="form-label">Battery Health</label>
+                            <input type="text" class="form-control" id="rbattery_health" name="battery_health" required>
+                        </div>
+
+
+                        <div class="mb-1">
+                            <label for="cost_price" class="form-label">Cost Price</label>
+                            <input type="number" class="form-control" id="rcost_price" name="cost_price" required>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="selling_price" class="form-label">Selling Price</label>
+                            <input type="number" class="form-control" id="rselling_price" name="selling_price" required>
+                        </div>
+
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-warning mr-1" data-dismiss="modal">
+                            <i class="feather icon-x"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="restoreButton">
+                            <i class="fa fa-check-square-o"></i> Restore
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
+</div>
     {{-- End Restore Modal --}}
 
     <div class="app-content content">
@@ -238,7 +257,9 @@
                                             <td>{{ $key->battery_health}}</td>
                                             <td>{{ $key->cost_price }}</td>
                                             <td>{{ $key->selling_price }}</td>
-                                            <td>{{ $key->customer_name }}</td>
+                                            <td>{{ optional($key->latestSaleTransaction)->customer_name
+                                                ?? optional($key->latestSaleTransaction->vendor)->name
+                                                ?? 'N/A' }}</td>
                                             <td>{{ $key->availability }}</td>
                                             <td><a href="" onclick="approve({{ $key->id }})" data-toggle="modal"
                                                     data-target="#exampleModal1">
@@ -276,6 +297,7 @@
         </div>
     </div>
     <script>
+     
         //  approve Function
         function approve(value) {
             console.log(value);
@@ -346,5 +368,32 @@
             document.getElementById('successMessage').style.display = 'none';
         }, 5000); // 15 seconds in milliseconds
         //End Message Time Out
+
+        $(document).ready(function () {
+        // Initialize Select2
+        $('#rvendor_id').select2({
+        placeholder: "-- Select Vendor --",
+        allowClear: true,
+        width: 'resolve'
+        });
+        
+        // Initial check on load
+        toggleCustomerName();
+        
+        // Trigger change event listener
+        $('#rvendor_id').on('change', function () {
+        toggleCustomerName();
+        });
+        
+        function toggleCustomerName() {
+        const vendorSelected = $('#rvendor_id').val();
+        if (vendorSelected) {
+        $('#customerNameWrapper').hide();
+        $('#customer_name').val('');
+        } else {
+        $('#customerNameWrapper').show();
+        }
+        }
+        });
     </script>
 @endsection

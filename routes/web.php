@@ -280,6 +280,8 @@ Route::get('/soldapprovedinventory', function () {
     $mobile = Mobile::where('availability', 'Sold')->where('is_transfer', false)
         ->where('is_approve', 'Approved')
         ->get();
+    $vendors = Vendor::all();
+
 
     $startOfWeek = Carbon::now()->startOfWeek(Carbon::FRIDAY);
     $endOfWeek = Carbon::now()->endOfWeek(Carbon::FRIDAY);
@@ -293,7 +295,7 @@ Route::get('/soldapprovedinventory', function () {
             ->where('is_approve', 'Approved')
             ->whereBetween('sold_at', [$startOfWeek, $endOfWeek])
             ->sum('cost_price');
-    return view('soldapprovedinventory', compact('mobile', 'profit','groups'));
+    return view('soldapprovedinventory', compact('mobile', 'profit','groups','vendors'));
 })->middleware('auth', 'login.time.restrict');
 
 

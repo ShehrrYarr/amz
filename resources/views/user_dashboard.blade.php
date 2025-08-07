@@ -164,56 +164,7 @@
                 </div>
             </div>
 
-            <style>
-                label {
-                    display: block;
-                    margin-bottom: 5px;
-                    font-weight: bold;
-                }
 
-                input[type="number"],
-                input[type="text"],
-                input[type="date"] {
-                    padding: 7px;
-                    width: 100%;
-                    border-radius: 5px;
-                    border:
-                        1px solid #ccc;
-                }
-
-                input[readonly] {
-                    background: #eee;
-                }
-
-                button {
-                    padding: 10px 20px;
-                    background: #4CAF50;
-                    color: #fff;
-                    border: none;
-                    border-radius: 6px;
-                    font-size: 15px;
-                }
-
-                .installments-section {
-                    margin-top: 25px;
-                }
-
-                .installment-group {
-                    padding: 12px;
-                    background: #f8f8f8;
-                    margin-bottom: 15px;
-                    border-radius: 7px;
-                }
-
-                .row {
-                    display: flex;
-                    gap: 12px;
-                }
-
-                .row>div {
-                    flex: 1;
-                }
-            </style>
 
 
             {{-- <h3 class="mb-4">Installment Calculator</h3>
@@ -250,38 +201,46 @@
                 <div id="installmentsContainer"></div>
             </form> --}}
 
-            {{-- <div class="container mt-5">
+            <style>
+           .calculator-box { background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 2px 10px #eee; max-width: 500px;
+            margin: auto;}
+            .calculator-box h2 { margin-bottom: 20px; }
+            .form-group { margin-bottom: 15px; }
+            .form-group label { display: block; margin-bottom: 5px;}
+            .form-group input, .form-group select { width: 100%; padding: 8px; font-size: 16px; border-radius: 6px; border: 1px
+            solid #ccc;}
+            .form-group input[readonly] { background: #f0f0f0; }
+            #installments-container { margin-top: 25px; }
+            .installment-row { display: flex; gap: 6px; margin-bottom: 10px;}
+            .installment-row input { flex: 1;}
+            .payable-group {display: flex; gap: 6px; margin-bottom: 5px;}
+            .payable-group input {width: 33%;}
+            .modal-bg {
+            position: fixed; top:0; left:0; width:100vw; height:100vh;
+            background:rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center;
+            }
+            .modal-content {
+            background: #fff; padding: 25px 35px; border-radius: 12px; box-shadow: 0 4px 20px #0002; min-width: 260px;
+            }
+            .close-modal { background: #d00; color: #fff; border: none; padding: 4px 14px; border-radius: 6px; float:right;}
+            .split-details {font-size: 17px; margin-bottom: 10px;}
+            .bold {font-weight: bold;}
+            </style>
 
-                <h2>Custom Installment Calculator</h2>
-                <div class="field">
-                    <label>Total Payment</label>
-                    <input type="number" id="totalPayment" min="0" step="0.01" placeholder="Total payment"
-                        oninput="updateRemaining()">
-                </div>
-                <div class="field">
-                    <label>Down Payment</label>
-                    <input type="number" id="downPayment" min="0" step="0.01" placeholder="Down payment"
-                        oninput="updateRemaining()">
-                </div>
-                <div class="field">
-                    <label>Remaining Payment</label>
-                    <input type="number" id="remainingPayment" readonly>
-                </div>
-                <div class="field">
-                    <label>Percentage (%)</label>
-                    <input type="number" id="percentage" min="0" step="0.01" placeholder="Enter percentage">
-                </div>
-                <div class="field">
-                    <label>Number of Installments</label>
-                    <input type="number" id="numInstallments" min="1" max="12" oninput="showInstallmentFields()"
-                        placeholder="How many installments?">
-                </div>
-                <form id="installmentsForm">
-                    <div id="installmentsContainer" class="installments-section"></div>
-                </form>
-                <div id="calculationResults"></div>
 
-            </div> --}}
+
+          
+
+            <!-- Modal for interest/principal split -->
+            <div class="modal-bg" id="splitModal">
+                <div class="modal-content">
+                    <button class="close-modal"
+                        onclick="document.getElementById('splitModal').style.display='none'">X</button>
+                    <div id="splitDetails"></div>
+                </div>
+            </div>
+
+
 
             @endif
 
@@ -295,93 +254,9 @@
 </div>
 
 <script>
-    function updateRemaining() {
-    const total = parseFloat(document.getElementById('totalPayment').value) || 0;
-    const down = parseFloat(document.getElementById('downPayment').value) || 0;
-    const remaining = Math.max(0, total - down);
-    document.getElementById('remainingPayment').value = remaining.toFixed(2);
-    }
-    
-    
-    function showInstallmentFields() {
-    const num = parseInt(document.getElementById('numInstallments').value) || 0;
-    const container = document.getElementById('installmentsContainer');
-    container.innerHTML = '';
-    for (let i = 1; i <= num; i++) { container.innerHTML +=` <div class="installment-group" id="installment${i}">
-        <h4>Installment #${i}</h4>
-        <div class="row">
-            <div>
-                <label>Calendar Date</label>
-                <input type="date" id="date${i}">
-            </div>
-            <div>
-                <label>Pay Amount</label>
-                <input type="number" min="0" step="0.01" id="payAmount${i}" placeholder="Enter amount">
-            </div>
-            <div>
-                <label>Remaining Amount</label>
-                <input type="number" id="remain${i}" readonly>
-            </div>
-        </div>
-        </div>`;
-        }
-    
-        if (num > 0) {
-        container.innerHTML += `<button type="button" onclick="calculateInstallments()">Calculate Installments</button>`;
-        }
-        }
-    
-        // Step 7–8: Custom Calculation Logic
-        function calculateInstallments() {
-        // Read main inputs
-        let principle = parseFloat(document.getElementById('remainingPayment').value) || 0;
-        let percentage = parseFloat(document.getElementById('percentage').value) || 0;
-        let num = parseInt(document.getElementById('numInstallments').value) || 0;
-        let perDayRate = percentage / 30; // As per your logic
-        let resultsHtml = '<h3>Calculation Results:</h3>';
-        let profit = 0;
-    
-        let lastDate = new Date();
-        let profitRemaining = 0;
-    
-        for (let i = 1; i <= num; i++) { const payAmount=parseFloat(document.getElementById(`payAmount${i}`).value) || 0;
-            const dateVal=document.getElementById(`date${i}`).value; let days=30;  if (dateVal) { const
-            currentDate=new Date(dateVal); if (i===1) { const today=new Date(); days=Math.round((currentDate - today) /
-            (1000 * 60 * 60 * 24)); lastDate=currentDate; } else { days=Math.round((currentDate - lastDate) / (1000 * 60 *
-            60 * 24)); lastDate=currentDate; } if (days < 1) days=30; }  let
-            percentForThis=perDayRate * days; let profitThis=principle * (percentForThis / 100); let totalThis=principle +
-            profitThis;  let payInfo='' ; if (payAmount> 0) {
-            if (payAmount >= profitThis) {
-            // Profit will be cleared, remaining will go to principle
-            let toPrinciple = payAmount - profitThis;
-            if (toPrinciple > 0) {
-            principle = Math.max(0, principle - toPrinciple);
-            profitRemaining = 0;
-            }
-            else {
-            profitRemaining = Math.abs(toPrinciple);
-            }
-            } else {
-            // Not enough to clear profit, keep principle same, reduce profit
-            profitRemaining = profitThis - payAmount;
-            }
-            }
-            // Next month: Always apply percentage on principle only (not on profit!)
-            document.getElementById(`remain${i}`).value = (principle + profitRemaining).toFixed(2);
-    
-            resultsHtml += `
-            <div>
-                <b>Installment #${i}:</b> Principle: ${principle.toFixed(2)},
-                Profit: ${profitThis.toFixed(2)},
-                Total Due: ${(principle + profitThis).toFixed(2)},
-                Paid: ${payAmount.toFixed(2)},
-                Remaining Principle: ${principle.toFixed(2)},
-                Remaining Profit: ${profitRemaining.toFixed(2)}
-            </div>
-            `;
-            }
-            document.getElementById('calculationResults').innerHTML = resultsHtml;
-            }
+    // Utility function for currency rounding
+  
+
 </script>
 
 
