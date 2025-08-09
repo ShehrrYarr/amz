@@ -215,10 +215,9 @@
             <div class="bold center" style="font-size:11.5px; margin-bottom:2px;">Return & Exchange Policy:</div>
         </div>
         <div class="urdu">
-            موبائل اسیسری موقع پہ چیک کریں •<br>
-            وارنٹی والی چیز کی کمپنی ذمہ دار ہوگی •<br>
-            استعمال شدہ اور کھلی ہوئی چیز کی واپسی نہیں ہوگی •<br>
-        </div>
+    پی ٹی اے موقع پر چیک کریں، بعد میں دکاندار ذمہ دار نہ ہوگا<br>
+            کلیم کمپنی کی ذمہ داری ہے دکاندار کلیم دینے کا پابند نہ ہوگ <br>
+                </div>
         <div class="divider"></div>
         <div class="address-note"><b>Address: Baldia road Hasilpur</b></div>
         <div class="center bold" style="font-size:13px;">
