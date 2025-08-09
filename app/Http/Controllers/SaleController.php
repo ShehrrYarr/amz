@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\vendor;
 use App\Models\Mobile;
-use App\Models\saleMobile;;
+use App\Models\saleMobile;
 use App\Models\Accounts;
 use App\Models\MobileTransaction;
 use App\Models\MobileHistory;
@@ -224,7 +224,9 @@ public function index(Request $request)
 }
 
 
-   
+    // Keep your existing store() & receipt() methods as you already implemented.
+    // If you need me to refactor them too, say the word.
+
 
 
 }
