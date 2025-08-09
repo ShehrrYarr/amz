@@ -75,7 +75,7 @@ public function store(Request $request)
             $mobile->save();
 
             // Create SaleMobile record
-            SaleMobile::create([
+            saleMobile::create([
                 'sale_id' => $sale->id,
                 'mobile_id' => $mobile->id,
                 'selling_price' => $m['selling_price'],
