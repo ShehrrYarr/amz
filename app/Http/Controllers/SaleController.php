@@ -164,62 +164,67 @@ public function index(Request $request)
     $dateFrom = $request->input('from');
     $dateTo   = $request->input('to');
 
-    // Base query for the listing (no cost calc here)
+    // Base query for listing
     $salesQuery = sale::query()
         ->when($vendorId, fn($q) => $q->where('vendor_id', $vendorId))
         ->when($sellerId, fn($q) => $q->where('sold_by', $sellerId))
         ->when($dateFrom, fn($q) => $q->whereDate('created_at', '>=', $dateFrom))
         ->when($dateTo, fn($q) => $q->whereDate('created_at', '<=', $dateTo));
 
-    // Paginated table data
+    // Paginated data for the table
     $sales = (clone $salesQuery)
         ->with(['vendor:id,name', 'seller:id,name'])
-        ->withCount('mobiles')                                    // relation: mobiles() hasMany(saleMobile::class)
-        ->withSum('mobiles as sell_sum', 'selling_price')         // sum from sale_mobiles
+        ->withCount('mobiles')                            // relation: mobiles() -> hasMany(saleMobile::class)
+        ->withSum('mobiles as sell_sum', 'selling_price') // sum from sale_mobiles
         ->latest('id')
         ->paginate(25);
 
-    // Overall profit across the filtered set (single aggregate query)
-    // Profit = SUM(sm.selling_price) - SUM(m.cost_price) - SUM(s.discount)
-    $totals = DB::table('sale_mobiles as sm')
-        ->join('sales as s', 's.id', '=', 'sm.sale_id')
-        ->join('mobiles as m', 'm.id', '=', 'sm.mobile_id')
-        ->when($vendorId, fn($q) => $q->where('s.vendor_id', $vendorId))
-        ->when($sellerId, fn($q) => $q->where('s.sold_by', $sellerId))
-        ->when($dateFrom, fn($q) => $q->whereDate('s.created_at', '>=', $dateFrom))
-        ->when($dateTo, fn($q) => $q->whereDate('s.created_at', '<=', $dateTo))
-        ->selectRaw('
-            COALESCE(SUM(sm.selling_price),0) AS sell_sum,
-            COALESCE(SUM(m.cost_price),0)     AS cost_sum,
-            COALESCE(SUM(s.discount),0)       AS disc_sum
-        ')
-        ->first();
+    // === Overall Profit (simple & optimized without DB::table alias) ===
+    // Get the filtered sale IDs (for the whole filtered set, not just current page)
+    $saleIds = (clone $salesQuery)->pluck('id'); // collection of IDs
 
-    $sellSum   = (float)($totals->sell_sum ?? 0);
-    $costSum   = (float)($totals->cost_sum ?? 0);
-    $discSum   = (float)($totals->disc_sum ?? 0);
-    $overallProfit = $sellSum - $costSum - $discSum;
+    // If no rows, profit is zero
+    if ($saleIds->isEmpty()) {
+        $overallProfit  = 0;
+        $overallSellSum = 0;
+        $overallCostSum = 0;
+        $overallDiscSum = 0;
+    } else {
+        // Sum of selling prices from sale_mobiles for these sales
+        $overallSellSum = (float) saleMobile::whereIn('sale_id', $saleIds)
+            ->sum('selling_price');
+
+        // Sum of costs via a light join to mobiles (uses table name but via Eloquent builder)
+        $overallCostSum = (float) saleMobile::whereIn('sale_id', $saleIds)
+            ->join('mobiles as m', 'm.id', '=', 'sale_mobiles.mobile_id')
+            ->sum(DB::raw('m.cost_price'));
+
+        // Sum of discounts from sales
+        $overallDiscSum = (float) sale::whereIn('id', $saleIds)
+            ->sum('discount');
+
+        // Profit = sell - cost - discount
+        $overallProfit = $overallSellSum - $overallCostSum - $overallDiscSum;
+    }
 
     // Filters dropdowns
     $vendors = vendor::orderBy('name')->get(['id','name']);
-    $users   = \App\Models\User::orderBy('name')->get(['id','name']);
+    $users   = User::orderBy('name')->get(['id','name']);
 
     return view('sales.index', [
         'sales'          => $sales,
         'vendors'        => $vendors,
         'users'          => $users,
         'overallProfit'  => $overallProfit,
-        // (optional) expose raw sums if you want to show cards/chips
-        'overallSellSum' => $sellSum,
-        'overallCostSum' => $costSum,
-        'overallDiscSum' => $discSum,
+        // optional chips above table:
+        'overallSellSum' => $overallSellSum,
+        'overallCostSum' => $overallCostSum,
+        'overallDiscSum' => $overallDiscSum,
     ]);
 }
 
 
-    // Keep your existing store() & receipt() methods as you already implemented.
-    // If you need me to refactor them too, say the word.
-
+   
 
 
 }
