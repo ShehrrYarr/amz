@@ -31,7 +31,7 @@ class sale extends Model
     // A Sale may belong to a Vendor
     public function vendor()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(vendor::class);
     }
 
     // A Sale was created by a User
