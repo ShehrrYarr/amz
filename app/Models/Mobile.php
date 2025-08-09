@@ -112,7 +112,7 @@ public function latestSaleTransaction()
 
 public function saleMobiles()
 {
-    return $this->hasMany(SaleMobile::class);
+    return $this->hasMany(saleMobile::class);
 }
 
 }
