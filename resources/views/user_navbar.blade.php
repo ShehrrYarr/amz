@@ -155,6 +155,21 @@
 
                                         </ul>
                                 </li>
+                                <li class=" nav-item"><a href="#"><i class="feather icon-book-open"></i><span
+                                                        class="menu-title" data-i18n="Templates">POS Managment</span></a>
+                                        <ul class="menu-content">
+                                               
+                                                <li class="@if(\Request::is('pos')) active @endif"><a
+                                                                class="menu-item" href="/pos"
+                                                                data-i18n="1 columns">POS</a>
+                                                </li>
+                                                <li class="@if(\Request::is('sales')) active @endif"><a
+                                                                class="menu-item" href="/sales"
+                                                                data-i18n="1 columns">Sales</a>
+                                                </li>
+
+                                        </ul>
+                                </li>
 
                                 <li class=" nav-item"><a href="#"><i class="feather icon-book-open"></i><span
                                                         class="menu-title" data-i18n="Templates">Inventory</span></a>

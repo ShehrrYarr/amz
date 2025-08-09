@@ -110,6 +110,9 @@ public function latestSaleTransaction()
         ->latestOfMany('created_at'); // or 'created_at' if you’re not using 'transaction_date'
 }
 
-
+public function saleMobiles()
+{
+    return $this->hasMany(SaleMobile::class);
+}
 
 }

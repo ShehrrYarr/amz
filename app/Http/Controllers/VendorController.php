@@ -243,6 +243,28 @@ class VendorController extends Controller
 
 
 
+public function balance($id)
+{
+    // Calculate vendor balance
+    $credit = Accounts::where('vendor_id', $id)
+        ->where('category', 'CR')
+        ->sum('amount');
+
+    $debit = Accounts::where('vendor_id', $id)
+        ->where('category', 'DB')
+        ->sum('amount');
+
+    $balance = $credit - $debit;
+
+    // Figure out the status
+    $status = $balance < 0 ? 'Debit' : ($balance > 0 ? 'Credit' : 'Settled');
+
+    return response()->json([
+        'balance' => abs($balance),
+        'status' => $status
+    ]);
+}
+
 
 
 

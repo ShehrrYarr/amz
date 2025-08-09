@@ -8,6 +8,7 @@ use App\Http\Controllers\MasterPasswordController;
 use App\Http\Controllers\MobileController;
 use App\Http\Controllers\MobileHistoryController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\VendorController;
 use App\Models\TransferRecord;
 use Illuminate\Support\Facades\Route;
@@ -629,5 +630,13 @@ Route::get('/edituser/{id}', [App\Http\Controllers\UserController::class, 'editU
 Route::put('/update-user', [UserController::class, 'update'])->name('updateUser');
 
 
-//Sold logic change 
+//Sale Routes
+Route::get('/pos', [SaleController::class, 'pos'])->name('pos');
+Route::get('/vendor/balance/{id}', [VendorController::class, 'balance']);
+Route::post('/sales/store', [SaleController::class, 'store'])->name('sales.store');
+Route::get('/sales/receipt/{id}', [SaleController::class, 'receipt'])->name('sales.receipt');
+// routes/web.php
+Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
+
+
 
