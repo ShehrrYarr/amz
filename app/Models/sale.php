@@ -25,7 +25,7 @@ class sale extends Model
      // A Sale has many SaleMobiles (mobiles in this sale)
     public function saleMobiles()
     {
-        return $this->hasMany(SaleMobile::class);
+        return $this->hasMany(saleMobile::class);
     }
 
     // A Sale may belong to a Vendor
@@ -40,7 +40,7 @@ class sale extends Model
         return $this->belongsTo(User::class, 'sold_by');
     }
     public function mobiles() {
-    return $this->hasMany(SaleMobile::class);
+    return $this->hasMany(saleMobile::class);
 }
 
 // total after discount
