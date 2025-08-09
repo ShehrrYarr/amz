@@ -158,53 +158,64 @@ public function receipt($id)
 }
 
 public function index(Request $request)
-    {
-        $vendorId = $request->input('vendor_id');
-        $sellerId = $request->input('sold_by');
-        $dateFrom = $request->input('from');
-        $dateTo   = $request->input('to');
+{
+    $vendorId = $request->input('vendor_id');
+    $sellerId = $request->input('sold_by');
+    $dateFrom = $request->input('from');
+    $dateTo   = $request->input('to');
 
-        // Base query for listing (DON'T compute cost here; only counts & selling sums)
-        $salesQuery = sale::query()
-            ->when($vendorId, fn($q) => $q->where('vendor_id', $vendorId))
-            ->when($sellerId, fn($q) => $q->where('sold_by', $sellerId))
-            ->when($dateFrom, fn($q) => $q->whereDate('created_at', '>=', $dateFrom))
-            ->when($dateTo, fn($q) => $q->whereDate('created_at', '<=', $dateTo));
+    // Base query for the listing (no cost calc here)
+    $salesQuery = sale::query()
+        ->when($vendorId, fn($q) => $q->where('vendor_id', $vendorId))
+        ->when($sellerId, fn($q) => $q->where('sold_by', $sellerId))
+        ->when($dateFrom, fn($q) => $q->whereDate('created_at', '>=', $dateFrom))
+        ->when($dateTo, fn($q) => $q->whereDate('created_at', '<=', $dateTo));
 
-        // Sales list for the table
-        $sales = (clone $salesQuery)
-            ->with(['vendor:id,name', 'seller:id,name'])
-            ->withCount('mobiles')                                   // sale_mobiles count
-            ->withSum('mobiles as sell_sum', 'selling_price')        // sum of selling_price from sale_mobiles
-            ->latest('id')
-            ->paginate(25);
+    // Paginated table data
+    $sales = (clone $salesQuery)
+        ->with(['vendor:id,name', 'seller:id,name'])
+        ->withCount('mobiles')                                    // relation: mobiles() hasMany(saleMobile::class)
+        ->withSum('mobiles as sell_sum', 'selling_price')         // sum from sale_mobiles
+        ->latest('id')
+        ->paginate(25);
 
-        // OVERALL PROFIT (Option B): single aggregate query across filtered rows
-        // Profit = SUM(sale_mobiles.selling_price) - SUM(mobiles.cost_price) - SUM(sales.discount)
-        $totals = DB::table('sale_mobiles as sm')
-            ->join('sales as s', 's.id', '=', 'sm.sale_id')
-            ->join('mobiles as m', 'm.id', '=', 'sm.mobile_id')
-            ->when($vendorId, fn($q) => $q->where('s.vendor_id', $vendorId))
-            ->when($sellerId, fn($q) => $q->where('s.sold_by', $sellerId))
-            ->when($dateFrom, fn($q) => $q->whereDate('s.created_at', '>=', $dateFrom))
-            ->when($dateTo, fn($q) => $q->whereDate('s.created_at', '<=', $dateTo))
-            ->selectRaw('
-                COALESCE(SUM(sm.selling_price),0) AS sell_sum,
-                COALESCE(SUM(m.cost_price),0)     AS cost_sum,
-                COALESCE(SUM(s.discount),0)       AS disc_sum
-            ')
-            ->first();
+    // Overall profit across the filtered set (single aggregate query)
+    // Profit = SUM(sm.selling_price) - SUM(m.cost_price) - SUM(s.discount)
+    $totals = DB::table('sale_mobiles as sm')
+        ->join('sales as s', 's.id', '=', 'sm.sale_id')
+        ->join('mobiles as m', 'm.id', '=', 'sm.mobile_id')
+        ->when($vendorId, fn($q) => $q->where('s.vendor_id', $vendorId))
+        ->when($sellerId, fn($q) => $q->where('s.sold_by', $sellerId))
+        ->when($dateFrom, fn($q) => $q->whereDate('s.created_at', '>=', $dateFrom))
+        ->when($dateTo, fn($q) => $q->whereDate('s.created_at', '<=', $dateTo))
+        ->selectRaw('
+            COALESCE(SUM(sm.selling_price),0) AS sell_sum,
+            COALESCE(SUM(m.cost_price),0)     AS cost_sum,
+            COALESCE(SUM(s.discount),0)       AS disc_sum
+        ')
+        ->first();
 
-        $overallProfit = (float)($totals->sell_sum ?? 0)
-                       - (float)($totals->cost_sum ?? 0)
-                       - (float)($totals->disc_sum ?? 0);
+    $sellSum   = (float)($totals->sell_sum ?? 0);
+    $costSum   = (float)($totals->cost_sum ?? 0);
+    $discSum   = (float)($totals->disc_sum ?? 0);
+    $overallProfit = $sellSum - $costSum - $discSum;
 
-        // Dropdown data for filters
-        $vendors = Vendor::orderBy('name')->get(['id','name']);
-        $users   = User::orderBy('name')->get(['id','name']);
+    // Filters dropdowns
+    $vendors = vendor::orderBy('name')->get(['id','name']);
+    $users   = \App\Models\User::orderBy('name')->get(['id','name']);
 
-        return view('sales.index', compact('sales','vendors','users','overallProfit'));
-    }
+    return view('sales.index', [
+        'sales'          => $sales,
+        'vendors'        => $vendors,
+        'users'          => $users,
+        'overallProfit'  => $overallProfit,
+        // (optional) expose raw sums if you want to show cards/chips
+        'overallSellSum' => $sellSum,
+        'overallCostSum' => $costSum,
+        'overallDiscSum' => $discSum,
+    ]);
+}
+
 
     // Keep your existing store() & receipt() methods as you already implemented.
     // If you need me to refactor them too, say the word.
