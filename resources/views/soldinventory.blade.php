@@ -430,7 +430,7 @@
                         </div>
                         <div class="col-auto">
                             <select name="per_page" id="perPage" class="form-select form-select-sm" onchange="this.form.submit()">
-                                @foreach([10,25,50,100,500,1000,1500,2000,2500,3000] as $n)
+                                @foreach([10,25,50,100,500] as $n)
                                 <option value="{{ $n }}" {{ (int)($perPage ?? 10)===$n ? 'selected' : '' }}>{{ $n }}</option>
                                 @endforeach
                             </select>
