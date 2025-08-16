@@ -203,6 +203,7 @@
                                             <th class="text-center" style="width:90px;">Items</th>
                                             <th class="text-end" style="width:140px;">Discount</th>
                                             <th class="text-end" style="width:160px;">Total</th>
+                                            <th class="text-end" style="width:160px;">Receipt</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -218,6 +219,13 @@
                                             <td class="text-center">{{ $s->mobiles_count }}</td>
                                             <td class="text-end">Rs {{ number_format($s->discount ?? 0, 0) }}</td>
                                             <td class="text-end fw-semibold">Rs {{ number_format($s->sell_sum ?? 0, 0) }}</td>
+                                            <td>
+                                                <a class="btn btn-sm btn-outline-primary" target="_blank" href="{{ route('sales.receipt', $s->id) }}">
+                                                    Receipt
+                                                </a>
+                                                {{-- Add a Show button if you later build details page --}}
+                                                {{-- <a class="btn btn-sm btn-outline-secondary" href="{{ route('sales.show',$sale->id) }}">View</a> --}}
+                                            </td>
                                         </tr>
                                         @endforeach
                                     </tbody>
