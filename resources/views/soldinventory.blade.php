@@ -423,65 +423,6 @@
 
 
 
-
-
-            <!-- <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
-                        <div class="card">
-                            <div class="card-header latest-update-heading d-flex justify-content-between">
-                                <h4 class="latest-update-heading-title text-bold-500">Sold Profit</h4>
-                                <h4>Rs {{$totalProfitMobile}}</h4>
-                            </div>
-                            <div class="card-header latest-update-heading d-flex justify-content-between">
-                                <h4 class="latest-update-heading-title text-bold-500">Received Sold Profit</h4>
-                                <h4>Rs {{$totalProfitTransfer}}</h4>
-                            </div>
-                            <div class="card-header latest-update-heading d-flex justify-content-between">
-                                <h4 class="latest-update-heading-title text-bold-500">Over All Proftt</h4>
-                                <h4>Rs {{$overAllProfit}}</h4>
-                            </div>
-                        </div>
-
-                    </div> -->
-
-            <!-- <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
-                        <div class="card">
-                            <div class="card-header latest-update-heading d-flex justify-content-between">
-                                <h4 class="latest-update-heading-title text-bold-500">Total Cost price of Mobiles</h4>
-                                <h4>Rs {{$sumCostPriceMobile}}</h4>
-                            </div>
-                            <div class="card-header latest-update-heading d-flex justify-content-between">
-                                <h4 class="latest-update-heading-title text-bold-500">Total Sold price of Mobiles</h4>
-                                <h4>Rs {{$sumSellingPriceMobile}}</h4>
-                            </div>
-                        </div>
-
-                    </div> -->
-            <!-- <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
-                        <div class="card">
-                            <div class="card-header latest-update-heading d-flex justify-content-between">
-                                <h4 class="latest-update-heading-title text-bold-500">Total Cost Price of Received Mobiles</h4>
-                                <h4>Rs {{$sumCostPriceTransfer}}</h4>
-                            </div>
-                            <div class="card-header latest-update-heading d-flex justify-content-between">
-                                <h4 class="latest-update-heading-title text-bold-500">Total Sold Price of Received Mobiles</h4>
-                                <h4>Rs {{$sumSellingPriceTransfer}}</h4>
-                            </div>
-                        </div>
-
-                    </div> -->
-
-
-            <!-- <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
-                        <div class="card">
-                            <div class="card-header latest-update-heading d-flex justify-content-between">
-                                <h4 class="latest-update-heading-title text-bold-500">Download The Sold Mobiles</h4>
-                                <a style="font-size: 25px" href="" data-toggle="modal" data-target="#exampleModal5"><i
-                                        style="color:red;" class="fa fa-download"></i></a>
-                            </div>
-                        </div>
-
-                    </div> -->
-
         </div>
     </div>
 </div>

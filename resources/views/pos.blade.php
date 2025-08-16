@@ -130,7 +130,7 @@
             imei_number: tr.find('td').eq(1).text().trim(),
             color: tr.find('td').eq(2).text().trim(),
             storage: tr.find('td').eq(3).text().trim(),
-            selling_price: parseFloat(tr.find('td').eq(4).text().replace(/,/g,''))
+            selling_price: parseFloat(tr.find('td').eq(4).text().replace(/,/g,'')) || 0
         };
         if (cart[mobile.imei_number]) {
             alert('Already in cart');
@@ -147,47 +147,71 @@
         renderCart();
     });
 
-    // Render cart function
-   function renderCart() {
-    let tbody = $('#cart-table tbody');
-    tbody.empty();
-    let total = 0;
-    $.each(cart, function(imei, m) {
-        tbody.append(`
-            <tr>
-                <td>${m.mobile_name}</td>
-                <td>${m.imei_number}</td>
-                <td><input type="text" class="form-control" style="width: 90px;" value="${m.selling_price}" readonly></td>
-                <td><button class="btn btn-danger btn-sm remove-from-cart-btn" data-imei="${m.imei_number}">Remove</button></td>
-            </tr>
-        `);
-        total += Number(m.selling_price);
+    // When user edits a price in the cart, update totals + sync to cart
+    $(document).on('input', '#cart-table .price-input', function() {
+        const tr = $(this).closest('tr');
+        const imei = tr.data('imei');
+        const price = parseFloat($(this).val()) || 0;
+        if (cart[imei]) cart[imei].selling_price = price;
+        updateTotals();
     });
-    let discount = Number($('#discount').val() || 0);
-    $('#total').val(total - discount);
-    updateBalanceDue(); // <<<<<<
-}
 
-function updateBalanceDue() {
-    let total = Number($('#total').val() || 0);
-    let pay = Number($('#pay_amount').val() || 0);
-    let balance = pay - total;
-    let text = balance < 0
-        ? `Due: ${Math.abs(balance).toLocaleString()}`
-        : `Change: ${balance.toLocaleString()}`;
-    $('#balance_due').val(text);
-}
+    // Render cart rows
+    function renderCart() {
+        let tbody = $('#cart-table tbody');
+        tbody.empty();
+        $.each(cart, function(imei, m) {
+            tbody.append(`
+                <tr data-imei="${m.imei_number}">
+                    <td>${m.mobile_name}</td>
+                    <td>${m.imei_number}</td>
+                    <td>
+                        <input type="number" step="0.01" min="0"
+                               class="form-control price-input" style="width: 110px;"
+                               value="${m.selling_price}">
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-sm remove-from-cart-btn" data-imei="${m.imei_number}">
+                            Remove
+                        </button>
+                    </td>
+                </tr>
+            `);
+        });
+        updateTotals();
+    }
 
-$('#pay_amount').on('input', updateBalanceDue);
-$('#discount').on('input', function() {
-    renderCart(); // already calls updateBalanceDue
-});
+    // Sum live prices from the table, apply discount, update total & balance
+    function updateTotals() {
+        let total = 0;
+        $('#cart-table tbody tr').each(function() {
+            const val = parseFloat($(this).find('.price-input').val()) || 0;
+            total += val;
+        });
 
+        let discount = parseFloat($('#discount').val()) || 0;
+        // Optional: prevent discount from exceeding total
+        if (discount > total) discount = total;
 
-    // Discount change
-    $('#discount').on('input', function() {
-        renderCart();
-    });
+        const finalTotal = total - discount;
+        $('#total').val(finalTotal);
+
+        updateBalanceDue();
+    }
+
+    function updateBalanceDue() {
+        let total = parseFloat($('#total').val()) || 0;
+        let pay = parseFloat($('#pay_amount').val()) || 0;
+        let balance = pay - total;
+        let text = balance < 0
+            ? `Due: ${Math.abs(balance).toLocaleString()}`
+            : `Change: ${balance.toLocaleString()}`;
+        $('#balance_due').val && $('#balance_due').val(text); // safe if input exists
+    }
+
+    // Inputs that affect totals
+    $('#pay_amount').on('input', updateBalanceDue);
+    $('#discount').on('input', updateTotals); // don't re-render (keeps edited prices)
 
     // Vendor/Customer field logic
     $('#vendor_id').on('change', function() {
@@ -202,6 +226,7 @@ $('#discount').on('input', function() {
             $('#vendor-balance').hide();
         }
     });
+
     $('#customer_name').on('input', function() {
         if ($(this).val()) {
             $('#vendor_id').val('').prop('disabled', true);
@@ -217,6 +242,14 @@ $('#discount').on('input', function() {
         if (!$('#vendor_id').val() && !$('#customer_name').val()) {
             return alert('Select a vendor or enter a customer name');
         }
+
+        // Ensure we send the latest edited prices
+        $('#cart-table tbody tr').each(function() {
+            const imei = $(this).data('imei');
+            const price = parseFloat($(this).find('.price-input').val()) || 0;
+            if (cart[imei]) cart[imei].selling_price = price;
+        });
+
         let saleData = {
             mobiles: Object.values(cart),
             vendor_id: $('#vendor_id').val(),
@@ -225,23 +258,24 @@ $('#discount').on('input', function() {
             pay_amount: $('#pay_amount').val(),
             _token: '{{ csrf_token() }}'
         };
+
         $.post('/sales/store', saleData, function(response) {
             alert(response.message);
             if (response.success && response.receipt_url) {
-        window.open(response.receipt_url, '_blank');
-        location.reload();
-    }
+                window.open(response.receipt_url, '_blank');
+                location.reload();
+            }
         });
     });
 });
 
 $(document).ready(function () {
-            $('#vendor_id').select2({
-                placeholder: "Select a vendor",
-                allowClear: true,
-                width: '100%' // Optional to make it responsive
-            });
-        });
+    $('#vendor_id').select2({
+        placeholder: "Select a vendor",
+        allowClear: true,
+        width: '100%'
+    });
+});
 </script>
 
 

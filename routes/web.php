@@ -221,54 +221,12 @@ Route::get('/soldinventory', function () {
     $groups = Group::all();
     $vendors = Vendor::all();
 
-    // Profit, Cost, and Selling Price Calculations from Transactions
-    $totalProfitMobile = $mobiles->sum(function ($mobile) {
-        return optional($mobile->latestSaleTransaction)->selling_price
-            - optional($mobile->latestSaleTransaction)->cost_price;
-    });
+   
 
-    $sumCostPriceMobile = $mobiles->sum(fn($mobile) => optional($mobile->latestSaleTransaction)->cost_price);
-    $sumSellingPriceMobile = $mobiles->sum(fn($mobile) => optional($mobile->latestSaleTransaction)->selling_price);
-
-    $transferMobiles = TransferRecord::with([
-            'fromUser',
-            'toUser',
-            'mobile.latestSaleTransaction'
-        ])
-        ->whereIn('id', function ($query) {
-            $query->select(DB::raw('MAX(id)'))
-                ->from('transfer_records')
-                ->groupBy('mobile_id');
-        })
-        ->where('to_user_id', Auth::id())
-        ->whereHas('mobile', function ($query) {
-            $query->where('user_id', Auth::id())
-                  ->where('availability', 'Sold')
-                  ->where('is_approve', 'Not_Approved')
-                  ->where('is_transfer', true);
-        })
-        ->get();
-
-    $totalProfitTransfer = $transferMobiles->sum(function ($record) {
-        return optional($record->mobile->latestSaleTransaction)->selling_price
-             - optional($record->mobile->latestSaleTransaction)->cost_price;
-    });
-
-    $sumSellingPriceTransfer = $transferMobiles->sum(fn($record) => optional($record->mobile->latestSaleTransaction)->selling_price);
-    $sumCostPriceTransfer = $transferMobiles->sum(fn($record) => optional($record->mobile->latestSaleTransaction)->cost_price);
-
-    $overAllProfit = $totalProfitMobile + $totalProfitTransfer;
 
     return view('soldinventory', compact(
         'mobiles',
-        'transferMobiles',
-        'totalProfitMobile',
-        'totalProfitTransfer',
-        'sumCostPriceMobile',
-        'sumSellingPriceTransfer',
-        'sumCostPriceTransfer',
-        'overAllProfit',
-        'sumSellingPriceMobile',
+        
         'groups',
         'vendors'
     ));
