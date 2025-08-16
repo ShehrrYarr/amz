@@ -237,36 +237,50 @@
     });
 
     // Finalize sale
-    $('#finalize-sale-btn').on('click', function() {
-        if (Object.keys(cart).length === 0) return alert('Cart is empty');
-        if (!$('#vendor_id').val() && !$('#customer_name').val()) {
-            return alert('Select a vendor or enter a customer name');
-        }
+  // Finalize sale
+$('#finalize-sale-btn').on('click', function() {
+    if (Object.keys(cart).length === 0) return alert('Cart is empty');
 
-        // Ensure we send the latest edited prices
-        $('#cart-table tbody tr').each(function() {
-            const imei = $(this).data('imei');
-            const price = parseFloat($(this).find('.price-input').val()) || 0;
-            if (cart[imei]) cart[imei].selling_price = price;
-        });
+    // must have either vendor or customer
+    if (!$('#vendor_id').val() && !$('#customer_name').val()) {
+        return alert('Select a vendor or enter a customer name');
+    }
 
-        let saleData = {
-            mobiles: Object.values(cart),
-            vendor_id: $('#vendor_id').val(),
-            customer_name: $('#customer_name').val(),
-            discount: $('#discount').val(),
-            pay_amount: $('#pay_amount').val(),
-            _token: '{{ csrf_token() }}'
-        };
+    // 🔴 Amount rule: if NO vendor selected, pay_amount must be > 0
+    const vendorId   = $('#vendor_id').val();
+    const payRaw     = $('#pay_amount').val();
+    const payAmount  = parseFloat(payRaw);
 
-        $.post('/sales/store', saleData, function(response) {
-            alert(response.message);
-            if (response.success && response.receipt_url) {
-                window.open(response.receipt_url, '_blank');
-                location.reload();
-            }
-        });
+    if (!vendorId && (!payRaw || isNaN(payAmount) || payAmount <= 0)) {
+        alert('Please enter the amount');
+        $('#pay_amount').focus();
+        return;
+    }
+
+    // Ensure we send the latest edited prices
+    $('#cart-table tbody tr').each(function() {
+        const imei = $(this).data('imei');
+        const price = parseFloat($(this).find('.price-input').val()) || 0;
+        if (cart[imei]) cart[imei].selling_price = price;
     });
+
+    let saleData = {
+        mobiles: Object.values(cart),
+        vendor_id: vendorId,
+        customer_name: $('#customer_name').val(),
+        discount: $('#discount').val(),
+        pay_amount: $('#pay_amount').val(),
+        _token: '{{ csrf_token() }}'
+    };
+
+    $.post('/sales/store', saleData, function(response) {
+        alert(response.message);
+        if (response.success && response.receipt_url) {
+            window.open(response.receipt_url, '_blank');
+            location.reload();
+        }
+    });
+});
 });
 
 $(document).ready(function () {

@@ -179,7 +179,7 @@
             <thead>
                 <tr>
                     <th style="width:40%;">Mobile Name</th>
-                    <th style="width:30%;">IMEI</th>
+                    <th style="width:30%;">Company</th>
                     <th style="width:30%;">Price</th>
                 </tr>
             </thead>
@@ -187,7 +187,7 @@
                 @foreach($sale->mobiles as $sm)
                 <tr>
                     <td style="text-align:left;">{{ $sm->mobile->mobile_name }}</td>
-                    <td>{{ $sm->mobile->imei_number }}</td>
+                    <td>{{ $sm->mobile->company->name }}</td>
                     <td>{{ number_format($sm->selling_price, 0) }}</td>
                 </tr>
                 @endforeach
