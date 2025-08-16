@@ -1538,17 +1538,17 @@ public function deletedMobiles(){
 
 public function approveBulk(Request $request)
 {
-    // Only allow if logged in user is admin (id = 6)
-    if (auth()->id() != 1) {
+    // Only allow if logged in user is admin (id = 1 or 2)
+    if (!in_array(auth()->id(), [1, 2])) {
         // For AJAX request, return JSON error
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => false,
-                'message' => "You can't approve this mobile"
+                'message' => "You can't approve these mobiles"
             ], 403);
         }
         // For normal requests, redirect back with error
-        return redirect()->back()->with('danger', "You can't approve this mobile");
+        return redirect()->back()->with('danger', "You can't approve these mobiles");
     }
 
     $ids = $request->input('mobile_ids', []);
@@ -1556,8 +1556,10 @@ public function approveBulk(Request $request)
         Mobile::whereIn('id', $ids)->update(['is_approve' => 'Approved']);
         return response()->json(['success' => true]);
     }
+
     return response()->json(['success' => false, 'message' => 'No mobiles selected'], 400);
 }
+
 
 
 
