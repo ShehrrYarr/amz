@@ -1,5 +1,42 @@
 @extends('user_navbar')
 @section('content')
+
+<style>
+    .kpi-card {
+        border: 0;
+        border-radius: 16px;
+        background: #f8fafc
+    }
+
+    .kpi-value {
+        font-size: 1.25rem;
+        font-weight: 700
+    }
+
+    .kpi-label {
+        font-size: .75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: .04em
+    }
+
+    .today-sales-card {
+        border: 0;
+        border-radius: 16px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, .04)
+    }
+
+    .today-sales-card .card-header {
+        border-bottom: 1px solid #f1f3f5
+    }
+
+    #todaySalesTable thead th {
+        position: sticky;
+        top: 0;
+        background: #fff;
+        z-index: 1
+    }
+</style>
 <div class="app-content content">
     <div class="content-overlay"></div>
     <div class="content-wrapper">
@@ -107,6 +144,100 @@
                                 </div>
                                 <button class="btn btn-primary w-100" id="finalize-sale-btn">Finalize Sale</button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card today-sales-card">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <h5 class="mb-0">Today’s Sales</h5>
+                            <span class="badge bg-light text-dark">
+                                {{ \Carbon\Carbon::today()->format('D, M d, Y') }}
+                            </span>
+                        </div>
+            
+                        <div class="card-body">
+            
+                            {{-- KPIs --}}
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6 col-lg-3">
+                                    <div class="p-3 kpi-card h-100">
+                                        <div class="kpi-label mb-1">Gross Sales</div>
+                                        <div class="kpi-value">Rs {{ number_format($todaySellSum ?? 0, 0) }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <div class="p-3 kpi-card h-100">
+                                        <div class="kpi-label mb-1">Discounts</div>
+                                        <div class="kpi-value">Rs {{ number_format($todayDiscSum ?? 0, 0) }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <div class="p-3 kpi-card h-100">
+                                        <div class="kpi-label mb-1">Cost</div>
+                                        <div class="kpi-value">Rs {{ number_format($todayCostSum ?? 0, 0) }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-3">
+                                    <div class="p-3 kpi-card h-100">
+                                        <div class="kpi-label mb-1">Profit</div>
+                                        <div class="kpi-value">Rs {{ number_format($todayProfit ?? 0, 0) }}</div>
+                                    </div>
+                                </div>
+                            </div>
+            
+                            {{-- List --}}
+                            @if(($todaySales ?? collect())->count())
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-2" id="todaySalesTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width:80px;">#Sale</th>
+                                            <th style="width:140px;">Time</th>
+                                            <th>Seller</th>
+                                            <th>Vendor / Customer</th>
+                                            <th class="text-center" style="width:90px;">Items</th>
+                                            <th class="text-end" style="width:140px;">Discount</th>
+                                            <th class="text-end" style="width:160px;">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($todaySales as $s)
+                                        <tr>
+                                            <td>#{{ $s->id }}</td>
+                                            <td>{{ optional($s->created_at)->format('H:i') }}</td>
+                                            <td>{{ optional($s->seller)->name ?? '—' }}</td>
+                                            <td>
+                                                {{ optional($s->vendor)->name
+                                                ?? ($s->customer_name ?? 'Walk-in') }}
+                                            </td>
+                                            <td class="text-center">{{ $s->mobiles_count }}</td>
+                                            <td class="text-end">Rs {{ number_format($s->discount ?? 0, 0) }}</td>
+                                            <td class="text-end fw-semibold">Rs {{ number_format($s->sell_sum ?? 0, 0) }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="small text-muted">
+                                    Showing <strong>{{ $todaySales->firstItem() }}</strong>–<strong>{{ $todaySales->lastItem()
+                                        }}</strong>
+                                    of <strong>{{ $todaySales->total() }}</strong> sales today
+                                </div>
+                                {{ $todaySales->onEachSide(1)->links('pagination::bootstrap-4') }}
+                            </div>
+                            @else
+                            <div class="text-center py-4 text-muted">
+                                No sales recorded today yet.
+                            </div>
+                            @endif
+            
                         </div>
                     </div>
                 </div>

@@ -13,16 +13,58 @@ use App\Models\MobileHistory;
 use App\Models\User;
 use App\Models\sale;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 
 
 class SaleController extends Controller
 {
-    public function pos()
+public function pos()
 {
+    // Existing data
     $mobiles = Mobile::where('availability', 'Available')->get();
     $vendors = vendor::all();
-    return view('pos', compact('mobiles', 'vendors'));
+
+    // 🔹 Today's sales (no filters)
+    $todayQuery = sale::whereDate('created_at', Carbon::today());
+
+    // List for the POS page (with basic rollups per sale)
+    $todaySales = (clone $todayQuery)
+        ->with(['vendor:id,name', 'seller:id,name'])
+        ->withCount('mobiles')
+        ->withSum('mobiles as sell_sum', 'selling_price')
+        ->latest('id')
+        ->paginate(10, ['*'], 'daily_page'); // separate pager key (if you add another pager later)
+
+    // Totals for today
+    $saleIds = (clone $todayQuery)->pluck('id');
+
+    if ($saleIds->isEmpty()) {
+        $todaySellSum = 0;
+        $todayCostSum = 0;
+        $todayDiscSum = 0;
+        $todayProfit  = 0;
+    } else {
+        $todaySellSum = (float) saleMobile::whereIn('sale_id', $saleIds)->sum('selling_price');
+
+        $todayCostSum = (float) saleMobile::whereIn('sale_id', $saleIds)
+            ->join('mobiles as m', 'm.id', '=', 'sale_mobiles.mobile_id')
+            ->sum(DB::raw('m.cost_price'));
+
+        $todayDiscSum = (float) sale::whereIn('id', $saleIds)->sum('discount');
+
+        $todayProfit = $todaySellSum - $todayCostSum - $todayDiscSum;
+    }
+
+    return view('pos', compact(
+        'mobiles',
+        'vendors',
+        'todaySales',
+        'todaySellSum',
+        'todayCostSum',
+        'todayDiscSum',
+        'todayProfit'
+    ));
 }
 
 public function store(Request $request)
