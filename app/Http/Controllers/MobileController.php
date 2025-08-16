@@ -1560,7 +1560,25 @@ public function approveBulk(Request $request)
     return response()->json(['success' => false, 'message' => 'No mobiles selected'], 400);
 }
 
+public function soldInventory(){
+     $mobiles = Mobile::where('availability', 'Sold')
+        ->where('is_approve', 'Not_Approved')
+        ->with(['soldBy', 'latestSaleTransaction']) 
+        ->get();
 
+    $groups = Group::all();
+    $vendors = Vendor::all();
+
+   
+
+
+    return view('soldinventory', compact(
+        'mobiles',
+        
+        'groups',
+        'vendors'
+    ));
+}
 
 
 }

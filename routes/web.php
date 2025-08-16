@@ -211,26 +211,10 @@ Route::get('/managerecentinventory', function () {
 //      'overAllProfit', 'sumSellingPriceMobile','groups'));
 // })->middleware('auth', 'login.time.restrict');
 
-Route::get('/soldinventory', function () {
-    $mobiles = Mobile::where('availability', 'Sold')
-        ->where('is_transfer', false)
-        ->where('is_approve', 'Not_Approved')
-        ->with(['soldBy', 'latestSaleTransaction']) // add transaction here
-        ->get();
-
-    $groups = Group::all();
-    $vendors = Vendor::all();
-
-   
 
 
-    return view('soldinventory', compact(
-        'mobiles',
-        
-        'groups',
-        'vendors'
-    ));
-})->middleware('auth', 'login.time.restrict');
+Route::get('/soldinventory', [MobileController::class, 'soldInventory'])->name('soldInventory');
+
 
 
 Route::get('/soldapprovedinventory', function () {

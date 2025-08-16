@@ -159,6 +159,7 @@ public function receipt($id)
 
 public function index(Request $request)
 {
+     $userId = auth()->id();
     $vendorId = $request->input('vendor_id');
     $sellerId = $request->input('sold_by');
     $dateFrom = $request->input('from');
@@ -220,6 +221,7 @@ public function index(Request $request)
         'overallSellSum' => $overallSellSum,
         'overallCostSum' => $overallCostSum,
         'overallDiscSum' => $overallDiscSum,
+        'userId' => $userId,
     ]);
 }
 
