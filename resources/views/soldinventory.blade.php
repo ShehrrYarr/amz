@@ -313,7 +313,90 @@
 </div>
 {{-- End Owner Transfer Modal --}}
 
+<style>
+    /* Card polish */
+    .latest-update-tracking .card {
+        border: 0;
+        border-radius: 16px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, .04);
+    }
 
+    .latest-update-heading {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f3f5;
+    }
+
+    /* Filter bar controls */
+    #perPage,
+    form[action="{{ url()->current() }}"] .form-control[type="search"] {
+        border-radius: 8px;
+    }
+
+    /* Table look */
+    #soldTable thead th {
+        position: sticky;
+        top: 0;
+        background: #f8fafc;
+        z-index: 1;
+        font-weight: 600;
+    }
+
+    #soldTable td,
+    #soldTable th {
+        vertical-align: middle;
+    }
+
+    #soldTable tbody tr:hover {
+        background: #f9fafb;
+    }
+
+    #soldTable th:first-child,
+    #soldTable td:first-child {
+        width: 36px;
+        text-align: center;
+    }
+
+    #soldTable td {
+        white-space: nowrap;
+    }
+
+    /* Softer status badges (scoped to this table only) */
+    #soldTable .badge-danger {
+        background: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+    }
+
+    #soldTable .badge-success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    /* Pagination styling */
+    .pagination .page-link {
+        border-radius: 8px;
+        border: 0;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, .05);
+    }
+
+    .pagination .page-item.active .page-link {
+        background: #12b886;
+        /* teal accent */
+    }
+
+    /* Checkbox sizing */
+    #soldTable input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Make the table container edges match the card */
+    .table-responsive {
+        border-radius: 0 0 16px 16px;
+        overflow: hidden;
+    }
+</style>
 
 <div class="app-content content">
     <div class="content-overlay"></div>
@@ -344,7 +427,31 @@
 
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-striped table-bordered zero-configuration" id="soldTable">
+                        <form method="GET" action="{{ url()->current() }}" class="row ml-1 g-2 align-items-center mb-3">
+                            <div class="col-auto">
+                                <label for="perPage" class="form-label mb-0 small text-muted">Show</label>
+                            </div>
+                            <div class="col-auto">
+                                <select name="per_page" id="perPage" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    @foreach([10,25,50,100,500,1000,1500,2000,2500,3000] as $n)
+                                    <option value="{{ $n }}" {{ (int)($perPage ?? 10)===$n ? 'selected' : '' }}>{{ $n }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <span class="small text-muted">entries</span>
+                            </div>
+                        
+                            <div class="col ms-auto">
+                                <input type="search" name="q" value="{{ $search ?? '' }}" class="form-control form-control-sm"
+                                    placeholder="Search IMEI, mobile, seller, group, customer, price…">
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-sm btn-primary" type="submit">Search</button>
+                                <a href="{{ url()->current() }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                            </div>
+                        </form>
+                        <table class="table table-hover table-bordered align-middle" id="soldTable">
                             <thead>
                                 <tr>
                                     <th><input type="checkbox" id="select-all"></th>
@@ -420,6 +527,20 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="small text-muted">
+                                @if ($mobiles->total() > 0)
+                                Showing <strong>{{ $mobiles->firstItem() }}</strong>–<strong>{{ $mobiles->lastItem() }}</strong>
+                                of <strong>{{ $mobiles->total() }}</strong> results
+                                @else
+                                No results found
+                                @endif
+                            </div>
+                        
+                            {{-- If your project uses Bootstrap pagination views, keep this line.
+                            If not, replace with: {{ $mobiles->onEachSide(1)->links() }} --}}
+                            {{ $mobiles->onEachSide(1)->links('pagination::bootstrap-4') }}
+                        </div>
                     </div>
                 </div>
                 <button id="approve-selected" class="btn btn-success mb-2">Approve Selected</button>

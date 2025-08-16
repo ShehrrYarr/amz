@@ -1560,24 +1560,45 @@ public function approveBulk(Request $request)
     return response()->json(['success' => false, 'message' => 'No mobiles selected'], 400);
 }
 
-public function soldInventory(){
-     $mobiles = Mobile::where('availability', 'Sold')
-        ->where('is_approve', 'Not_Approved')
-        ->with(['soldBy', 'latestSaleTransaction']) 
-        ->get();
+public function soldInventory(Request $request)
+{
+    // Read query string
+    $perPage = (int) $request->input('per_page', 10);   // options we'll expose: 10, 25, 50, 100
+    $search  = trim($request->input('q', ''));
 
-    $groups = Group::all();
+    $query = Mobile::query()
+        ->where('availability', 'Sold')
+        ->where('is_approve', 'Not_Approved')
+        ->with(['soldBy', 'latestSaleTransaction', 'group'])  // add 'group' to avoid N+1
+        ->orderByDesc('sold_at');
+
+    // Global search across relevant columns/relations
+    if ($search !== '') {
+        $query->where(function ($q) use ($search) {
+            $q->where('mobile_name', 'like', "%{$search}%")
+              ->orWhere('imei_number', 'like', "%{$search}%")
+              ->orWhere('sim_lock', 'like', "%{$search}%")
+              ->orWhere('color', 'like', "%{$search}%")
+              ->orWhere('storage', 'like', "%{$search}%")
+              ->orWhere('battery_health', 'like', "%{$search}%")
+              ->orWhereHas('soldBy', fn($qq) => $qq->where('name', 'like', "%{$search}%"))
+              ->orWhereHas('group',  fn($qq) => $qq->where('name', 'like', "%{$search}%"))
+              ->orWhereHas('latestSaleTransaction', function ($qq) use ($search) {
+                  $qq->where('customer_name', 'like', "%{$search}%")
+                     ->orWhere('selling_price', 'like', "%{$search}%")
+                     ->orWhere('cost_price', 'like', "%{$search}%");
+              });
+        });
+    }
+
+    // Paginate + keep q/per_page on links
+    $mobiles = $query->paginate($perPage)->withQueryString();
+
+    // (If you still need these in the view)
+    $groups  = Group::all();
     $vendors = Vendor::all();
 
-   
-
-
-    return view('soldinventory', compact(
-        'mobiles',
-        
-        'groups',
-        'vendors'
-    ));
+    return view('soldinventory', compact('mobiles', 'groups', 'vendors', 'search', 'perPage'));
 }
 
 
