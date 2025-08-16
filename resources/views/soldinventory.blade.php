@@ -347,6 +347,7 @@
                         <table class="table table-striped table-bordered zero-configuration" id="soldTable">
                             <thead>
                                 <tr>
+                                    <th><input type="checkbox" id="select-all"></th>
                                     <th>Sold at</th>
                                     <th>Sold By</th>
                                     <th>Mobile Name</th>
@@ -374,6 +375,9 @@
                             <tbody>
                                 @foreach ($mobiles as $key)
                                 <tr>
+                                    <td>
+                                        <input type="checkbox" class="row-checkbox" value="{{ $key->id }}">
+                                    </td>
                                     <!--<td>{{ $key->sold_at }}</td>-->
                                     <td>{{ \Carbon\Carbon::parse($key->sold_at)->format(' Y-m-d / h:i ') }}</td>
                                     <td>{{ $key->soldBy->name }}</td>
@@ -418,6 +422,7 @@
                         </table>
                     </div>
                 </div>
+                <button id="approve-selected" class="btn btn-success mb-2">Approve Selected</button>
             </div>
 
 
@@ -589,6 +594,49 @@
                 $('#customerNameWrapper').show();
             }
         }
+    });
+
+
+    // Select-all functionality
+    $('#select-all').on('change', function() {
+    $('.row-checkbox').prop('checked', this.checked);
+    });
+    
+    // Uncheck 'select-all' if any single checkbox is unchecked
+    $(document).on('change', '.row-checkbox', function() {
+    if(!this.checked) {
+    $('#select-all').prop('checked', false);
+    }
+    });
+    
+    // Approve selected
+    $('#approve-selected').on('click', function(e) {
+    e.preventDefault();
+    let selected = [];
+    $('.row-checkbox:checked').each(function() {
+    selected.push($(this).val());
+    });
+    
+    if(selected.length === 0) {
+    alert('Please select at least one mobile to approve.');
+    return;
+    }
+    
+    // Send AJAX POST to approve route
+    $.ajax({
+    url: '{{ route("approveBulkMobiles") }}',
+    type: 'POST',
+    data: {
+    _token: '{{ csrf_token() }}',
+    mobile_ids: selected
+    },
+    success: function(response) {
+    location.reload(); // Or handle as needed
+    },
+    error: function() {
+    alert('There was an error approving the selected mobiles.');
+    }
+    });
     });
 </script>
 @endsection

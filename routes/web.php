@@ -598,3 +598,5 @@ Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
 
 
 
+//Approve Bulk Mobile
+Route::post('/mobiles/approve-bulk', [MobileController::class, 'approveBulk'])->name('approveBulkMobiles');
