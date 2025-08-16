@@ -393,8 +393,9 @@
 
     /* Make the table container edges match the card */
     .table-responsive {
-        border-radius: 0 0 16px 16px;
-        overflow: hidden;
+      border-radius: 0 0 16px 16px;
+    overflow-x: auto; /* allow horizontal scroll */
+    overflow-y: hidden; /* keep vertical tidy */
     }
 </style>
 
@@ -420,37 +421,35 @@
                 <div class="card">
                     <div class="card-header latest-update-heading d-flex justify-content-between">
                         <h4 class="latest-update-heading-title text-bold-500">Sold Mobiles</h4>
-                        <div>
-                            <a href="#" class="btn btn-primary gradient-button3 ml-1" id="exportPDF">Download
-                                PDF</a>
-                        </div>
+                       
 
                     </div>
+                    <form method="GET" action="{{ url()->current() }}" class="row ml-1 g-2 align-items-center mb-3">
+                        <div class="col-auto">
+                            <label for="perPage" class="form-label mb-0 small text-muted">Show</label>
+                        </div>
+                        <div class="col-auto">
+                            <select name="per_page" id="perPage" class="form-select form-select-sm" onchange="this.form.submit()">
+                                @foreach([10,25,50,100,500,1000,1500,2000,2500,3000] as $n)
+                                <option value="{{ $n }}" {{ (int)($perPage ?? 10)===$n ? 'selected' : '' }}>{{ $n }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <span class="small text-muted">entries</span>
+                        </div>
+                    
+                        <div class="col ms-auto">
+                            <input type="search" name="q" value="{{ $search ?? '' }}" class="form-control form-control-sm"
+                                placeholder="Search IMEI, mobile, seller, group, customer, price…">
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-sm btn-primary" type="submit">Search</button>
+                            <a href="{{ url()->current() }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                        </div>
+                    </form>
                     <div class="table-responsive">
-                        <form method="GET" action="{{ url()->current() }}" class="row ml-1 g-2 align-items-center mb-3">
-                            <div class="col-auto">
-                                <label for="perPage" class="form-label mb-0 small text-muted">Show</label>
-                            </div>
-                            <div class="col-auto">
-                                <select name="per_page" id="perPage" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    @foreach([10,25,50,100,500,1000,1500,2000,2500,3000] as $n)
-                                    <option value="{{ $n }}" {{ (int)($perPage ?? 10)===$n ? 'selected' : '' }}>{{ $n }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-auto">
-                                <span class="small text-muted">entries</span>
-                            </div>
-                        
-                            <div class="col ms-auto">
-                                <input type="search" name="q" value="{{ $search ?? '' }}" class="form-control form-control-sm"
-                                    placeholder="Search IMEI, mobile, seller, group, customer, price…">
-                            </div>
-                            <div class="col-auto">
-                                <button class="btn btn-sm btn-primary" type="submit">Search</button>
-                                <a href="{{ url()->current() }}" class="btn btn-sm btn-outline-secondary">Reset</a>
-                            </div>
-                        </form>
+                       
                         <table class="table table-hover table-bordered align-middle" id="soldTable">
                             <thead>
                                 <tr>
@@ -527,20 +526,21 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div class="small text-muted">
-                                @if ($mobiles->total() > 0)
-                                Showing <strong>{{ $mobiles->firstItem() }}</strong>–<strong>{{ $mobiles->lastItem() }}</strong>
-                                of <strong>{{ $mobiles->total() }}</strong> results
-                                @else
-                                No results found
-                                @endif
-                            </div>
                         
-                            {{-- If your project uses Bootstrap pagination views, keep this line.
-                            If not, replace with: {{ $mobiles->onEachSide(1)->links() }} --}}
-                            {{ $mobiles->onEachSide(1)->links('pagination::bootstrap-4') }}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-1 ml-1">
+                        <div class="small text-muted">
+                            @if ($mobiles->total() > 0)
+                            Showing <strong>{{ $mobiles->firstItem() }}</strong>–<strong>{{ $mobiles->lastItem() }}</strong>
+                            of <strong>{{ $mobiles->total() }}</strong> results
+                            @else
+                            No results found
+                            @endif
                         </div>
+                    
+                        {{-- If your project uses Bootstrap pagination views, keep this line.
+                        If not, replace with: {{ $mobiles->onEachSide(1)->links() }} --}}
+                        {{ $mobiles->onEachSide(1)->links('pagination::bootstrap-4') }}
                     </div>
                 </div>
                 <button id="approve-selected" class="btn btn-success mb-2">Approve Selected</button>
@@ -553,21 +553,7 @@
     </div>
 </div>
 <script>
-    //Genrate PDF
-
-        document.getElementById("exportPDF").addEventListener("click", function () {
-            var tableContent = document.getElementById("soldTable").outerHTML;
-            var iframe = document.createElement("iframe");
-            iframe.style.display = "none";
-            document.body.appendChild(iframe);
-            iframe.contentDocument.open();
-            iframe.contentDocument.write(tableContent);
-            iframe.contentDocument.close();
-
-            iframe.contentWindow.print();
-            document.body.removeChild(iframe);
-        });
-        //end Genrate PDF
+    
 
         //Disable Mobile Approve Button Function
 
