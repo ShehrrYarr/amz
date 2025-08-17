@@ -1,208 +1,158 @@
 @extends('user_navbar')
 @section('content')
+<div class="app-content content">
+    <div class="content-overlay"></div>
+    <div class="content-wrapper">
+        <div class="content-header row"></div>
+        <div class="content-body">
 
-
-
-    <div class="app-content content">
-        <div class="content-overlay"></div>
-        <div class="content-wrapper">
-            <div class="content-header row">
-            </div>
-            <div class="content-body">
-                @if (session('success'))
-                    <div class="alert alert-success" id="successMessage">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @if (session('danger'))
-                    <div class="alert alert-danger" id="dangerMessage" style="color: red;">
-                        {{ session('danger') }}
-                    </div>
-                @endif
-
-                <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1 ">
-
-
-                    <div class="row mb-3">
-                        <div class="col-md-3">
-                            <label>Start Date</label>
-                            <input type="date" id="start_date" class="form-control">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <form method="GET" action="{{ route('report.fetch') }}" class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="start_date" class="form-control"
+                                value="{{ $filters['start_date'] ?? '' }}">
                         </div>
-                        <div class="col-md-3">
-                            <label>End Date</label>
-                            <input type="date" id="end_date" class="form-control">
+                        <div class="col-md-2">
+                            <label class="form-label">End Date</label>
+                            <input type="date" name="end_date" class="form-control"
+                                value="{{ $filters['end_date'] ?? '' }}">
                         </div>
-                        <div class="col-md-3">
-                            <label>Availability</label>
-                            <select id="availability" class="form-control">
+                        <div class="col-md-2">
+                            <label class="form-label">Availability</label>
+                            <select name="availability" class="form-control">
                                 <option value="">-- Select --</option>
-                                <option value="Available">Available</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Sold">Sold</option>
+                                <option value="Available" {{ ($filters['availability'] ?? '' )==='Available'
+                                    ? 'selected' : '' }}>Available</option>
+                                <option value="Pending" {{ ($filters['availability'] ?? '' )==='Pending' ? 'selected'
+                                    : '' }}>Pending</option>
+                                <option value="Sold" {{ ($filters['availability'] ?? '' )==='Sold' ? 'selected' : '' }}>
+                                    Sold</option>
                             </select>
                         </div>
-
                         <div class="col-md-3">
-                            <label>Company</label>
-                            <select id="company_id" class="form-control">
+                            <label class="form-label">Company</label>
+                            <select name="company_id" class="form-control">
                                 <option value="">-- Select Company --</option>
                                 @foreach($company as $c)
-                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                <option value="{{ $c->id }}" {{ (string)($filters['company_id'] ?? '' )===(string)$c->id
+                                    ? 'selected':'' }}>{{ $c->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                    </div>
-
-                    <div class="row mb-3">
-
                         <div class="col-md-2">
-                            <label>Group</label>
-                            <select id="group_id" class="form-control">
+                            <label class="form-label">Group</label>
+                            <select name="group_id" class="form-control">
                                 <option value="">-- Select Group --</option>
                                 @foreach($group as $g)
-                                    <option value="{{ $g->id }}">{{ $g->name }}</option>
+                                <option value="{{ $g->id }}" {{ (string)($filters['group_id'] ?? '' )===(string)$g->id ?
+                                    'selected':'' }}>{{ $g->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button class="btn btn-primary w-100" id="filterButton">Generate Report</button>
+                        <div class="col-md-1">
+                            <label class="form-label">Per page</label>
+                            <select name="per_page" class="form-control">
+                                @foreach([25,50,100,200] as $n)
+                                <option value="{{ $n }}" {{ (int)($filters['per_page'] ?? 25)===$n ? 'selected' :'' }}>
+                                    {{ $n }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                    </div>
-
-                    <div id="reportResults" class="mt-4">
-                        <!-- Report will be loaded here -->
-                    </div>
+                        <div class="col-12 col-md-3 mt-1">
+                            <button class="btn btn-primary w-100">Generate Report</button>
+                        </div>
+                    </form>
                 </div>
-
-
-                <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12 latest-update-tracking mt-1">
-                    <div class="card">
-                        <div class="card-header latest-update-heading d-flex justify-content-between">
-                            <h4 class="latest-update-heading-title text-bold-500">Custom Report</h4>
-
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered zero-configuration" id="mobileTable">
-                                <thead>
-                                    <tr>
-                                        <th>Added at</th>
-                                        <th>Sold at</th>
-                                        <th>Mobile Name</th>
-                                        <th>Company</th>
-                                        <th>Group</th>
-                                        <th>Vendor Name</th>
-                                        <th>Customer Name</th>
-                                        <th>IMEI#</th>
-                                        <th>SIM Lock</th>
-                                        <th>Color</th>
-                                        <th>Storage</th>
-                                        <th>Battery Health</th>
-                                        <th>Cost Price</th>
-                                        <th>Selling Price</th>
-                                        <th>Mobile History</th>
-                                        <th>Availability</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-
             </div>
+
+            @isset($summary)
+            <div class="alert alert-light border">
+                <strong>{{ $summary['label'] }}:</strong>
+                <span>Rs. {{ number_format($summary['value'] ?? 0, 0) }}</span>
+            </div>
+            @endisset
+
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Custom Report</h4>
+                    @if($mobiles->total() > 0)
+                    <span class="text-muted small">Total results: {{ number_format($mobiles->total()) }}</span>
+                    @endif
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Added at</th>
+                                <th>Sold at</th>
+                                <th>Mobile Name</th>
+                                <th>Company</th>
+                                <th>Group</th>
+                                <th>Vendor Name</th>
+                                <th>Customer Name</th>
+                                <th>IMEI#</th>
+                                <th>SIM Lock</th>
+                                <th>Color</th>
+                                <th>Storage</th>
+                                <th>Battery Health</th>
+                                <th>Cost Price</th>
+                                <th>Selling Price</th>
+                                <th>Availability</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($mobiles as $m)
+                            <tr>
+                                <td>{{ optional($m->created_at)->format('Y-m-d H:i') }}</td>
+                                <td>{{ $m->sold_at ? \Carbon\Carbon::parse($m->sold_at)->format('Y-m-d H:i') : '-' }}
+                                </td>
+                                <td>{{ $m->mobile_name }}</td>
+                                <td>{{ optional($m->company)->name ?? '-' }}</td>
+                                <td>{{ optional($m->group)->name ?? '-' }}</td>
+                                <td>
+                                    {{ optional($m->vendor)->name
+                                    ?? optional($m->soldVendor)->name
+                                    ?? optional(optional($m->latestVendorTransaction)->vendor)->name
+                                    ?? '-' }}
+                                </td>
+                                <td>
+                                    {{ optional($m->latestSaleTransaction)->customer_name
+                                    ?? optional(optional($m->latestSaleTransaction)->vendor)->name
+                                    ?? '-' }}
+                                </td>
+                                <td>{{ $m->imei_number }}</td>
+                                <td>{{ $m->sim_lock }}</td>
+                                <td>{{ $m->color }}</td>
+                                <td>{{ $m->storage }}</td>
+                                <td>{{ $m->battery_health ?? '-' }}</td>
+                                <td>Rs. {{ number_format($m->cost_price ?? 0, 0) }}</td>
+                                <td>Rs. {{ number_format($m->selling_price ?? 0, 0) }}</td>
+                                <td>{{ $m->availability }}</td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="15" class="text-center text-muted py-4">No data found</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div class="small text-muted">
+                        @if($mobiles->total() > 0)
+                        Showing <strong>{{ $mobiles->firstItem() }}</strong>–<strong>{{ $mobiles->lastItem() }}</strong>
+                        of <strong>{{ $mobiles->total() }}</strong>
+                        @endif
+                    </div>
+                    {{ $mobiles->onEachSide(1)->links('pagination::bootstrap-4') }}
+                </div>
+            </div>
+
         </div>
     </div>
-
-    <script>
-        $(document).ready(function () {
-            const table = $('#mobileTable').DataTable({
-                destroy: true,
-                ordering: true,
-                paging: true,
-                searching: true,
-                info: true
-            });
-
-            $('#filterButton').click(function () {
-                let start = $('#start_date').val();
-                let end = $('#end_date').val();
-                let availability = $('#availability').val();
-                let company_id = $('#company_id').val();
-                let group_id = $('#group_id').val();
-
-                $.ajax({
-                    url: "{{ route('report.fetch') }}",
-                    method: "GET",
-                    data: {
-                        start_date: start,
-                        end_date: end,
-                        availability: availability,
-                        company_id: company_id,
-                        group_id: group_id
-                    },
-                    success: function (response) {
-                        // Show summary
-                        $('#reportResults').html(`
-                        <h5>${response.summary.label}: 
-                        <strong>Rs. ${Number(response.summary.value).toLocaleString()}</strong></h5>
-                    `);
-
-                        // Clear existing rows in DataTable
-                        table.clear();
-
-                        // Append rows
-                        response.mobiles.forEach(function (mobile) {
-                            let customer = '-';
-                            if (response.availability === 'Sold') {
-                                customer = mobile.sold_vendor?.name || mobile.customer_name || '-';
-                            }
-
-                            table.row.add([
-                                mobile.created_at,
-                                mobile.sold_at ?? '-',
-                                mobile.mobile_name,
-                                mobile.company?.name ?? '-',
-                                mobile.group?.name ?? '-',
-                                mobile.vendor?.name ?? '-',
-                                customer,
-                                mobile.imei_number,
-                                mobile.sim_lock,
-                                mobile.color,
-                                mobile.storage,
-                                mobile.battery_health ?? '-',
-                                `Rs. ${Number(mobile.cost_price).toLocaleString()}`,
-                                `Rs. ${Number(mobile.selling_price).toLocaleString()}`,
-                                '-', // For Mobile History
-                                mobile.availability
-                            ]);
-                        });
-
-                        table.draw();
-
-                        // Show/hide columns
-                        toggleColumnVisibility(table, 1, response.availability === 'Sold'); // Sold at
-                        toggleColumnVisibility(table, 6, response.availability === 'Sold'); // Customer Name
-                    },
-                    error: function () {
-                        $('#reportResults').html('<div class="alert alert-danger">Error loading report</div>');
-                    }
-                });
-            });
-
-            function toggleColumnVisibility(table, columnIndex, visible) {
-                table.column(columnIndex).visible(visible);
-            }
-        });
-
-
-
-    </script>
-
-
-
-
+</div>
 @endsection

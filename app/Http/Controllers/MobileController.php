@@ -1143,59 +1143,58 @@ public function storeMobile(Request $request)
         return response()->json($mobiles);
     }
 
-    public function fetch(Request $request)
-    {
-        $query = Mobile::with(['vendor', 'soldVendor', 'company', 'group']);
+   public function Report(Request $request)
+{
+    $company = company::orderBy('name')->get();
+    $group   = group::orderBy('name')->get();
 
-        if ($request->filled('start_date')) {
-            $query->whereDate('created_at', '>=', $request->start_date);
+    $perPage = (int) $request->input('per_page', 25);
+
+    $base = Mobile::query()
+        ->with([
+            'vendor:id,name',
+            'soldVendor:id,name',
+            'company:id,name',
+            'group:id,name',
+            'latestSaleTransaction.vendor:id,name','latestVendorTransaction'
+        ])
+        ->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date))
+        ->when($request->filled('end_date'),   fn($q) => $q->whereDate('created_at', '<=', $request->end_date))
+        ->when($request->filled('availability'), fn($q) => $q->where('availability', $request->availability))
+        ->when($request->filled('company_id'), fn($q) => $q->where('company_id', $request->company_id))
+        ->when($request->filled('group_id'),   fn($q) => $q->where('group_id', $request->group_id))
+        ->latest('created_at');
+
+    $mobiles = (clone $base)->paginate($perPage)->withQueryString();
+
+    // Summary (matches your previous logic)
+    if ($request->availability === 'Sold') {
+        $totalCost = (clone $base)->sum('cost_price');
+        $totalSold = (clone $base)->sum('selling_price');
+        $summary = ['label' => 'Total Profit from Sold Mobiles', 'value' => $totalSold - $totalCost];
+    } elseif ($request->availability === 'Pending') {
+        $totalCost = (clone $base)->sum('cost_price');
+        $summary = ['label' => 'Total Cost of Pending Mobiles', 'value' => $totalCost];
+    } else {
+        $availableOnly = (clone $base);
+        if ($request->availability !== 'Available') {
+            $availableOnly->where('availability', 'Available');
         }
-
-        if ($request->filled('end_date')) {
-            $query->whereDate('created_at', '<=', $request->end_date);
-        }
-
-        if ($request->filled('availability')) {
-            $query->where('availability', $request->availability);
-        }
-
-        if ($request->filled('company_id')) {
-            $query->where('company_id', $request->company_id);
-        }
-
-        if ($request->filled('group_id')) {
-            $query->where('group_id', $request->group_id);
-        }
-
-        $mobiles = $query->get();
-
-        // Calculate summary
-        $summary = '';
-        if ($request->availability === 'Available' || !$request->availability) {
-            $summary = [
-                'label' => 'Total Cost of Available Mobiles',
-                'value' => $mobiles->sum('cost_price'),
-            ];
-        } elseif ($request->availability === 'Pending') {
-            $summary = [
-                'label' => 'Total Cost of Pending Mobiles',
-                'value' => $mobiles->sum('cost_price'),
-            ];
-        } elseif ($request->availability === 'Sold') {
-            $totalCost = $mobiles->sum('cost_price');
-            $totalSold = $mobiles->sum('selling_price');
-            $summary = [
-                'label' => 'Total Profit from Sold Mobiles',
-                'value' => $totalSold - $totalCost,
-            ];
-        }
-
-        return response()->json([
-            'summary' => $summary,
-            'mobiles' => $mobiles,
-            'availability' => $request->availability,
-        ]);
+        $totalCost = $availableOnly->sum('cost_price');
+        $summary = ['label' => 'Total Cost of Available Mobiles', 'value' => $totalCost];
     }
+
+    $filters = [
+        'start_date'  => $request->start_date,
+        'end_date'    => $request->end_date,
+        'availability'=> $request->availability,
+        'company_id'  => $request->company_id,
+        'group_id'    => $request->group_id,
+        'per_page'    => $perPage,
+    ];
+
+    return view('report', compact('company', 'group', 'mobiles', 'summary', 'filters'));
+}
 
 
 

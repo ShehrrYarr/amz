@@ -550,12 +550,7 @@ Route::post('/deleteaccount', [AccountsController::class, 'destroyAccount'])->na
 Route::post('/mobiles/bulk-store', [MobileController::class, 'bulkStoreMobile'])->name('bulkStoreMobile');
 
 //Report Routes
-Route::get('/report/fetch', [MobileController::class, 'fetch'])->name('report.fetch');
-Route::get('/report', function () {
-    $company = company::all();
-    $group = group::all();
-    return view('report', compact('company', 'group'));
-})->middleware('auth', 'login.time.restrict');
+Route::get('/report', [MobileController::class, 'Report'])->name('report.fetch');
 
 
 
