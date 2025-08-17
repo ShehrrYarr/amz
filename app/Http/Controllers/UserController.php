@@ -26,12 +26,18 @@ class UserController extends Controller
         $userMobileCount = Mobile::where('availability', 'Available')
             ->where('is_transfer', false)
             ->count();
+       
 
         // 2. Sold Mobiles (Not Approved & not transferred)
         $soldMobile = MobileTransaction::where('category', 'Sale')->count();
 
         // 3. Pending Mobiles Count & Cost
         $pendingMobiles = Mobile::where('availability', 'Pending')
+            ->where('is_approve', 'Not_Approved')
+            ->where('is_transfer', false)
+            ->count();
+
+        $notApproveMobiles = Mobile::where('availability', 'Sold')
             ->where('is_approve', 'Not_Approved')
             ->where('is_transfer', false)
             ->count();
@@ -112,7 +118,7 @@ class UserController extends Controller
             'pendingMobiles',
             'pendingMobilesCost',
             'totalReceivable',
-            'userId'
+            'userId','notApproveMobiles'
         ));
     }
 
