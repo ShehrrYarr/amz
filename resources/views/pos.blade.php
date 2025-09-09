@@ -36,7 +36,68 @@
         background: #fff;
         z-index: 1
     }
+
+    /* === Processing Overlay === */
+    .blurred {
+    filter: blur(3px);
+    pointer-events: none;
+    user-select: none;
+    }
+    
+    .processing-overlay {
+    position: fixed;
+    inset: 0;
+    display: none; /* hidden by default */
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(2px);
+    z-index: 9999;
+    }
+    
+    .processing-box {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.12);
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #f1f3f5;
+    }
+    
+    /* Simple spinner */
+    .spinner {
+    width: 22px;
+    height: 22px;
+    border: 3px solid #e9ecef;
+    border-top-color: #0d6efd; /* primary-ish */
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .processing-text {
+    font-weight: 600;
+    color: #111827;
+    }
+    .processing-sub {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+    }
 </style>
+<!-- Processing overlay -->
+<div id="processingOverlay" class="processing-overlay" aria-live="polite" aria-busy="true">
+    <div class="processing-box">
+        <div class="spinner" aria-hidden="true"></div>
+        <div>
+            <div class="processing-text" id="processingMsg">Processing sale…</div>
+            <div class="processing-sub">Please wait</div>
+        </div>
+    </div>
+</div>
+
 <div class="app-content content">
     <div class="content-overlay"></div>
     <div class="content-wrapper">
@@ -257,6 +318,20 @@
 
 <script>
     $(function() {
+
+        function showProcessing(message) {
+        if (message) $('#processingMsg').text(message);
+        $('.content-wrapper').addClass('blurred');
+        $('#processingOverlay').fadeIn(120);
+        }
+        
+        function hideProcessing() {
+        $('#processingOverlay').fadeOut(120, function() {
+        $('.content-wrapper').removeClass('blurred');
+        });
+        }
+
+
     $('#mobiles-table').DataTable({ order: [] });
 
     let cart = {};
@@ -377,6 +452,7 @@
 
     // Finalize sale
   // Finalize sale
+// Finalize sale
 $('#finalize-sale-btn').on('click', function() {
     if (Object.keys(cart).length === 0) return alert('Cart is empty');
 
@@ -412,13 +488,39 @@ $('#finalize-sale-btn').on('click', function() {
         _token: '{{ csrf_token() }}'
     };
 
-    $.post('/sales/store', saleData, function(response) {
-        alert(response.message);
-        if (response.success && response.receipt_url) {
-            window.open(response.receipt_url, '_blank');
+    // 🟦 Show processing overlay and disable button to avoid double submit
+    showProcessing('Processing sale…');
+    const $btn = $(this);
+    $btn.prop('disabled', true);
+
+    // Use $.post but capture jqXHR to handle fail/always cleanly
+    const req = $.post('/sales/store', saleData);
+
+    req.done(function(response) {
+        if (response && response.success) {
+            // Keep overlay visible while opening receipt & reloading
+            $('#processingMsg').text('Opening receipt…');
+            if (response.receipt_url) {
+                window.open(response.receipt_url, '_blank');
+            }
+            // Reload to refresh POS lists and Today’s Sales
             location.reload();
+        } else {
+            hideProcessing();
+            $btn.prop('disabled', false);
+            alert(response && response.message ? response.message : 'Sale failed.');
         }
     });
+
+    req.fail(function(xhr) {
+        hideProcessing();
+        $btn.prop('disabled', false);
+        let msg = 'Sale failed!';
+        if (xhr.responseJSON && xhr.responseJSON.message) msg += ' ' + xhr.responseJSON.message;
+        alert(msg);
+    });
+
+    // (No .always() here so overlay persists until we decide above; success path reloads the page)
 });
 });
 

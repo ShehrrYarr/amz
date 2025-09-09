@@ -730,6 +730,7 @@ public function storeMobile(Request $request)
     $data->selling_price = $request->input('selling_price');
     $data->pending_by = null;
     $data->sold_at = null;
+    $data->added_by = $user->id;
     $data->is_approve = 'Not_Approved';
     $data->save();
 
