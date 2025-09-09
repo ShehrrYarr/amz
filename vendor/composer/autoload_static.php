@@ -583,6 +583,7 @@ class ComposerStaticInit8f29f88cb4b3b0f2534b9633daae1c1a
         'App\\Http\\Controllers\\MobileTransactionController' => __DIR__ . '/../..' . '/app/Http/Controllers/MobileTransactionController.php',
         'App\\Http\\Controllers\\RestoreController' => __DIR__ . '/../..' . '/app/Http/Controllers/RestoreController.php',
         'App\\Http\\Controllers\\SaleController' => __DIR__ . '/../..' . '/app/Http/Controllers/SaleController.php',
+        'App\\Http\\Controllers\\SaleMobileController' => __DIR__ . '/../..' . '/app/Http/Controllers/SaleMobileController.php',
         'App\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',
         'App\\Http\\Controllers\\UserThreadController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserThreadController.php',
         'App\\Http\\Controllers\\VendorController' => __DIR__ . '/../..' . '/app/Http/Controllers/VendorController.php',

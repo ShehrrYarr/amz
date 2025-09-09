@@ -74,137 +74,323 @@ public function pos()
     ));
 }
 
+// public function store(Request $request)
+// {
+//     $user = auth()->user();
+//     $mobiles = $request->input('mobiles', []);
+//     $vendorId = $request->input('vendor_id');
+//     $customerName = $request->input('customer_name');
+//     $discount = floatval($request->input('discount'));
+//     $payAmount = floatval($request->input('pay_amount'));
+
+//     if (empty($mobiles)) {
+//         return response()->json(['success' => false, 'message' => 'No mobiles in sale.']);
+//     }
+
+//     // Calculate total selling price
+//     $total = array_sum(array_map(function($m) {
+//         return floatval($m['selling_price']);
+//     }, $mobiles));
+//     $totalAfterDiscount = $total - $discount;
+
+//     DB::beginTransaction();
+//     try {
+//         // Create Sale record
+//         $sale = sale::create([
+//             'user_id' => $user->id,
+//             'vendor_id' => $vendorId,
+//             'sold_by' => $user->id,
+//             'customer_name' => $customerName,
+//             'discount' => $discount,
+//             'total' => $totalAfterDiscount,
+//             'total_amount'   => $total, 
+//             'pay_amount' => $payAmount,
+//             'sale_type'      => 'POS',
+//             'paid_amount' => $payAmount,
+
+//         ]);
+
+//         foreach ($mobiles as $m) {
+//             $mobile = Mobile::where('imei_number', $m['imei_number'])->first();
+//             if (!$mobile) {
+//                 throw new \Exception("Mobile with IMEI {$m['imei_number']} not found.");
+//             }
+
+//             // Update mobile status
+//             $mobile->availability = 'Sold';
+//             $mobile->sold_at = now();
+//             $mobile->sold_by = $user->id;
+//             // $mobile->is_approve = 'Approved';
+//             $mobile->save();
+
+//             // Create SaleMobile record
+//             saleMobile::create([
+//                 'sale_id' => $sale->id,
+//                 'mobile_id' => $mobile->id,
+//                 'selling_price' => $m['selling_price'],
+//                 'cost_price' => $mobile->cost_price,
+//             ]);
+
+//             // Create transaction
+//             MobileTransaction::create([
+//                 'mobile_id' => $mobile->id,
+//                 'category' => 'Sale',
+//                 'selling_price' => $m['selling_price'],
+//                 'cost_price' => $mobile->cost_price,
+//                 'vendor_id' => $vendorId,
+//                 'customer_name' => $vendorId ? null : $customerName,
+//                 'transaction_date' => now(),
+//                 'user_id' => $user->id,
+//                 'note' => 'Bulk sale via POS',
+//             ]);
+
+//             // Vendor accounts
+//             if ($vendorId) {
+//                 Accounts::create([
+//                     'vendor_id' => $vendorId,
+//                     'category' => 'DB',
+//                     'amount' => $m['selling_price'],
+//                     'description' => "Sold mobile: {$mobile->mobile_name}",
+//                     'created_by' => $user->id,
+//                 ]);
+//             }
+
+//             // Mobile History
+//             MobileHistory::create([
+//                 'mobile_id' => $mobile->id,
+//                 'mobile_name' => $mobile->mobile_name,
+//                 'customer_name' => $vendorId ? (Vendor::find($vendorId)->name ?? 'Unknown Vendor') : $customerName,
+//                 'battery_health' => $mobile->battery_health,
+//                 'cost_price' => $mobile->cost_price,
+//                 'selling_price' => $m['selling_price'],
+//                 'availability_status' => 'Sold',
+//                 'created_by' => $user->name,
+//                 'group' => optional($mobile->group)->name,
+//             ]);
+//         }
+
+//         // Vendor: record payment (if any)
+//         if ($vendorId && $payAmount > 0) {
+//             Accounts::create([
+//                 'vendor_id' => $vendorId,
+//                 'category' => 'CR',
+//                 'amount' => $payAmount,
+//                 'description' => "Vendor paid for POS sale (receipt #{$sale->id})",
+//                 'created_by' => $user->id,
+//             ]);
+//         }
+
+//         DB::commit();
+
+//         return response()->json([
+//             'success' => true,
+//             'message' => 'Sale completed!',
+//             'receipt_url' => route('sales.receipt', $sale->id),
+//             'sale_id' => $sale->id,
+//         ]);
+
+//     } catch (\Exception $e) {
+//         DB::rollBack();
+//         // Optionally: Log error
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Sale failed! ' . $e->getMessage()
+//         ], 500);
+//     }
+// }
+
 public function store(Request $request)
 {
-    $user = auth()->user();
-    $mobiles = $request->input('mobiles', []);
-    $vendorId = $request->input('vendor_id');
+    $user         = auth()->user();
+    $mobiles      = $request->input('mobiles', []);   // each: ['imei_number' => ..., 'selling_price' => ...]
+    $vendorId     = $request->input('vendor_id');
     $customerName = $request->input('customer_name');
-    $discount = floatval($request->input('discount'));
-    $payAmount = floatval($request->input('pay_amount'));
+    $discount     = (float) $request->input('discount', 0);
+    $payAmount    = (float) $request->input('pay_amount', 0);
 
     if (empty($mobiles)) {
         return response()->json(['success' => false, 'message' => 'No mobiles in sale.']);
     }
 
-    // Calculate total selling price
-    $total = array_sum(array_map(function($m) {
-        return floatval($m['selling_price']);
+    // ===== 1) Compute totals (original/gross) =====
+    $total = array_sum(array_map(static function ($m) {
+        return (float) $m['selling_price'];
     }, $mobiles));
-    $totalAfterDiscount = $total - $discount;
+
+    // Guardrails
+    if ($total <= 0) {
+        return response()->json(['success' => false, 'message' => 'Invalid total amount.']);
+    }
+    if ($discount < 0) {
+        $discount = 0;
+    }
+    if ($discount > $total) {
+        $discount = $total;
+    }
+
+    $totalAfterDiscount = round($total - $discount, 2);
+
+    // ===== 2) Allocate discount PROPORTIONALLY per item (by original price) =====
+    // Build allocations keyed by IMEI for stable lookup
+    $allocations = [];
+    $allocatedSum = 0.0;
+
+    foreach ($mobiles as $m) {
+        $imei  = $m['imei_number'];
+        $price = (float) $m['selling_price'];
+        $share = $total > 0 ? round($discount * ($price / $total), 2) : 0.0;
+
+        $allocations[$imei] = [
+            'original_price'           => $price,
+            'discount_share'           => $share,
+            'selling_discounted_price' => round($price - $share, 2),
+        ];
+        $allocatedSum += $share;
+    }
+
+    // Fix rounding remainder on the last item to ensure exact sum
+    $remainder = round($discount - $allocatedSum, 2);
+    if (abs($remainder) >= 0.01) {
+        $lastImei = array_key_last($allocations);
+        $allocations[$lastImei]['discount_share']            = round($allocations[$lastImei]['discount_share'] + $remainder, 2);
+        $allocations[$lastImei]['selling_discounted_price']  = round(
+            $allocations[$lastImei]['original_price'] - $allocations[$lastImei]['discount_share'], 2
+        );
+    }
 
     DB::beginTransaction();
     try {
-        // Create Sale record
+        // ===== 3) Create Sale (header) =====
         $sale = sale::create([
-            'user_id' => $user->id,
-            'vendor_id' => $vendorId,
-            'sold_by' => $user->id,
+            'user_id'       => $user->id,
+            'vendor_id'     => $vendorId,
+            'sold_by'       => $user->id,
             'customer_name' => $customerName,
-            'discount' => $discount,
-            'total' => $totalAfterDiscount,
-            'total_amount'   => $total, 
-            'pay_amount' => $payAmount,
-            'sale_type'      => 'POS',
-            'paid_amount' => $payAmount,
-
+            'discount'      => $discount,            // overall discount
+            'total_amount'  => $total,               // sum of originals (gross)
+            'total'         => $totalAfterDiscount,  // net after discount
+            'pay_amount'    => $payAmount,
+            'paid_amount'   => $payAmount,
+            'sale_type'     => 'POS',
         ]);
 
+        // Pre-fetch vendor name once for history (avoid inside loop N+1)
+        $vendorName = null;
+        if ($vendorId) {
+            $vendor = Vendor::find($vendorId);
+            $vendorName = $vendor->name ?? 'Unknown Vendor';
+        }
+
+        // ===== 4) Line items, inventory updates, transactions, accounts, history =====
         foreach ($mobiles as $m) {
-            $mobile = Mobile::where('imei_number', $m['imei_number'])->first();
+            $imei   = $m['imei_number'];
+            $mobile = Mobile::where('imei_number', $imei)->first();
+
             if (!$mobile) {
-                throw new \Exception("Mobile with IMEI {$m['imei_number']} not found.");
+                throw new \Exception("Mobile with IMEI {$imei} not found.");
             }
 
-            // Update mobile status
+            $lineOriginal   = $allocations[$imei]['original_price'];
+            $lineDiscount   = $allocations[$imei]['discount_share'];
+            $lineDiscounted = $allocations[$imei]['selling_discounted_price'];
+
+            // Inventory update
             $mobile->availability = 'Sold';
-            $mobile->sold_at = now();
-            $mobile->sold_by = $user->id;
-            // $mobile->is_approve = 'Approved';
+            $mobile->sold_at      = now();
+            $mobile->sold_by      = $user->id;
             $mobile->save();
 
-            // Create SaleMobile record
+            // SaleMobile (store both original & net and the discount share)
             saleMobile::create([
-                'sale_id' => $sale->id,
-                'mobile_id' => $mobile->id,
-                'selling_price' => $m['selling_price'],
-                'cost_price' => $mobile->cost_price,
+                'sale_id'                  => $sale->id,
+                'mobile_id'                => $mobile->id,
+                'selling_price'            => $lineOriginal,    // original/gross
+                'selling_discounted_price' => $lineDiscounted,  // net after per-item discount
+                'discount_share'           => $lineDiscount,
+                'cost_price'               => $mobile->cost_price,
             ]);
 
-            // Create transaction
+            // Transaction (use discounted/net)
             MobileTransaction::create([
-                'mobile_id' => $mobile->id,
-                'category' => 'Sale',
-                'selling_price' => $m['selling_price'],
-                'cost_price' => $mobile->cost_price,
-                'vendor_id' => $vendorId,
-                'customer_name' => $vendorId ? null : $customerName,
+                'mobile_id'        => $mobile->id,
+                'category'         => 'Sale',
+                'selling_price'    => $lineDiscounted, // net
+                'cost_price'       => $mobile->cost_price,
+                'vendor_id'        => $vendorId,
+                'customer_name'    => $vendorId ? null : $customerName,
                 'transaction_date' => now(),
-                'user_id' => $user->id,
-                'note' => 'Bulk sale via POS',
+                'user_id'          => $user->id,
+                'note'             => 'Bulk sale via POS',
             ]);
 
-            // Vendor accounts
+            // Vendor Accounts (DB) — record the net receivable per line for vendor sales
             if ($vendorId) {
                 Accounts::create([
-                    'vendor_id' => $vendorId,
-                    'category' => 'DB',
-                    'amount' => $m['selling_price'],
+                    'vendor_id'   => $vendorId,
+                    'category'    => 'DB',
+                    'amount'      => $lineDiscounted, // net (after discount)
                     'description' => "Sold mobile: {$mobile->mobile_name}",
-                    'created_by' => $user->id,
+                    'created_by'  => $user->id,
                 ]);
             }
 
-            // Mobile History
+            // Mobile History (store net selling price)
             MobileHistory::create([
-                'mobile_id' => $mobile->id,
-                'mobile_name' => $mobile->mobile_name,
-                'customer_name' => $vendorId ? (Vendor::find($vendorId)->name ?? 'Unknown Vendor') : $customerName,
-                'battery_health' => $mobile->battery_health,
-                'cost_price' => $mobile->cost_price,
-                'selling_price' => $m['selling_price'],
+                'mobile_id'           => $mobile->id,
+                'mobile_name'         => $mobile->mobile_name,
+                'customer_name'       => $vendorId ? $vendorName : $customerName,
+                'battery_health'      => $mobile->battery_health,
+                'cost_price'          => $mobile->cost_price,
+                'selling_price'       => $lineDiscounted, // net
                 'availability_status' => 'Sold',
-                'created_by' => $user->name,
-                'group' => optional($mobile->group)->name,
+                'created_by'          => $user->name,
+                'group'               => optional($mobile->group)->name,
             ]);
         }
 
-        // Vendor: record payment (if any)
+        // ===== 5) Vendor payment (CR) if provided =====
         if ($vendorId && $payAmount > 0) {
             Accounts::create([
-                'vendor_id' => $vendorId,
-                'category' => 'CR',
-                'amount' => $payAmount,
+                'vendor_id'   => $vendorId,
+                'category'    => 'CR',
+                'amount'      => $payAmount,
                 'description' => "Vendor paid for POS sale (receipt #{$sale->id})",
-                'created_by' => $user->id,
+                'created_by'  => $user->id,
             ]);
         }
 
         DB::commit();
 
         return response()->json([
-            'success' => true,
-            'message' => 'Sale completed!',
+            'success'     => true,
+            'message'     => 'Sale completed!',
             'receipt_url' => route('sales.receipt', $sale->id),
-            'sale_id' => $sale->id,
+            'sale_id'     => $sale->id,
         ]);
-
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         DB::rollBack();
-        // Optionally: Log error
         return response()->json([
             'success' => false,
-            'message' => 'Sale failed! ' . $e->getMessage()
+            'message' => 'Sale failed! ' . $e->getMessage(),
         ], 500);
     }
 }
 
+
 public function receipt($id)
 {
-    $sale = sale::with(['mobiles.mobile'])->findOrFail($id); // adjust relation names as needed
-    // Return a Blade view (receipt.blade.php)
+    $sale = Sale::with(['saleMobiles.mobile.company', 'vendor', 'seller'])->findOrFail($id);
+
     return view('sales.receipt', compact('sale'));
 }
+
+
+// public function receipt($id)
+// {
+//     $sale = sale::with(['mobiles.mobile'])->findOrFail($id); // adjust relation names as needed
+//     // Return a Blade view (receipt.blade.php)
+//     return view('sales.receipt', compact('sale'));
+// }
 
 public function index(Request $request)
 {

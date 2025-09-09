@@ -4,7 +4,6 @@
 <head>
     <meta charset="utf-8">
     <title>Sale Receipt #{{ $sale->id }}</title>
-    <!-- Google Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap"
         rel="stylesheet">
@@ -184,29 +183,47 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($sale->mobiles as $sm)
+                @foreach($sale->saleMobiles as $sm)
                 <tr>
-                    <td style="text-align:left;">{{ $sm->mobile->mobile_name }}</td>
-                    <td>{{ $sm->mobile->company->name }}</td>
+                    <td style="text-align:left;">{{ $sm->mobile->mobile_name ?? '-' }}</td>
+                    <td>{{ $sm->mobile->company->name ?? ($sm->mobile->brand ?? '-') }}</td>
+                    {{-- ORIGINAL price per item --}}
                     <td>{{ number_format($sm->selling_price, 0) }}</td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
 
+        @php
+        // Safe calculations for display (do not depend on $sale->total)
+        $gross = (float)($sale->total_amount ?? $sale->saleMobiles->sum('selling_price'));
+        $discount = (float)($sale->discount ?? 0);
+        $grand = max(round($gross - $discount, 2), 0);
+        $paid = (float)($sale->paid_amount ?? $sale->pay_amount ?? 0);
+        $balance = max(round($grand - $paid, 2), 0);
+        @endphp
+
         <div class="divider"></div>
         <table style="width:100%;">
             <tr>
                 <td class="totals total-label">Total</td>
-                <td class="totals total-value">Rs. {{ number_format($sale->total_amount, 0) }}</td>
+                <td class="totals total-value">Rs. {{ number_format($gross, 0) }}</td>
             </tr>
             <tr>
                 <td class="totals total-label">Discount</td>
-                <td class="totals total-value">Rs. {{ number_format($sale->discount, 0) }}</td>
+                <td class="totals total-value">Rs. {{ number_format($discount, 0) }}</td>
+            </tr>
+            <tr>
+                <td class="totals total-label">Grand Total</td>
+                <td class="totals total-value">Rs. {{ number_format($grand, 0) }}</td>
             </tr>
             <tr>
                 <td class="totals total-label">Paid</td>
-                <td class="totals total-value">Rs. {{ number_format($sale->paid_amount, 0) }}</td>
+                <td class="totals total-value">Rs. {{ number_format($paid, 0) }}</td>
+            </tr>
+            <tr>
+                <td class="totals total-label">Balance</td>
+                <td class="totals total-value">Rs. {{ number_format($balance, 0) }}</td>
             </tr>
         </table>
 
@@ -216,13 +233,11 @@
         </div>
         <div class="urdu">
             پی ٹی اے موقع پر چیک کریں، بعد میں دکاندار ذمہ دار نہ ہوگا<br>
-            کلیم کمپنی کی ذمہ داری ہے دکاندار کلیم دینے کا پابند نہ ہوگ <br>
+            کلیم کمپنی کی ذمہ داری ہے، دکاندار کلیم دینے کا پابند نہ ہوگا<br>
         </div>
         <div class="divider"></div>
         <div class="address-note"><b>Address: Baldia road Hasilpur</b></div>
-        <div class="center bold" style="font-size:13px;">
-            Thank you for shopping!
-        </div>
+        <div class="center bold" style="font-size:13px;">Thank you for shopping!</div>
 
         <div class="no-print center" style="margin-top:10px;">
             <button onclick="window.print()" style="padding:5px 16px;font-size:13px;">Print</button>

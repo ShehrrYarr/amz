@@ -32,6 +32,7 @@ return array(
     'App\\Http\\Controllers\\MobileTransactionController' => $baseDir . '/app/Http/Controllers/MobileTransactionController.php',
     'App\\Http\\Controllers\\RestoreController' => $baseDir . '/app/Http/Controllers/RestoreController.php',
     'App\\Http\\Controllers\\SaleController' => $baseDir . '/app/Http/Controllers/SaleController.php',
+    'App\\Http\\Controllers\\SaleMobileController' => $baseDir . '/app/Http/Controllers/SaleMobileController.php',
     'App\\Http\\Controllers\\UserController' => $baseDir . '/app/Http/Controllers/UserController.php',
     'App\\Http\\Controllers\\UserThreadController' => $baseDir . '/app/Http/Controllers/UserThreadController.php',
     'App\\Http\\Controllers\\VendorController' => $baseDir . '/app/Http/Controllers/VendorController.php',

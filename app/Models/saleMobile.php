@@ -13,6 +13,8 @@ class saleMobile extends Model
         'sale_id',
         'mobile_id',
         'selling_price',
+         'selling_discounted_price',  // net discounted price
+    'discount_share',
     ];
 
     // SaleMobile belongs to a Sale

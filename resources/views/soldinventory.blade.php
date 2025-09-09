@@ -507,7 +507,7 @@
                                     <td>{{ optional($key->latestSaleTransaction)->customer_name
                                         ?? optional($key->latestSaleTransaction->vendor)->name
                                         ?? 'N/A' }}</td>
-                                    <td>{{ $key->availability }}</td>
+                                    <td>{{ $key->availability ?? "N/A" }}</td>
                                     <td>
                                         <a href="{{ route('showHistory', $key->id) }}" class="btn btn-sm btn-warning">
                                             <i class="fa fa-eye"></i>
