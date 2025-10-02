@@ -1,0 +1,21 @@
+name: Bug report
+description: Report a bug
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: input
+    id: qa_username
+    attributes:
+      label: QA GitHub username
+      description: "Who found the bug? (GitHub handle, e.g., @fatima-qa)"
+      placeholder: "@fatima-qa"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: "What happened? Steps to reproduce, expected vs actual."
+      placeholder: "1) …  2) …  3) …"
+    validations:
+      required: true
